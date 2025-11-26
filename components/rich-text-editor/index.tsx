@@ -6,6 +6,7 @@ import React from "react";
 import MenuBar from "./menu-bar";
 import TextAlign from "@tiptap/extension-text";
 import Highlight from "@tiptap/extension-highlight";
+import { Button } from "../ui/button";
 
 interface RichTextEditorProps {
   content: string;
@@ -50,7 +51,8 @@ export default function RichTextEditor({
   return (
     <div>
       <MenuBar editor={editor} />
-      <EditorContent editor={editor} />;
+      <EditorContent editor={editor} />
+      <Button>Submit</Button>
     </div>
   );
 }
