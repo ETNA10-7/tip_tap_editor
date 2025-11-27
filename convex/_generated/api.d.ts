@@ -8,6 +8,8 @@
  * @module
  */
 
+import type * as mutation from "../mutation.js";
+import type * as query from "../query.js";
 import type * as tasks from "../tasks.js";
 
 import type {
@@ -17,6 +19,8 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  mutation: typeof mutation;
+  query: typeof query;
   tasks: typeof tasks;
 }>;
 

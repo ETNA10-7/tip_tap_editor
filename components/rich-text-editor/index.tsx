@@ -7,12 +7,17 @@ import MenuBar from "./menu-bar";
 import TextAlign from "@tiptap/extension-text";
 import Highlight from "@tiptap/extension-highlight";
 import { Button } from "../ui/button";
+//import { insertNote } from "@/convex/mutation";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 interface RichTextEditorProps {
+  title: string,
   content: string;
   onChange: (content: string) => void;
 }
 export default function RichTextEditor({
+  title,
   content,
   onChange,
 }: RichTextEditorProps) {
@@ -48,11 +53,22 @@ export default function RichTextEditor({
     immediatelyRender: false, // 👈 fixes SSR hydration error
   });
 
+  const insertNote = useMutation(api.mutation.insertNote);
+
+  const handleSubmit = async () => {
+    if (!editor) return;
+    await insertNote({
+      title, // you can make this dynamic
+      body: editor.getHTML(), // or JSON: JSON.stringify(editor.getJSON())
+    });
+    console.log("Note saved!");
+  };
   return (
     <div>
       <MenuBar editor={editor} />
       <EditorContent editor={editor} />
-      <Button>Submit</Button>
+      {/*<Button>Submit</Button>*/}
+      <Button onClick={handleSubmit}>Submit</Button>
     </div>
   );
 }
