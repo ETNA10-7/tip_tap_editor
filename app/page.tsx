@@ -50,8 +50,7 @@ export default function Home() {
   const [post, setPost] = useState("");
   const [title, setTitle] = useState("");
   const notes = useQuery(api.query.getNotes);
-  const deleteNote = useMutation(api.mutation.deleteNote
-  );
+  const deleteNote = useMutation(api.mutation.deleteNote);
   const onChange = (content: string) => {
     setPost(content);
     console.log(content);
@@ -67,16 +66,16 @@ export default function Home() {
       placeholder="Enter note title"
       className="border px-2 py-1 rounded"
     />
-      <RichTextEditor title={title} content={notes?.[0]?.body || post} onChange={onChange} />
+      <RichTextEditor title={title} content={post} onChange={onChange} />
 
-      <NotesGrid
+      {/*<NotesGrid
         notes={notes}
         onEdit={(note) => {
           setTitle(note.title);
           setPost(note.body);
         }}
         onDelete={(id) => deleteNote({ id })}
-      />
+      />*/}
 
       
       
