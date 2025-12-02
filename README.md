@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+📝 Next.js + TipTap + Convex Demo
+A demo project showcasing a rich text editor built with Next.js, TipTap, shadcn/ui, and Convex for real‑time persistence.
 
-## Getting Started
+This project demonstrates how to:
+Integrate TipTap into a Next.js app
+Style the editor with shadcn/ui components
+Save and load editor content using Convex mutations & queries
+Round‑trip persistence (type → save → reload → load)
 
-First, run the development server:
+🚀 Features
+✨ Next.js app scaffolded with TypeScript
+🎨 UI powered by shadcn/ui
+🖋️ Rich text editing via TipTap (bold, italic, etc.)
+💾 Save & Load buttons wired to Convex backend
+🔄 Verified persistence (save → reload → load works)
 
-```bash
+📂 Project Structure
+/app
+  └── page.tsx                  # Renders TipTap editor
+
+/components
+  └── rich-text-editor/
+        ├── index.tsx           # Main TipTap editor component
+        └── menu-bar.tsx        # Toolbar for formatting actions
+  └── ui/
+        ├── button.tsx          # Reusable button component
+        └── card.tsx            # Reusable card component
+  └── notes-grid.tsx            # Grid layout for saved notes
+
+/convex
+  ├── schema.ts                 # Convex schema
+  ├── mutations.ts              # Save mutation
+  └── queries.ts                # Load query
+
+/screenshots
+  └── editor.png                # Screenshot of working editor
+
+
+## 🖼️ Screenshot
+
+![TipTap Editor Screenshot](./screenshots/editor.png)
+
+
+## ⚙️ Setup & Run
+
+### 1. Clone the repo
+
+git clone https://github.com/your-username/tip_tap_editor.git
+cd tip_tap_editor
+
+### 2. Install dependencies
+
+npm install
+
+### 3. Run Convex dev server
+bash
+npx convex dev
+### 4. Start Next.js app
+bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 5. Open in browser
+Visit: http://localhost:3000
