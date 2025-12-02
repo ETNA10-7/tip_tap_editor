@@ -59,19 +59,22 @@ Round‑trip persistence (type → save → reload → load)
 git clone https://github.com/your-username/tip_tap_editor.git
 cd tip_tap_editor
 2. Install dependencies
+```bash
 npm install
 
 3. Run Convex dev server
+```bash
 npx convex dev
 
 
 Note: Run this command in a separate terminal.
 
 4. Start Next.js app
+```bash
 npm run dev
 
 5. Open in browser
-
+```bash
 Visit: http://localhost:3000
 
 </details> ```
