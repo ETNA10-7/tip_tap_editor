@@ -51,28 +51,33 @@ Round‑trip persistence (type → save → reload → load)
 
 
 ⚙️ Setup & Run
-<details> <summary><strong>1️⃣ Clone the repository</strong></summary> <br/>
+1️⃣ Clone the repository
+<details> <summary><strong>Show instructions</strong></summary> <br/>
 git clone https://github.com/your-username/tip_tap_editor.git
 cd tip_tap_editor
 
 </details>
-<details> <summary><strong>2️⃣ Install dependencies</strong></summary> <br/>
+2️⃣ Install dependencies
+<details> <summary><strong>Show instructions</strong></summary> <br/>
 npm install
 
 </details>
-<details> <summary><strong>3️⃣ Run Convex dev server</strong></summary> <br/>
+3️⃣ Run Convex dev server
+<details> <summary><strong>Show instructions</strong></summary> <br/>
 npx convex dev
 
 
-⚠️ Run this in a separate terminal
+⚠️ Run this command in a separate terminal
 
 </details>
-<details> <summary><strong>4️⃣ Start the Next.js app</strong></summary> <br/>
+4️⃣ Start the Next.js app
+<details> <summary><strong>Show instructions</strong></summary> <br/>
 npm run dev
 
 </details>
-<details> <summary><strong>5️⃣ Open in browser</strong></summary> <br/>
+5️⃣ Open in browser
+<details> <summary><strong>Show instructions</strong></summary> <br/>
 
-👉 http://localhost:3000
+👉 Visit: http://localhost:3000
 
 </details>
