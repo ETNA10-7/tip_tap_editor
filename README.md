@@ -53,10 +53,9 @@ Round‑trip persistence (type → save → reload → load)
 <summary><strong>⚙️ Setup & Run</strong></summary>
 
 <br/>
-
+```bash
 1. Clone the repo
 
-```bash
 git clone https://github.com/your-username/tip_tap_editor.git
 cd tip_tap_editor
 2. Install dependencies
