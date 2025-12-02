@@ -52,7 +52,10 @@ Round‑trip persistence (type → save → reload → load)
 
 ⚙️ Setup & Run
 1️⃣ Clone the repository
-<details> <summary><strong>Show instructions</strong></summary> <br/>
+<details> 
+<summary><strong>Show instructions</strong></summary> 
+
+<br/>
 git clone https://github.com/your-username/tip_tap_editor.git
 cd tip_tap_editor
 
