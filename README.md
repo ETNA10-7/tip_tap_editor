@@ -23,6 +23,30 @@ Round‑trip persistence (type → save → reload → load)
 🔄 Verified persistence (save → reload → load works)
 
 
+📁 **Project Structure**
+
+.
+├── app/
+│   └── page.tsx                     # Renders TipTap editor
+│
+├── components/
+│   ├── rich-text-editor/
+│   │   ├── index.tsx                # Main TipTap editor component
+│   │   └── menu-bar.tsx             # Toolbar for formatting actions
+│   │
+│   └── ui/
+│       ├── button.tsx               # Reusable button component
+│       ├── card.tsx                 # Reusable card component
+│       └── notes-grid.tsx           # Grid layout for saved notes
+│
+├── convex/
+│   ├── schema.ts                    # Convex schema
+│   ├── mutations.ts                 # Save mutation
+│   └── queries.ts                   # Load query
+│
+└── screenshots/
+    └── editor.png                   # Screenshot of working editor
+
 
 
 ## 🖼️ Screenshot
