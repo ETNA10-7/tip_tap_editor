@@ -1,30 +1,27 @@
 // convex/schema.ts
+import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-// export default defineSchema({
-//    // const now = Date.now();
-//   note: defineTable({
-//     body: v.string(),      // document title
-//     content: v.string(),    // TipTap editor content (can be JSON string)
-//     createdAt: "number",  // timestamp
-//   }),
-// });
-export default defineSchema({
-    note: defineTable({
-      title: v.string(),       // document title
-      body: v.string(),    // TipTap editor content (can be JSON string)
-      createdAt: v.number(),  // timestamp
-    }),
-  });
 
-// export default defineSchema({
-//     documents: defineTable({
-//       id: v.id("documents"),
-//       string: v.string(),
-//       number: v.number(),
-//       boolean: v.boolean(),
-//       nestedObject: v.object({
-//         property: v.string(),
-//       }),
-//     }),
-//   });
+/**
+ * Core Convex data model.
+ *
+ * Legacy `note` table is kept for backward compatibility.
+ * `posts` now carries author ownership for auth-aware mutations.
+ */
+export default defineSchema({
+  ...authTables,
+  note: defineTable({
+    title: v.string(),
+    body: v.string(),
+    createdAt: v.number(),
+  }),
+  posts: defineTable({
+    title: v.string(),
+    content: v.string(), // serialized HTML from TipTap
+    excerpt: v.optional(v.string()),
+    authorId: v.id("users"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }),
+});

@@ -74,7 +74,7 @@ export const updateNote = mutation({
     const { id, title, body } = args;
 
     // Build patch object dynamically
-    const patch: Record<string, any> = {};
+    const patch: Partial<{ title: string; body: string }> = {};
     if (title !== undefined) patch.title = title;
     if (body !== undefined) patch.body = body;
 

@@ -40,45 +40,70 @@
 // }
 
 "use client";
-import { useMutation, useQuery } from "convex/react";
-import RichTextEditor from "../components/rich-text-editor";
-import { useState } from "react";
+
+import Link from "next/link";
+import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { NotesGrid } from "@/components/notes-grid";
+import { PostCard } from "@/components/post-card";
 
 export default function Home() {
-  const [post, setPost] = useState("");
-  const [title, setTitle] = useState("");
-  const notes = useQuery(api.query.getNotes);
-  const deleteNote = useMutation(api.mutation.deleteNote);
-  const onChange = (content: string) => {
-    setPost(content);
-    console.log(content);
-  };
+  const posts = useQuery(api.posts.list) ?? [];
+  const latest = posts.slice(0, 3);
 
   return (
-    <div className="max-w-3xl mx-auto py-8">
-      {/* Load the first note’s body into the editor if available */}
-      <input
-      type="text"
-      value={title}
-      onChange={(e) => setTitle(e.target.value)}
-      placeholder="Enter note title"
-      className="border px-2 py-1 rounded"
-    />
-      <RichTextEditor title={title} content={post} onChange={onChange} />
+    <div className="space-y-10">
+      <section className="grid gap-8 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 px-8 py-12 text-white shadow-lg">
+        <div className="space-y-4">
+          <p className="text-sm uppercase tracking-[0.2em] text-slate-300">
+            TipTap + Convex + Next.js
+          </p>
+          <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
+            Publish beautiful stories with a clean, Medium-like experience.
+          </h1>
+          <p className="max-w-3xl text-lg text-slate-200">
+            A minimal editor-first blog starter. Write with TipTap, store posts
+            in Convex, and ship fast on the Next.js App Router.
+          </p>
+          <div className="flex flex-wrap gap-3 pt-1">
+            <Link
+              href="/create"
+              className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-slate-900 shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              Start writing
+            </Link>
+            <Link
+              href="/posts"
+              className="rounded-full border border-white/40 px-5 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
+            >
+              Browse posts
+            </Link>
+          </div>
+        </div>
+      </section>
 
-      {/*<NotesGrid
-        notes={notes}
-        onEdit={(note) => {
-          setTitle(note.title);
-          setPost(note.body);
-        }}
-        onDelete={(id) => deleteNote({ id })}
-      />*/}
-
-      
-      
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Latest posts</h2>
+          <Link href="/posts" className="text-sm text-primary hover:underline">
+            View all
+          </Link>
+        </div>
+        {latest.length === 0 ? (
+          <p className="text-muted-foreground">
+            No posts yet. Be the first to{" "}
+            <Link href="/create" className="underline">
+              write one
+            </Link>
+            .
+          </p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {latest.map((post) => (
+              <PostCard key={post._id} post={post} />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
