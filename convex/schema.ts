@@ -23,5 +23,6 @@ export default defineSchema({
     authorId: v.id("users"),
     createdAt: v.number(),
     updatedAt: v.number(),
-  }),
+  })
+    .index("authorId", ["authorId"]),
 });

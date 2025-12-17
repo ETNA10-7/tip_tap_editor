@@ -1,19 +1,17 @@
 "use client";
 
-import { useMutation, useQuery } from "convex/react";
+import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 import RichTextEditor from "@/components/rich-text-editor";
 import Link from "next/link";
-import { Doc } from "@/convex/_generated/dataModel";
 
 export default function CreatePage() {
   const router = useRouter();
   const createPost = useMutation(api.posts.create);
-  const me = useQuery(api.users.me) as Doc<"users"> | null | undefined;
-  const isAuthenticated = me !== null;
-  const isLoading = me === undefined;
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
@@ -21,9 +19,30 @@ export default function CreatePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Route to auth page ONLY after auth state has fully resolved
+  // CRITICAL: Only route if:
+  // 1. Auth loading is complete (isLoading === false)
+  // 2. User is not authenticated (user === null)
+  // Do NOT route while isLoading is true
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      console.log("[CreatePage] ❌ User not authenticated - routing to /auth");
+      router.push("/auth?redirect=/create");
+    } else if (!isLoading && user) {
+      console.log("[CreatePage] ✅ User authenticated and exists:");
+      console.log("[CreatePage] User info:", {
+        email: user.email,
+        name: user.name,
+        _id: user._id,
+      });
+      console.log("[CreatePage] User can write posts");
+    }
+  }, [isLoading, isAuthenticated, user, router]);
+
   const handleSubmit = async () => {
-    if (!isAuthenticated) {
-      setError("Please log in to publish.");
+    // Double-check authentication before submitting
+    if (!isAuthenticated || !user) {
+      router.push("/auth?redirect=/create");
       return;
     }
     if (!title.trim() || !content.trim()) {
@@ -47,6 +66,44 @@ export default function CreatePage() {
     }
   };
 
+  // CRITICAL: Show loading state while auth is loading
+  // Do NOT check authentication or redirect until isLoading is false
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-semibold">Write a post</h1>
+          <p className="text-muted-foreground">Loading authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Only check authentication AFTER loading is complete
+  // CRITICAL: Only redirect if user is null (not authenticated)
+  // Do NOT redirect if user exists (authenticated)
+  // The useEffect handles the redirect, but show message if redirect is delayed
+  if (!isAuthenticated || !user) {
+    // Show message while redirect is happening (useEffect will redirect)
+    return (
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-semibold">Write a post</h1>
+          <p className="text-muted-foreground">
+            Please sign in to write a post.
+          </p>
+        </div>
+        <div className="rounded-xl border bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          You need to be signed in to write a post.{" "}
+          <Link href="/auth?redirect=/create" className="font-semibold underline">
+            Sign in or sign up
+          </Link>{" "}
+          to continue.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -55,13 +112,6 @@ export default function CreatePage() {
           Compose with TipTap, save to Convex, and publish instantly.
         </p>
       </div>
-
-      {!isAuthenticated && !isLoading ? (
-        <div className="rounded-xl border bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          Please <Link className="underline" href="/login">log in</Link> or{" "}
-          <Link className="underline" href="/signup">sign up</Link> to write.
-        </div>
-      ) : null}
 
       <div className="space-y-4">
         <input

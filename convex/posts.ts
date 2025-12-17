@@ -86,6 +86,21 @@ export const list = query(async (ctx) => {
   return await ctx.db.query("posts").order("desc").collect();
 });
 
+/**
+ * Get all posts created by the current authenticated user.
+ */
+export const listByUser = query(async (ctx) => {
+  const userId = await auth.getUserId(ctx);
+  if (!userId) {
+    return [];
+  }
+  return await ctx.db
+    .query("posts")
+    .withIndex("authorId", (q) => q.eq("authorId", userId))
+    .order("desc")
+    .collect();
+});
+
 export const get = query({
   args: { id: v.id("posts") },
   handler: async (ctx, args) => {
