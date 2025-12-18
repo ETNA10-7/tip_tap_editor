@@ -1,82 +1,109 @@
-## 📝 Next.js + TipTap + Convex Demo
+# Mediumish - Next.js + TipTap + Convex
 
-A demo project showcasing a rich text editor built with Next.js, TipTap, shadcn/ui, and Convex for real‑time persistence.
+A Medium-like blogging platform with rich text editing, user authentication,
+and real-time persistence.
 
-#### This project demonstrates how to:
-Integrate TipTap into a Next.js app
+## Features
 
-Style the editor with shadcn/ui components
+- Rich text editing via TipTap (headings, bold, italic, lists, highlights)
+- User authentication (signup/login with email & password)
+- Create, edit, delete posts (with ownership protection)
+- Real-time data sync via Convex
 
-Save and load editor content using Convex mutations & queries
+## Tech Stack
 
-Round‑trip persistence (type → save → reload → load)
+- **Frontend**: Next.js 16, React 19, Tailwind CSS, shadcn/ui
+- **Backend**: Convex (database + serverless functions)
+- **Auth**: Convex Auth with Password provider
+- **Editor**: TipTap
 
-#### 🚀 Features
-✨ Next.js app scaffolded with TypeScript
+---
 
-🎨 UI powered by shadcn/ui
+## Quick Start
 
-🖋️ Rich text editing via TipTap (bold, italic, etc.)
+### Prerequisites
 
-💾 Save & Load buttons wired to Convex backend
+- [Bun](https://bun.sh/) (or Node.js/npm)
+- [Convex account](https://dashboard.convex.dev) (free)
 
-🔄 Verified persistence (save → reload → load works)
+### Setup Steps
 
-
-<details>
-<summary><strong>📁 Project Structure</strong></summary>
-
-<br/>
-
-```
-📦 tip_tap_editor
-├── app/
-│   └── page.tsx
-├── components/
-│   ├── rich-text-editor/
-│   └── ui/
-├── convex/
-└── screenshots/
-```
-
-</details>
-
-
-
-
-## 🖼️ Screenshot
-
-![TipTap Editor Screenshot](./screenshots/editor.png)
-
-
-<details>
-<summary><strong>⚙️ Setup & Run</strong></summary>
-
-<br/>
-
-1. Clone the repo
 ```bash
+# 1. Clone and install
 git clone https://github.com/your-username/tip_tap_editor.git
 cd tip_tap_editor
-2. Install dependencies
+bun install
 
-npm install
+# 2. Initialize Convex (creates your deployment)
+bunx convex dev
+# → Log in, create new project, keep this terminal running
 
-3. Run Convex dev server
+# 3. Set up authentication (new terminal)
+bunx @convex-dev/auth
+# → Accept defaults (http://localhost:3000)
 
-npx convex dev
+# 4. Start Next.js (new terminal)
+bun dev
 
+# 5. Open http://localhost:3000
+```
 
-Note: Run this command in a separate terminal.
+### Terminal Layout
 
-4. Start Next.js app
+| Terminal | Command            | Purpose                       |
+|----------|--------------------|------------------------------ |
+| 1        | `bunx convex dev`  | Convex backend (keep running) |
+| 2        | `bun dev`          | Next.js frontend              |
 
-npm run dev
+---
 
-5. Open in browser
+## Project Structure
 
-Visit: http://localhost:3000
+```text
+├── app/                    # Next.js pages
+│   ├── auth/               # Login, signup, settings
+│   ├── create/             # New post page
+│   ├── post/[id]/          # View/edit post
+│   └── posts/              # All posts
+├── components/
+│   ├── rich-text-editor/   # TipTap editor
+│   └── ui/                 # shadcn components
+├── convex/                 # Backend functions
+│   ├── auth.ts             # Auth config
+│   ├── posts.ts            # Post CRUD
+│   ├── schema.ts           # Database schema
+│   └── users.ts            # User queries
+└── hooks/
+    └── useAuth.ts          # Auth hook
+```
 
+---
 
+## For Collaborators
 
+Each developer needs their own Convex deployment (or share one for team work).
 
+### Option A: Own Deployment (Recommended)
+
+```bash
+bun install
+bunx convex dev          # Create YOUR project
+bunx @convex-dev/auth    # Set up YOUR auth keys
+bun dev
+```
+
+### Option B: Shared Team Deployment
+
+Ask the project owner to:
+
+1. Add you to the team at [dashboard.convex.dev](https://dashboard.convex.dev)
+2. Share the deployment name
+
+Then:
+
+```bash
+bun install
+bunx convex dev --configure existing   # Select shared project
+bunx @convex-dev/auth
+bun dev
+```
