@@ -7,6 +7,7 @@ import {
     Heading2,
     Heading3,
     Highlighter,
+    Image as ImageIcon,
     Italic,
     List,
     ListOrdered,
@@ -19,6 +20,13 @@ import {
     if (!editor) {
       return null;
     }
+
+    const addImage = () => {
+      const url = window.prompt("Enter image URL:");
+      if (url && url.trim()) {
+        editor.chain().focus().setImage({ src: url.trim() }).run();
+      }
+    };
   
     const Options = [
       {
@@ -84,7 +92,7 @@ import {
     ];
   
     return (
-      <div className="border rounded-md p-1 mb-1 bg-slate-50 space-x-2 z-50">
+      <div className="border rounded-md p-1 mb-1 bg-slate-50 space-x-2 z-50 flex flex-wrap items-center gap-1">
         {Options.map((option, index) => (
           <Toggle
             key={index}
@@ -94,6 +102,15 @@ import {
             {option.icon}
           </Toggle>
         ))}
+        <div className="w-px h-6 bg-slate-300 mx-1" />
+        <button
+          onClick={addImage}
+          className="p-1.5 rounded hover:bg-slate-200 transition-colors"
+          title="Insert image"
+          type="button"
+        >
+          <ImageIcon className="size-4" />
+        </button>
       </div>
     );
   }

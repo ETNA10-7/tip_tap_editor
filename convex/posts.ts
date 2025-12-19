@@ -10,6 +10,7 @@ export const create = mutation({
     title: v.string(),
     content: v.string(),
     excerpt: v.optional(v.string()),
+    featuredImage: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await auth.getUserId(ctx);
@@ -26,6 +27,7 @@ export const create = mutation({
       title: args.title,
       content: args.content,
       excerpt,
+      featuredImage: args.featuredImage,
       authorId: userId,
       createdAt: now,
       updatedAt: now,
@@ -41,6 +43,7 @@ export const update = mutation({
     title: v.optional(v.string()),
     content: v.optional(v.string()),
     excerpt: v.optional(v.string()),
+    featuredImage: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await auth.getUserId(ctx);
@@ -60,6 +63,7 @@ export const update = mutation({
     if (rest.title !== undefined) patch.title = rest.title;
     if (rest.content !== undefined) patch.content = rest.content;
     if (rest.excerpt !== undefined) patch.excerpt = rest.excerpt;
+    if (rest.featuredImage !== undefined) patch.featuredImage = rest.featuredImage;
 
     await ctx.db.patch(id, patch);
     return await ctx.db.get(id);
@@ -110,7 +114,10 @@ export const get = query({
     const userId = await auth.getUserId(ctx);
     const canEdit = !!userId && post.authorId === userId;
 
-    return { post, canEdit };
+    // Get author information
+    const author = await ctx.db.get(post.authorId);
+
+    return { post, author, canEdit };
   },
 });
 

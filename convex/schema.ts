@@ -36,6 +36,7 @@ export default defineSchema({
     title: v.string(),
     content: v.string(), // serialized HTML from TipTap
     excerpt: v.optional(v.string()),
+    featuredImage: v.optional(v.string()), // Featured image URL for Medium-like display
     authorId: v.id("users"),
     createdAt: v.number(),
     updatedAt: v.number(),

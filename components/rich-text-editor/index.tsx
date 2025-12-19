@@ -6,6 +6,7 @@ import React, { useEffect } from "react";
 import MenuBar from "./menu-bar";
 import TextAlign from "@tiptap/extension-text";
 import Highlight from "@tiptap/extension-highlight";
+import Image from "@tiptap/extension-image";
 
 interface RichTextEditorProps {
   content: string;
@@ -34,6 +35,12 @@ export default function RichTextEditor({
         types: ["heading", "paragraph"],
       }),
       Highlight,
+      Image.configure({
+        HTMLAttributes: {
+          class: "max-w-full h-auto rounded-lg my-4",
+        },
+        inline: false,
+      }),
     ],
     content,
     editorProps: {

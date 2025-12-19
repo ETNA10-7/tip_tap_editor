@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import RichTextEditor from "@/components/rich-text-editor";
+import { ImageInstructions } from "@/components/image-instructions";
 import Link from "next/link";
 
 export default function CreatePage() {
@@ -16,6 +17,7 @@ export default function CreatePage() {
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
+  const [featuredImage, setFeaturedImage] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,6 +58,7 @@ export default function CreatePage() {
         title: title.trim(),
         content,
         excerpt: excerpt.trim() || undefined,
+        featuredImage: featuredImage.trim() || undefined,
       });
       router.push(`/post/${id}`);
     } catch (err) {
@@ -114,6 +117,8 @@ export default function CreatePage() {
       </div>
 
       <div className="space-y-4">
+        <ImageInstructions />
+        
         <input
           type="text"
           value={title}
@@ -128,6 +133,33 @@ export default function CreatePage() {
           className="w-full rounded-lg border px-3 py-2"
           rows={3}
         />
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-slate-700">
+            Featured Image URL (Optional)
+          </label>
+          <input
+            type="url"
+            value={featuredImage}
+            onChange={(e) => setFeaturedImage(e.target.value)}
+            placeholder="https://example.com/image.jpg"
+            className="w-full rounded-lg border px-3 py-2 text-sm"
+          />
+          <p className="text-xs text-muted-foreground">
+            Add a featured image that will appear at the top of your post
+          </p>
+          {featuredImage && (
+            <div className="mt-2">
+              <img
+                src={featuredImage}
+                alt="Featured image preview"
+                className="max-w-full h-auto rounded-lg border"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            </div>
+          )}
+        </div>
         <RichTextEditor content={content} onChange={setContent} />
       </div>
 

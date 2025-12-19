@@ -6,32 +6,49 @@ type Post = {
   _id: Id<"posts">;
   title: string;
   excerpt?: string;
+  featuredImage?: string;
   createdAt: number;
 };
 
 export function PostCard({ post }: { post: Post }) {
   return (
-    <article className="rounded-xl border bg-white p-5 shadow-sm transition hover:shadow-md">
-      <div className="text-xs uppercase tracking-wide text-muted-foreground">
-        {format(new Date(post.createdAt), "PP")}
+    <article className="group rounded-xl border bg-white overflow-hidden shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
+      {post.featuredImage && (
+        <Link href={`/post/${post._id}`} className="block">
+          <div className="relative w-full h-48 overflow-hidden bg-slate-100">
+            <img
+              src={post.featuredImage}
+              alt={post.title}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+          </div>
+        </Link>
+      )}
+      <div className="p-5">
+        <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
+          {format(new Date(post.createdAt), "PP")}
+        </div>
+        <Link
+          href={`/post/${post._id}`}
+          className="block text-xl font-bold leading-tight text-slate-900 hover:text-slate-700 transition-colors"
+        >
+          {post.title}
+        </Link>
+        {post.excerpt ? (
+          <p className="mt-2 text-sm text-slate-600 line-clamp-3 leading-relaxed">
+            {post.excerpt}
+          </p>
+        ) : null}
+        <Link
+          href={`/post/${post._id}`}
+          className="mt-4 inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+        >
+          Read story →
+        </Link>
       </div>
-      <Link
-        href={`/post/${post._id}`}
-        className="mt-2 block text-lg font-semibold leading-tight"
-      >
-        {post.title}
-      </Link>
-      {post.excerpt ? (
-        <p className="mt-2 text-sm text-muted-foreground line-clamp-3">
-          {post.excerpt}
-        </p>
-      ) : null}
-      <Link
-        href={`/post/${post._id}`}
-        className="mt-3 inline-flex text-sm font-medium text-primary hover:underline"
-      >
-        Read story →
-      </Link>
     </article>
   );
 }

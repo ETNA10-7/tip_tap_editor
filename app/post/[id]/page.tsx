@@ -8,6 +8,8 @@ import { Id } from "@/convex/_generated/dataModel";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import RichTextEditor from "@/components/rich-text-editor";
+import { ProfileAvatar } from "@/components/profile-avatar";
+import { format } from "date-fns";
 
 export default function PostDetailPage() {
   const params = useParams<{ id: string }>();
@@ -22,6 +24,7 @@ export default function PostDetailPage() {
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
+  const [featuredImage, setFeaturedImage] = useState("");
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +35,7 @@ export default function PostDetailPage() {
       setTitle(result.post.title ?? "");
       setExcerpt(result.post.excerpt ?? "");
       setContent(result.post.content ?? "");
+      setFeaturedImage(result.post.featuredImage ?? "");
     }
   }, [result]);
 
@@ -56,12 +60,23 @@ export default function PostDetailPage() {
   }
 
   return (
-    <article className="space-y-4">
-      <div className="flex items-start justify-between gap-4">
-        <div className="space-y-2">
-          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
-            Published {new Date(result.post.createdAt).toLocaleDateString()}
-          </p>
+    <article className="max-w-4xl mx-auto">
+      {/* Medium-like Header Section */}
+      <header className="mb-8">
+        {!editing && result.post.featuredImage && (
+          <div className="mb-8 -mx-4 sm:-mx-8 md:-mx-12 lg:-mx-16">
+            <img
+              src={result.post.featuredImage}
+              alt={result.post.title}
+              className="w-full h-[400px] object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+          </div>
+        )}
+        
+        <div className="space-y-4">
           {editing ? (
             <>
               <input
@@ -77,124 +92,172 @@ export default function PostDetailPage() {
                 placeholder="Optional excerpt"
                 rows={2}
               />
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">
+                  Featured Image URL
+                </label>
+                <input
+                  type="url"
+                  value={featuredImage}
+                  onChange={(e) => setFeaturedImage(e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                  className="w-full rounded-lg border px-3 py-2 text-sm"
+                />
+                {featuredImage && (
+                  <img
+                    src={featuredImage}
+                    alt="Preview"
+                    className="max-w-full h-auto rounded-lg border"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                )}
+              </div>
             </>
           ) : (
             <>
-              <h1 className="text-4xl font-semibold leading-tight">
+              <h1 className="text-5xl font-bold leading-tight tracking-tight text-slate-900">
                 {result.post.title}
               </h1>
-              {result.post.excerpt ? (
-                <p className="text-lg text-muted-foreground">
+              {result.post.excerpt && (
+                <p className="text-xl text-slate-600 leading-relaxed">
                   {result.post.excerpt}
                 </p>
-              ) : null}
+              )}
+              
+              {/* Author Info */}
+              {result.author && (
+                <div className="flex items-center gap-3 pt-4 border-t border-slate-200">
+                  <ProfileAvatar user={result.author} size="md" />
+                  <div className="flex-1">
+                    <p className="font-semibold text-slate-900">
+                      {result.author.name || "Anonymous"}
+                    </p>
+                    <p className="text-sm text-slate-500">
+                      {format(new Date(result.post.createdAt), "MMMM d, yyyy")}
+                    </p>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
+      </header>
 
-        <div className="flex items-center gap-3">
-          {result.canEdit ? (
-            editing ? (
-              <>
-                <button
-                  onClick={() => {
+      {/* Edit/Delete Actions */}
+      {result.canEdit && (
+        <div className="mt-8 pt-6 border-t border-slate-200 flex items-center gap-3">
+          {editing ? (
+            <>
+              <button
+                onClick={() => {
+                  setEditing(false);
+                  setError(null);
+                  // reset changes
+                  if (result?.post) {
+                    setTitle(result.post.title ?? "");
+                    setExcerpt(result.post.excerpt ?? "");
+                    setContent(result.post.content ?? "");
+                    setFeaturedImage(result.post.featuredImage ?? "");
+                  }
+                }}
+                className="rounded-full border px-4 py-2 text-sm hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={saving}
+                onClick={async () => {
+                  if (!title.trim() || !content.trim()) {
+                    setError("Title and content are required.");
+                    return;
+                  }
+                  setSaving(true);
+                  setError(null);
+                  try {
+                    await updatePost({
+                      id,
+                      title: title.trim(),
+                      excerpt: excerpt.trim() || undefined,
+                      content,
+                      featuredImage: featuredImage.trim() || undefined,
+                    });
                     setEditing(false);
-                    setError(null);
-                    // reset changes
-                    if (result?.post) {
-                      setTitle(result.post.title ?? "");
-                      setExcerpt(result.post.excerpt ?? "");
-                      setContent(result.post.content ?? "");
-                    }
-                  }}
-                  className="rounded-full border px-4 py-2 text-sm"
-                >
-                  Cancel
-                </button>
-                <button
-                  disabled={saving}
-                  onClick={async () => {
-                    if (!title.trim() || !content.trim()) {
-                      setError("Title and content are required.");
-                      return;
-                    }
-                    setSaving(true);
-                    setError(null);
-                    try {
-                      await updatePost({
-                        id,
-                        title: title.trim(),
-                        excerpt: excerpt.trim() || undefined,
-                        content,
-                      });
-                      setEditing(false);
-                    } catch (err) {
-                      console.error(err);
-                      setError("Failed to save changes.");
-                    } finally {
-                      setSaving(false);
-                    }
-                  }}
-                  className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {saving ? "Saving…" : "Save"}
-                </button>
-              </>
-            ) : (
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setEditing(true)}
-                  className="rounded-full border px-4 py-2 text-sm"
-                >
-                  Edit
-                </button>
-                <button
-                  disabled={deleting}
-                  onClick={async () => {
-                    const confirmed = window.confirm(
-                      "Delete this post? This cannot be undone."
-                    );
-                    if (!confirmed) return;
-                    setDeleting(true);
-                    try {
-                      await deletePost({ id });
-                      router.push("/posts");
-                    } catch (err) {
-                      console.error(err);
-                      setError("Failed to delete post.");
-                    } finally {
-                      setDeleting(false);
-                    }
-                  }}
-                  className="rounded-full border border-red-500 px-4 py-2 text-sm font-semibold text-red-600 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {deleting ? "Deleting…" : "Delete"}
-                </button>
-              </div>
-            )
-          ) : null}
+                  } catch (err) {
+                    console.error(err);
+                    setError("Failed to save changes.");
+                  } finally {
+                    setSaving(false);
+                  }
+                }}
+                className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow disabled:cursor-not-allowed disabled:opacity-60 hover:bg-slate-800 transition-colors"
+              >
+                {saving ? "Saving…" : "Save"}
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setEditing(true)}
+                className="rounded-full border px-4 py-2 text-sm hover:bg-slate-50 transition-colors"
+              >
+                Edit
+              </button>
+              <button
+                disabled={deleting}
+                onClick={async () => {
+                  const confirmed = window.confirm(
+                    "Delete this post? This cannot be undone."
+                  );
+                  if (!confirmed) return;
+                  setDeleting(true);
+                  try {
+                    await deletePost({ id });
+                    router.push("/posts");
+                  } catch (err) {
+                    console.error(err);
+                    setError("Failed to delete post.");
+                  } finally {
+                    setDeleting(false);
+                  }
+                }}
+                className="rounded-full border border-red-500 px-4 py-2 text-sm font-semibold text-red-600 disabled:cursor-not-allowed disabled:opacity-60 hover:bg-red-50 transition-colors"
+              >
+                {deleting ? "Deleting…" : "Delete"}
+              </button>
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
-      {editing ? (
-        <RichTextEditor content={content} onChange={setContent} />
-      ) : (
-        <div
-          className="prose prose-slate max-w-none prose-headings:scroll-mt-24"
-          dangerouslySetInnerHTML={{ __html: result.post.content }}
-        />
-      )}
+      {/* Medium-like Content Section */}
+      <div className="prose prose-lg prose-slate max-w-none 
+        prose-headings:font-bold prose-headings:text-slate-900
+        prose-p:text-slate-700 prose-p:leading-relaxed
+        prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
+        prose-strong:text-slate-900
+        prose-img:rounded-lg prose-img:my-8 prose-img:shadow-lg
+        prose-blockquote:border-l-4 prose-blockquote:border-slate-300 prose-blockquote:pl-4
+        prose-code:text-sm prose-code:bg-slate-100 prose-code:px-1 prose-code:rounded
+        prose-pre:bg-slate-900 prose-pre:text-slate-100">
+        {editing ? (
+          <RichTextEditor content={content} onChange={setContent} />
+        ) : (
+          <div
+            dangerouslySetInnerHTML={{ __html: result.post.content }}
+          />
+        )}
+      </div>
 
-      {!result.canEdit ? (
-        <p className="text-sm text-muted-foreground">
-          Sign in as the author to edit this post.
-        </p>
-      ) : null}
-
-      <div className="pt-6">
-        <Link href="/posts" className="text-primary underline">
+      {/* Footer Navigation */}
+      <div className="mt-12 pt-8 border-t border-slate-200">
+        <Link 
+          href="/posts" 
+          className="inline-flex items-center text-slate-600 hover:text-slate-900 transition-colors"
+        >
           ← Back to posts
         </Link>
       </div>
