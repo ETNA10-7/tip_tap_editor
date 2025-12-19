@@ -72,6 +72,9 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
     return null;
   }
 
+  // Check if profile needs completion (no bio and no image)
+  const needsProfileSetup = !user.bio && !user.image;
+
   return (
     <div className="relative" ref={menuRef}>
       {/* Clickable Avatar */}
@@ -108,16 +111,32 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
               onClick={handleProfileClick}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
             >
-              <User className="h-4 w-4" />
-              <span>View Profile</span>
+              <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
+                <User className="h-4 w-4" />
+              </div>
+              <span className="flex-1 text-left">View Profile</span>
             </button>
 
             <button
               onClick={handleEditProfileClick}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
             >
-              <Settings className="h-4 w-4" />
-              <span>Edit Profile</span>
+              <div className="relative flex-shrink-0 w-4 h-4 flex items-center justify-center">
+                <Settings className="h-4 w-4" />
+                {/* Red notification dot - shows when profile is incomplete */}
+                {needsProfileSetup && (
+                  <span 
+                    className="absolute bg-red-500 rounded-full border-2 border-white shadow-sm" 
+                    style={{ 
+                      width: '8px',
+                      height: '8px',
+                      top: '-2px',
+                      right: '-2px',
+                    }}
+                  />
+                )}
+              </div>
+              <span className="flex-1 text-left">Edit Profile</span>
             </button>
 
             {/* Divider */}
@@ -128,8 +147,10 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
               onClick={handleLogout}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
             >
-              <LogOut className="h-4 w-4" />
-              <span>Logout</span>
+              <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
+                <LogOut className="h-4 w-4" />
+              </div>
+              <span className="flex-1 text-left">Logout</span>
             </button>
           </div>
         </div>

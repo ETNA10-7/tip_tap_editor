@@ -45,6 +45,7 @@ import Link from "next/link";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { PostCard } from "@/components/post-card";
+import { ProfileSetupPrompt } from "@/components/profile-setup-prompt";
 
 export default function Home() {
   const posts = useQuery(api.posts.list) ?? [];
@@ -52,6 +53,9 @@ export default function Home() {
 
   return (
     <div className="space-y-10">
+      {/* Profile Setup Prompt - Shows for authenticated users who haven't set up their profile */}
+      <ProfileSetupPrompt />
+
       <section className="grid gap-8 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 px-8 py-12 text-white shadow-lg">
         <div className="space-y-4">
           <p className="text-sm uppercase tracking-[0.2em] text-slate-300">

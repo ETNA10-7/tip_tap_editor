@@ -71,6 +71,11 @@ export default function EditProfilePage() {
         image: image.trim() || undefined,
       });
 
+      // Clear the dismissed flag so prompt can show again if they remove bio/image later
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("profileSetupPromptDismissed");
+      }
+
       setSuccess(true);
       // Redirect to profile page after a short delay
       setTimeout(() => {

@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { cn } from "@/lib/utils";
 import { Doc } from "@/convex/_generated/dataModel";
 
@@ -75,26 +76,51 @@ export function ProfileAvatar({
   const fallbackText = getFallbackText(user);
   const hasImage = user?.image && user.image.trim().length > 0;
 
-  // Generate a color based on user's name/email for consistent avatar colors
+  // Generate RGB-based color based on user's name/email
+  // Only uses: Red, Green, Blue, Black, and Grey shades
   const getAvatarColor = (text: string): string => {
+    // Create a hash from the text for consistent color assignment
+    let hash = 0;
+    for (let i = 0; i < text.length; i++) {
+      hash = text.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    return `text-white`;
+  };
+
+  const getAvatarStyle = (text: string): React.CSSProperties | undefined => {
+    if (hasImage) return undefined;
+    
+    let hash = 0;
+    for (let i = 0; i < text.length; i++) {
+      hash = text.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    // Color palette: Only Red, Green, Blue, Black, and Grey shades
     const colors = [
-      "bg-gradient-to-br from-blue-500 to-blue-600 text-white",
-      "bg-gradient-to-br from-purple-500 to-purple-600 text-white",
-      "bg-gradient-to-br from-pink-500 to-pink-600 text-white",
-      "bg-gradient-to-br from-indigo-500 to-indigo-600 text-white",
-      "bg-gradient-to-br from-green-500 to-green-600 text-white",
-      "bg-gradient-to-br from-orange-500 to-orange-600 text-white",
-      "bg-gradient-to-br from-teal-500 to-teal-600 text-white",
-      "bg-gradient-to-br from-red-500 to-red-600 text-white",
+      { from: "rgb(59, 130, 246)", to: "rgb(37, 99, 235)" }, // Blue
+      { from: "rgb(96, 165, 250)", to: "rgb(59, 130, 246)" }, // Light Blue
+      { from: "rgb(34, 197, 94)", to: "rgb(22, 163, 74)" }, // Green
+      { from: "rgb(74, 222, 128)", to: "rgb(34, 197, 94)" }, // Light Green
+      { from: "rgb(239, 68, 68)", to: "rgb(220, 38, 38)" }, // Red
+      { from: "rgb(248, 113, 113)", to: "rgb(239, 68, 68)" }, // Light Red
+      { from: "rgb(0, 0, 0)", to: "rgb(30, 30, 30)" }, // Black
+      { from: "rgb(107, 114, 128)", to: "rgb(75, 85, 99)" }, // Grey Matte
+      { from: "rgb(156, 163, 175)", to: "rgb(107, 114, 128)" }, // Light Grey Matte
     ];
-    // Use first character to pick a consistent color
-    const index = (text.charCodeAt(0) || 0) % colors.length;
-    return colors[index];
+    
+    const index = Math.abs(hash) % colors.length;
+    const color = colors[index];
+    
+    return {
+      background: `linear-gradient(to bottom right, ${color.from}, ${color.to})`,
+    };
   };
 
   const avatarColor = hasImage 
     ? "" 
     : getAvatarColor(user?.name || user?.email || "?");
+  const avatarStyle = getAvatarStyle(user?.name || user?.email || "?");
 
   return (
     <div
@@ -106,6 +132,7 @@ export function ProfileAvatar({
         hasImage ? "" : avatarColor,
         className
       )}
+      style={avatarStyle}
       role="img"
       aria-label={user?.name || user?.email || "User avatar"}
     >
