@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
-import { useAuthActions } from "@convex-dev/auth/react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { ProfileMenu } from "@/components/profile-menu";
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -14,20 +13,6 @@ const navItems = [
 
 export function SiteHeader() {
   const { user } = useAuth();
-  const { signOut } = useAuthActions();
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      // Force full page reload to clear all state and start fresh
-      window.location.href = "/";
-    } catch (err) {
-      console.error("Logout error:", err);
-      // Even if there's an error, reload to clear state
-      window.location.href = "/";
-    }
-  };
 
   return (
     <header className="border-b bg-white/90 backdrop-blur sticky top-0 z-40">
@@ -50,14 +35,8 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-3">
           {user ? (
-            // Show logout button when authenticated
-            <Button
-              onClick={handleLogout}
-              variant="outline"
-              className="rounded-full"
-            >
-              Logout
-            </Button>
+            // Show profile menu with dropdown when authenticated
+            <ProfileMenu user={user} />
           ) : (
             // Show sign in / sign up button when not authenticated
             <Link href="/auth">

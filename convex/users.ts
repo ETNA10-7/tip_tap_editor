@@ -1,6 +1,7 @@
-import { query } from "./_generated/server";
+import { query, mutation } from "./_generated/server";
 import { auth } from "./auth";
 import { Id } from "./_generated/dataModel";
+import { v } from "convex/values";
 
 /**
  * Check if a session exists and get the userId.
@@ -106,4 +107,64 @@ export const getCurrentUser = query(async (ctx) => {
  * This is the primary query used by useAuth hook.
  */
 export const me = getCurrentUser;
+
+/**
+ * Update the current user's profile.
+ * 
+ * Only the authenticated user can update their own profile.
+ * 
+ * @param args.name - Optional: Update user's name
+ * @param args.image - Optional: Update user's profile picture URL
+ * @param args.bio - Optional: Update user's biography/description
+ */
+export const updateProfile = mutation({
+  args: {
+    name: v.optional(v.string()),
+    image: v.optional(v.string()),
+    bio: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Get the current authenticated user ID
+    const userId = await auth.getUserId(ctx);
+    
+    if (!userId) {
+      throw new Error("Not authenticated. Please sign in to update your profile.");
+    }
+    
+    // Get the current user document
+    const user = await ctx.db.get(userId);
+    
+    if (!user) {
+      throw new Error("User not found in database.");
+    }
+    
+    // Build update object with only provided fields
+    const updates: {
+      name?: string;
+      image?: string;
+      bio?: string;
+    } = {};
+    
+    if (args.name !== undefined) {
+      updates.name = args.name.trim() || undefined;
+    }
+    
+    if (args.image !== undefined) {
+      updates.image = args.image.trim() || undefined;
+    }
+    
+    if (args.bio !== undefined) {
+      updates.bio = args.bio.trim() || undefined;
+    }
+    
+    // Update the user document
+    await ctx.db.patch(userId, updates);
+    
+    console.log("[updateProfile] ✅ Profile updated for user:", userId);
+    console.log("[updateProfile] Updates:", updates);
+    
+    // Return the updated user document
+    return await ctx.db.get(userId);
+  },
+});
 

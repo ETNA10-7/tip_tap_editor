@@ -8,9 +8,25 @@ import { v } from "convex/values";
  *
  * Legacy `note` table is kept for backward compatibility.
  * `posts` now carries author ownership for auth-aware mutations.
+ * 
+ * Users table is extended from authTables to include profile fields:
+ * - image: Profile picture URL
+ * - bio: User biography/description
  */
 export default defineSchema({
   ...authTables,
+  // Extend users table with profile fields
+  users: defineTable({
+    name: v.optional(v.string()),
+    image: v.optional(v.string()), // Profile picture URL
+    email: v.optional(v.string()),
+    emailVerificationTime: v.optional(v.number()),
+    phone: v.optional(v.string()),
+    phoneVerificationTime: v.optional(v.number()),
+    isAnonymous: v.optional(v.boolean()),
+    bio: v.optional(v.string()), // User biography/description
+  })
+    .index("email", ["email"]),
   note: defineTable({
     title: v.string(),
     body: v.string(),
