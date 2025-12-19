@@ -30,6 +30,7 @@ export default function EditProfilePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
 
   // Load user data into form
   useEffect(() => {
@@ -126,24 +127,63 @@ export default function EditProfilePage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Avatar Preview */}
             <div className="flex flex-col items-center sm:items-start gap-4 pb-6 border-b">
-              <div className="space-y-2 text-center sm:text-left">
+              <div className="space-y-2 text-center sm:text-left w-full">
                 <label className="text-sm font-medium text-slate-700">
                   Profile Picture
                 </label>
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                   <ProfileAvatar user={{ ...user, image, name }} size="xl" />
-                  <div className="flex-1 w-full sm:max-w-md">
+                  <div className="flex-1 w-full sm:max-w-md space-y-2">
                     <Input
                       type="url"
-                      placeholder="https://example.com/your-image.jpg"
+                      placeholder="https://images.pexels.com/photos/..."
                       value={image}
-                      onChange={(e) => setImage(e.target.value)}
+                      onChange={(e) => {
+                        setImage(e.target.value);
+                        setImageError(null);
+                      }}
+                      onBlur={(e) => {
+                        // Validate image URL format
+                        const url = e.target.value.trim();
+                        if (url && !url.match(/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i) && !url.includes('images.pexels.com') && !url.includes('images.unsplash.com')) {
+                          setImageError("Please use a direct image URL (ends with .jpg, .png, etc.)");
+                        } else {
+                          setImageError(null);
+                        }
+                      }}
                       disabled={saving}
                       className="w-full"
                     />
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Enter a URL to your profile picture. The image will be displayed in a circular format.
-                    </p>
+                    {imageError && (
+                      <p className="text-xs text-red-600 mt-1">{imageError}</p>
+                    )}
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">
+                        Enter a direct image URL (must end with .jpg, .png, .gif, etc.)
+                      </p>
+                      <details className="text-xs">
+                        <summary className="text-slate-600 cursor-pointer hover:text-slate-900">
+                          How to get an image URL?
+                        </summary>
+                        <div className="mt-2 pl-4 space-y-2 text-muted-foreground">
+                          <p className="font-medium text-slate-700">Universal method (works for any website):</p>
+                          <ol className="list-decimal list-inside space-y-1 ml-2">
+                            <li>Find an image you want to use on any website</li>
+                            <li>Right-click on the image</li>
+                            <li>Select "Copy image address" or "Copy image URL"</li>
+                            <li>Paste the URL here</li>
+                          </ol>
+                          <p className="mt-2 font-medium text-slate-700">Popular image sources:</p>
+                          <ul className="list-disc list-inside space-y-1 ml-2">
+                            <li><a href="https://www.pexels.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Pexels</a> - Free stock photos</li>
+                            <li><a href="https://unsplash.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Unsplash</a> - Free high-quality images</li>
+                            <li><a href="https://imgur.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Imgur</a> - Upload your own images</li>
+                            <li>Any website with publicly accessible images</li>
+                          </ul>
+                          <p className="mt-2 text-xs italic">Note: Make sure the image URL is publicly accessible and ends with an image file extension (.jpg, .png, .gif, .webp, etc.)</p>
+                        </div>
+                      </details>
+                    </div>
                   </div>
                 </div>
               </div>
