@@ -44,4 +44,16 @@ export default defineSchema({
   })
     .index("authorId", ["authorId"])
     .index("slug", ["slug"]), // Index for fast slug lookups
+  comments: defineTable({
+    postId: v.id("posts"),
+    authorId: v.id("users"),
+    parentId: v.optional(v.id("comments")), // For nested replies
+    content: v.string(), // Comment text content
+    claps: v.number(), // Number of claps/likes
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    editedAt: v.optional(v.number()), // Track if comment was edited
+  })
+    .index("postId", ["postId"])
+    .index("parentId", ["parentId"]), // Index for nested replies
 });

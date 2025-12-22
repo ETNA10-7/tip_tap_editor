@@ -5,6 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ProfileAvatar } from "@/components/profile-avatar";
+import { PostComments } from "@/components/post-comments";
 import { format } from "date-fns";
 import { useEffect, useMemo } from "react";
 
@@ -161,6 +162,9 @@ export default function PostDetailPage() {
           dangerouslySetInnerHTML={{ __html: result.post.content }}
         />
       </div>
+
+      {/* Comments Section */}
+      <PostComments postId={result.post._id} />
 
       {/* Footer Navigation */}
       <div className="mt-12 pt-8 border-t border-slate-200">
