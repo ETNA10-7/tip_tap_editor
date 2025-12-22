@@ -6,7 +6,21 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ProfileAvatar } from "@/components/profile-avatar";
 import { format } from "date-fns";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+
+/**
+ * Calculate reading time from HTML content
+ * Average reading speed: 200 words per minute
+ */
+function calculateReadingTime(htmlContent: string): number {
+  // Strip HTML tags and get text content
+  const text = htmlContent.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  // Count words (split by spaces)
+  const wordCount = text.split(/\s+/).filter(word => word.length > 0).length;
+  // Calculate minutes (200 words per minute)
+  const minutes = Math.ceil(wordCount / 200);
+  return Math.max(1, minutes); // At least 1 minute
+}
 
 export default function PostDetailPage() {
   const params = useParams<{ slug: string }>();
@@ -15,6 +29,12 @@ export default function PostDetailPage() {
 
   const result = useQuery(api.posts.getBySlug, slug ? { slug } : "skip");
   const ensureSlug = useMutation(api.posts.ensurePostSlug);
+
+  // Calculate reading time
+  const readingTime = useMemo(() => {
+    if (!result?.post?.content) return null;
+    return calculateReadingTime(result.post.content);
+  }, [result?.post?.content]);
 
   // Debug logging
   useEffect(() => {
@@ -100,9 +120,15 @@ export default function PostDetailPage() {
                 <p className="font-semibold text-slate-900">
                   {result.author.name || "Anonymous"}
                 </p>
-                <p className="text-sm text-slate-500">
-                  {format(new Date(result.post.createdAt), "MMMM d, yyyy")}
-                </p>
+                <div className="flex items-center gap-2 text-sm text-slate-500">
+                  <span>{format(new Date(result.post.createdAt), "MMM d, yyyy")}</span>
+                  {readingTime && (
+                    <>
+                      <span>•</span>
+                      <span>{readingTime} min read</span>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           )}

@@ -153,6 +153,57 @@ export const list = query(async (ctx) => {
 });
 
 /**
+ * Search posts by title and content
+ * Prioritizes title matches over content matches
+ */
+export const search = query({
+  args: { query: v.string() },
+  handler: async (ctx, args) => {
+    const searchTerm = args.query.toLowerCase().trim();
+    if (!searchTerm) {
+      return [];
+    }
+
+    const allPosts = await ctx.db.query("posts").order("desc").collect();
+    
+    // For single character searches, only search titles to avoid irrelevant results
+    const isSingleChar = searchTerm.length === 1;
+    
+    // Separate posts into title matches and content matches
+    const titleMatches: typeof allPosts = [];
+    const contentMatches: typeof allPosts = [];
+    
+    for (const post of allPosts) {
+      const titleLower = post.title.toLowerCase();
+      const titleMatch = titleLower.includes(searchTerm);
+      
+      if (titleMatch) {
+        titleMatches.push(post);
+      } else if (!isSingleChar) {
+        // Only search content for multi-character searches
+        const contentText = post.content.replace(/<[^>]+>/g, " ").toLowerCase();
+        const contentMatch = contentText.includes(searchTerm);
+        if (contentMatch) {
+          contentMatches.push(post);
+        }
+      }
+    }
+
+    // Combine: title matches first, then content matches
+    const matchingPosts = [...titleMatches, ...contentMatches];
+
+    // Generate slugs for posts that don't have them
+    return matchingPosts.map((post) => {
+      if (!post.slug) {
+        const tempSlug = generateSlug(post.title);
+        return { ...post, slug: tempSlug };
+      }
+      return post;
+    });
+  },
+});
+
+/**
  * Get all posts created by the current authenticated user.
  */
 export const listByUser = query(async (ctx) => {
