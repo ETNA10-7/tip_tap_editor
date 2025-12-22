@@ -105,21 +105,73 @@ export const remove = mutation({
 });
 
 /**
- * Clap (like) a comment
+ * Toggle clap (like/unlike) a comment
+ * Returns the new clap count and whether the user has clapped
  */
-export const clap = mutation({
+export const toggleClap = mutation({
   args: { id: v.id("comments") },
   handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
     const comment = await ctx.db.get(args.id);
     if (!comment) {
       throw new Error("Comment not found");
     }
 
-    await ctx.db.patch(args.id, {
-      claps: comment.claps + 1,
-    });
+    // Check if user already clapped
+    const existingClap = await ctx.db
+      .query("commentClaps")
+      .withIndex("commentId_userId", (q: any) =>
+        q.eq("commentId", args.id).eq("userId", userId)
+      )
+      .first();
 
-    return comment.claps + 1;
+    if (existingClap) {
+      // User already clapped - remove the clap (unlike)
+      await ctx.db.delete(existingClap._id);
+      const newClapCount = Math.max(0, comment.claps - 1);
+      await ctx.db.patch(args.id, {
+        claps: newClapCount,
+      });
+      return { claps: newClapCount, hasClapped: false };
+    } else {
+      // User hasn't clapped - add the clap (like)
+      await ctx.db.insert("commentClaps", {
+        commentId: args.id,
+        userId,
+        createdAt: Date.now(),
+      });
+      const newClapCount = comment.claps + 1;
+      await ctx.db.patch(args.id, {
+        claps: newClapCount,
+      });
+      return { claps: newClapCount, hasClapped: true };
+    }
+  },
+});
+
+/**
+ * Check if current user has clapped a comment
+ */
+export const hasClapped = query({
+  args: { commentId: v.id("comments") },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) {
+      return false;
+    }
+
+    const clap = await ctx.db
+      .query("commentClaps")
+      .withIndex("commentId_userId", (q: any) =>
+        q.eq("commentId", args.commentId).eq("userId", userId)
+      )
+      .first();
+
+    return !!clap;
   },
 });
 
@@ -150,14 +202,42 @@ export const listByPost = query({
       }
     });
 
-    // Build comment tree with author info
+    // Get current user ID for clap checking
+    const userId = await auth.getUserId(ctx);
+
+    // Build comment tree with author info and clap status
     const buildCommentWithReplies = async (comment: typeof allComments[0]) => {
       const author = await ctx.db.get(comment.authorId);
       const replies = repliesMap.get(comment._id) || [];
       
+      // Check if current user has clapped this comment
+      let hasClapped = false;
+      if (userId) {
+        const clap = await ctx.db
+          .query("commentClaps")
+          .withIndex("commentId_userId", (q: any) =>
+            q.eq("commentId", comment._id).eq("userId", userId)
+          )
+          .first();
+        hasClapped = !!clap;
+      }
+      
       const repliesWithAuthors = await Promise.all(
         replies.map(async (reply) => {
           const replyAuthor = await ctx.db.get(reply.authorId);
+          
+          // Check if current user has clapped this reply
+          let replyHasClapped = false;
+          if (userId) {
+            const replyClap = await ctx.db
+              .query("commentClaps")
+              .withIndex("commentId_userId", (q: any) =>
+                q.eq("commentId", reply._id).eq("userId", userId)
+              )
+              .first();
+            replyHasClapped = !!replyClap;
+          }
+          
           return {
             ...reply,
             author: replyAuthor
@@ -167,6 +247,7 @@ export const listByPost = query({
                   image: replyAuthor.image,
                 }
               : null,
+            hasClapped: replyHasClapped,
             replies: [], // Replies don't have nested replies for now
           };
         })
@@ -181,6 +262,7 @@ export const listByPost = query({
               image: author.image,
             }
           : null,
+        hasClapped,
         replies: repliesWithAuthors,
       };
     };

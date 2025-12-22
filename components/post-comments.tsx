@@ -27,7 +27,7 @@ export function PostComments({ postId }: PostCommentsProps) {
   const createComment = useMutation(api.comments.create);
   const updateComment = useMutation(api.comments.update);
   const deleteComment = useMutation(api.comments.remove);
-  const clapComment = useMutation(api.comments.clap);
+  const toggleClap = useMutation(api.comments.toggleClap);
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,10 +96,14 @@ export function PostComments({ postId }: PostCommentsProps) {
   };
 
   const handleClap = async (id: Id<"comments">) => {
+    if (!isAuthenticated || !user) {
+      router.push("/auth");
+      return;
+    }
     try {
-      await clapComment({ id });
+      await toggleClap({ id });
     } catch (err) {
-      console.error("Failed to clap:", err);
+      console.error("Failed to toggle clap:", err);
     }
   };
 
@@ -282,9 +286,17 @@ function CommentItem({
             <div className="flex items-center gap-4 text-xs text-slate-600">
               <button
                 onClick={() => handleClap(comment._id)}
-                className="flex items-center gap-1 hover:text-slate-900 transition-colors"
+                className={`flex items-center gap-1 transition-colors ${
+                  comment.hasClapped
+                    ? "text-blue-600 hover:text-blue-700"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
               >
-                <ThumbsUp className="h-4 w-4" />
+                <ThumbsUp
+                  className={`h-4 w-4 ${
+                    comment.hasClapped ? "fill-current" : ""
+                  }`}
+                />
                 <span>{comment.claps}</span>
               </button>
               {isAuthenticated && (
@@ -387,9 +399,17 @@ function CommentItem({
                     <div className="flex items-center gap-4 text-xs text-slate-600">
                       <button
                         onClick={() => handleClap(reply._id)}
-                        className="flex items-center gap-1 hover:text-slate-900"
+                        className={`flex items-center gap-1 transition-colors ${
+                          reply.hasClapped
+                            ? "text-blue-600 hover:text-blue-700"
+                            : "text-slate-600 hover:text-slate-900"
+                        }`}
                       >
-                        <ThumbsUp className="h-4 w-4" />
+                        <ThumbsUp
+                          className={`h-4 w-4 ${
+                            reply.hasClapped ? "fill-current" : ""
+                          }`}
+                        />
                         <span>{reply.claps}</span>
                       </button>
                     </div>

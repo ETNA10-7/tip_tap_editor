@@ -49,11 +49,19 @@ export default defineSchema({
     authorId: v.id("users"),
     parentId: v.optional(v.id("comments")), // For nested replies
     content: v.string(), // Comment text content
-    claps: v.number(), // Number of claps/likes
+    claps: v.number(), // Number of claps/likes (denormalized for performance)
     createdAt: v.number(),
     updatedAt: v.number(),
     editedAt: v.optional(v.number()), // Track if comment was edited
   })
     .index("postId", ["postId"])
     .index("parentId", ["parentId"]), // Index for nested replies
+  commentClaps: defineTable({
+    commentId: v.id("comments"),
+    userId: v.id("users"),
+    createdAt: v.number(),
+  })
+    .index("commentId", ["commentId"])
+    .index("userId", ["userId"])
+    .index("commentId_userId", ["commentId", "userId"]), // Unique constraint for one clap per user per comment
 });
