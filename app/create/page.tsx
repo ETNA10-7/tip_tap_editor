@@ -54,13 +54,20 @@ export default function CreatePage() {
     setError(null);
     setSaving(true);
     try {
-      const id = await createPost({
+      const createdPost = await createPost({
         title: title.trim(),
         content,
         excerpt: excerpt.trim() || undefined,
         featuredImage: featuredImage.trim() || undefined,
       });
-      router.push(`/post/${id}`);
+      // Redirect to slug-based URL
+      if (createdPost?.slug) {
+        router.push(`/posts/${createdPost.slug}`);
+      } else {
+        // Fallback: try to construct slug from title (shouldn't happen, but safety check)
+        const fallbackSlug = title.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+        router.push(`/posts/${fallbackSlug}`);
+      }
     } catch (err) {
       console.error(err);
       setError("Failed to save. Please try again.");

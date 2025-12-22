@@ -14,6 +14,7 @@ import type * as mutation from "../mutation.js";
 import type * as posts from "../posts.js";
 import type * as query from "../query.js";
 import type * as users from "../users.js";
+import type * as utils from "../utils.js";
 
 import type {
   ApiFromModules,
@@ -28,6 +29,7 @@ declare const fullApi: ApiFromModules<{
   posts: typeof posts;
   query: typeof query;
   users: typeof users;
+  utils: typeof utils;
 }>;
 
 /**

@@ -34,6 +34,7 @@ export default defineSchema({
   }),
   posts: defineTable({
     title: v.string(),
+    slug: v.optional(v.string()), // URL-friendly slug for SEO (temporarily optional for migration)
     content: v.string(), // serialized HTML from TipTap
     excerpt: v.optional(v.string()),
     featuredImage: v.optional(v.string()), // Featured image URL for Medium-like display
@@ -41,5 +42,6 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   })
-    .index("authorId", ["authorId"]),
+    .index("authorId", ["authorId"])
+    .index("slug", ["slug"]), // Index for fast slug lookups
 });
