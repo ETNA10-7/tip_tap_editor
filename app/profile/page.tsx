@@ -16,10 +16,12 @@ import {
 } from "@/components/ui/card";
 import { Edit, Mail, FileText, Plus } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
 export default function ProfilePage() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
+  const [postView, setPostView] = useState<"published" | "drafts">("published");
 
   // Get user's posts
   const posts = useQuery(
@@ -27,9 +29,26 @@ export default function ProfilePage() {
     isAuthenticated ? {} : "skip"
   );
 
-  // Redirect to auth if not authenticated
+  // Separate published and draft posts
+  const { publishedPosts, draftPosts } = useMemo(() => {
+    if (!posts) return { publishedPosts: [], draftPosts: [] };
+    const published = posts.filter(post => post.published !== false);
+    const drafts = posts.filter(post => post.published === false);
+    return { publishedPosts: published, draftPosts: drafts };
+  }, [posts]);
+
+  // Determine which posts to display based on view
+  const displayedPosts = postView === "published" ? publishedPosts : draftPosts;
+
+  // Redirect to auth if not authenticated (use useEffect to avoid render-time navigation)
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push("/auth?redirect=/profile");
+    }
+  }, [isLoading, isAuthenticated, router]);
+
+  // Return null while redirecting or loading
   if (!isLoading && !isAuthenticated) {
-    router.push("/auth?redirect=/profile");
     return null;
   }
 
@@ -108,17 +127,37 @@ export default function ProfilePage() {
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Posts
-              </CardTitle>
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Posts
+                </CardTitle>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={postView === "published" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setPostView("published")}
+                    className="rounded-full"
+                  >
+                    Published ({publishedPosts.length})
+                  </Button>
+                  <Button
+                    variant={postView === "drafts" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setPostView("drafts")}
+                    className="rounded-full"
+                  >
+                    Drafts ({draftPosts.length})
+                  </Button>
+                </div>
+              </div>
               <CardDescription className="mt-1">
                 {posts === undefined
                   ? "Loading your posts..."
-                  : posts.length === 0
-                  ? "No posts yet"
-                  : `${posts.length} ${posts.length === 1 ? "post" : "posts"} published`}
+                  : postView === "published"
+                  ? `${publishedPosts.length} ${publishedPosts.length === 1 ? "post" : "posts"} published`
+                  : `${draftPosts.length} ${draftPosts.length === 1 ? "draft" : "drafts"} saved`}
               </CardDescription>
             </div>
             
@@ -141,7 +180,7 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
-          ) : posts.length === 0 ? (
+          ) : displayedPosts.length === 0 ? (
             <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-12 text-center">
               <div className="space-y-4">
                 <div className="mx-auto w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center">
@@ -149,23 +188,29 @@ export default function ProfilePage() {
                 </div>
                 <div className="space-y-2">
                   <p className="text-slate-700 font-medium">
-                    You haven&apos;t published any posts yet.
+                    {postView === "published"
+                      ? "You haven't published any posts yet."
+                      : "You don't have any drafts yet."}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Start sharing your thoughts with the world!
+                    {postView === "published"
+                      ? "Start sharing your thoughts with the world!"
+                      : "Create a draft to save your work in progress."}
                   </p>
                 </div>
-                <Link href="/create">
-                  <Button className="rounded-full mt-4">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Write your first post
-                  </Button>
-                </Link>
+                {postView === "published" && (
+                  <Link href="/create">
+                    <Button className="rounded-full mt-4">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Write your first post
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {posts.map((post) => (
+              {displayedPosts.map((post) => (
                 <PostCard key={post._id} post={post} />
               ))}
             </div>

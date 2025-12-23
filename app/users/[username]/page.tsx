@@ -154,89 +154,148 @@ export default function UserProfilePage() {
         </CardContent>
       </Card>
 
-      {/* Published Posts Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                {isOwnProfile ? "Published Posts" : "Posts"}
-              </CardTitle>
-              <CardDescription className="mt-1">
-                {allPosts === undefined
-                  ? "Loading posts..."
-                  : publishedPosts.length === 0
-                  ? "No posts yet"
-                  : `${publishedPosts.length} ${publishedPosts.length === 1 ? "post" : "posts"} published`}
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-
-        <CardContent>
-          {/* Published Posts Grid */}
-          {allPosts === undefined ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-center space-y-2">
-                <div className="animate-pulse text-muted-foreground">
-                  Loading posts...
+      {isOwnProfile ? (
+        // Show published and drafts separately when viewing own profile
+        <div className="space-y-6">
+          {/* Published Posts Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Published Posts
+                  </CardTitle>
+                  <CardDescription className="mt-1">
+                    {allPosts === undefined
+                      ? "Loading posts..."
+                      : `${publishedPosts.length} ${publishedPosts.length === 1 ? "post" : "posts"} published`}
+                  </CardDescription>
                 </div>
               </div>
-            </div>
-          ) : publishedPosts.length === 0 ? (
-            <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-12 text-center">
-              <div className="space-y-4">
-                <div className="mx-auto w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center">
-                  <FileText className="h-8 w-8 text-slate-400" />
+            </CardHeader>
+
+            <CardContent>
+              {allPosts === undefined ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center space-y-2">
+                    <div className="animate-pulse text-muted-foreground">
+                      Loading posts...
+                    </div>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <p className="text-slate-700 font-medium">
-                    {isOwnProfile
-                      ? "You haven't published any posts yet."
-                      : `${user.name || "This user"} hasn't published any posts yet.`}
+              ) : publishedPosts.length === 0 ? (
+                <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
+                  <p className="text-muted-foreground">
+                    You haven't published any posts yet.
                   </p>
-                  <p className="text-sm text-muted-foreground">
-                    {isOwnProfile
-                      ? "Start writing to share your thoughts!"
-                      : "Check back later for new content!"}
-                  </p>
+                </div>
+              ) : (
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {publishedPosts.map((post) => (
+                    <PostCard key={post._id} post={post} />
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Draft Posts Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Drafts
+                  </CardTitle>
+                  <CardDescription className="mt-1">
+                    {allPosts === undefined
+                      ? "Loading drafts..."
+                      : `${draftPosts.length} ${draftPosts.length === 1 ? "draft" : "drafts"} saved`}
+                  </CardDescription>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {publishedPosts.map((post) => (
-                <PostCard key={post._id} post={post} />
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            </CardHeader>
 
-      {/* Draft Posts Section (only shown when viewing own profile) */}
-      {isOwnProfile && draftPosts.length > 0 && (
+            <CardContent>
+              {allPosts === undefined ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center space-y-2">
+                    <div className="animate-pulse text-muted-foreground">
+                      Loading drafts...
+                    </div>
+                  </div>
+                </div>
+              ) : draftPosts.length === 0 ? (
+                <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
+                  <p className="text-muted-foreground">
+                    You don't have any drafts yet.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {draftPosts.map((post) => (
+                    <PostCard key={post._id} post={post} />
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        // Show only published posts when viewing other user's profile
         <Card>
           <CardHeader>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
-                  Drafts
+                  Posts
                 </CardTitle>
                 <CardDescription className="mt-1">
-                  {draftPosts.length} {draftPosts.length === 1 ? "draft" : "drafts"} saved
+                  {allPosts === undefined
+                    ? "Loading posts..."
+                    : publishedPosts.length === 0
+                    ? "No posts yet"
+                    : `${publishedPosts.length} ${publishedPosts.length === 1 ? "post" : "posts"} published`}
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
 
           <CardContent>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {draftPosts.map((post) => (
-                <PostCard key={post._id} post={post} />
-              ))}
-            </div>
+            {allPosts === undefined ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center space-y-2">
+                  <div className="animate-pulse text-muted-foreground">
+                    Loading posts...
+                  </div>
+                </div>
+              </div>
+            ) : publishedPosts.length === 0 ? (
+              <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-12 text-center">
+                <div className="space-y-4">
+                  <div className="mx-auto w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center">
+                    <FileText className="h-8 w-8 text-slate-400" />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-slate-700 font-medium">
+                      {user.name || "This user"} hasn't published any posts yet.
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Check back later for new content!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {publishedPosts.map((post) => (
+                  <PostCard key={post._id} post={post} />
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
