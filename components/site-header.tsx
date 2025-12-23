@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { format } from "date-fns";
+import { useAuthModal } from "@/contexts/auth-modal-context";
 
 /**
  * Generate slug from title (client-side, matches server-side logic)
@@ -34,6 +35,7 @@ const navItems = [
 export function SiteHeader() {
   const { user } = useAuth();
   const router = useRouter();
+  const { openModal } = useAuthModal();
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -205,11 +207,13 @@ export function SiteHeader() {
             <ProfileMenu user={user} />
           ) : (
             // Show sign in / sign up button when not authenticated
-            <Link href="/auth">
-              <Button variant="outline" className="rounded-full">
-                Sign in / Sign up
-              </Button>
-            </Link>
+            <Button 
+              variant="outline" 
+              className="rounded-full"
+              onClick={() => openModal("login")}
+            >
+              Sign in / Sign up
+            </Button>
           )}
         </div>
       </div>

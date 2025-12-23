@@ -8,11 +8,13 @@ import { useAuth } from "@/hooks/useAuth";
 import RichTextEditor from "@/components/rich-text-editor";
 import { ImageInstructions } from "@/components/image-instructions";
 import Link from "next/link";
+import { useAuthModal } from "@/contexts/auth-modal-context";
 
 export default function CreatePage() {
   const router = useRouter();
   const createPost = useMutation(api.posts.create);
   const { user, isAuthenticated, isLoading } = useAuth();
+  const { openModal } = useAuthModal();
 
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
@@ -22,15 +24,11 @@ export default function CreatePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Route to auth page ONLY after auth state has fully resolved
-  // CRITICAL: Only route if:
-  // 1. Auth loading is complete (isLoading === false)
-  // 2. User is not authenticated (user === null)
-  // Do NOT route while isLoading is true
+  // Open auth modal if not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      console.log("[CreatePage] ❌ User not authenticated - routing to /auth");
-      router.push("/auth?redirect=/create");
+      console.log("[CreatePage] ❌ User not authenticated - opening auth modal");
+      openModal("login");
     } else if (!isLoading && user) {
       console.log("[CreatePage] ✅ User authenticated and exists:");
       console.log("[CreatePage] User info:", {
@@ -40,12 +38,12 @@ export default function CreatePage() {
       });
       console.log("[CreatePage] User can write posts");
     }
-  }, [isLoading, isAuthenticated, user, router]);
+  }, [isLoading, isAuthenticated, user, openModal]);
 
   const handleSubmit = async () => {
     // Double-check authentication before submitting
     if (!isAuthenticated || !user) {
-      router.push("/auth?redirect=/create");
+      openModal("login");
       return;
     }
     if (!title.trim() || !content.trim()) {

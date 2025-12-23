@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import { SiteHeader } from "@/components/site-header";
+import { AuthModalProvider } from "@/contexts/auth-modal-context";
+import { AuthModalWrapper } from "@/components/auth-modal-wrapper";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -29,10 +31,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ConvexClientProvider>
-          <SiteHeader />
-          <main className="mx-auto min-h-screen max-w-5xl px-4 py-10">
-            {children}
-          </main>
+          <AuthModalProvider>
+            <SiteHeader />
+            <main className="mx-auto min-h-screen max-w-5xl px-4 py-10">
+              {children}
+            </main>
+            <AuthModalWrapper />
+          </AuthModalProvider>
         </ConvexClientProvider>
       </body>
     </html>

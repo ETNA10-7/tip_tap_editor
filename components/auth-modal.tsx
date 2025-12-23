@@ -1,57 +1,82 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { X, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, X } from "lucide-react";
 
-type AuthModalProps = {
+interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  mode: "login" | "signup";
-  onSwitchMode: () => void;
-  onAuthSuccess?: () => void;
-};
+  initialMode?: "login" | "signup";
+}
 
-export function AuthModal({ isOpen, onClose, mode, onSwitchMode, onAuthSuccess }: AuthModalProps) {
-  const { signIn } = useAuthActions();
+export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalProps) {
   const router = useRouter();
-  const modalRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
+  const { signIn } = useAuthActions();
+  const { user, isLoading } = useAuth();
+  const [mode, setMode] = useState<"login" | "signup">(initialMode);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  // Reset form when modal opens/closes or mode changes
+  // Get redirect destination from URL params or default to current path
+  const redirectTo = searchParams?.get("redirect") || (typeof window !== "undefined" ? window.location.pathname : "/");
+
+  // Reset form when modal opens/closes
   useEffect(() => {
     if (isOpen) {
       setEmail("");
       setUsername("");
       setPassword("");
       setError(null);
+      setSuccess(false);
       setShowPassword(false);
+      setMode(initialMode);
     }
-  }, [isOpen, mode]);
+  }, [isOpen, initialMode]);
 
-  // Close on Escape key
+  // Close modal and redirect when user is authenticated
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
+    if (!isLoading && user && isOpen) {
+      setSuccess(true);
+      setTimeout(() => {
         onClose();
-      }
-    };
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [isOpen, onClose]);
+        if (redirectTo && redirectTo !== window.location.pathname) {
+          router.push(redirectTo);
+        } else {
+          router.refresh();
+        }
+      }, 500);
+    }
+  }, [isLoading, user, isOpen, onClose, redirectTo, router]);
 
-  const onSubmit = async (e: React.FormEvent) => {
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(false);
+
     try {
       const result = await signIn("password", {
         flow: mode === "login" ? "signIn" : "signUp",
@@ -61,83 +86,82 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode, onAuthSuccess }
       });
 
       if (result.signingIn) {
-        console.log("[AuthModal] Login successful! Session stored.");
-        // Close modal immediately
-        onClose();
-        // Notify parent that auth was successful
-        if (onAuthSuccess) {
-          onAuthSuccess();
-        }
-        // Wait for Convex Auth to fully store the session token in localStorage
-        // Then force a full page reload to ensure Convex client picks up the new token
+        console.log("[AuthModal] ✅ Sign-in successful, session stored");
+        setSuccess(true);
+        setLoading(false);
+        
+        // Reload page to establish session
         setTimeout(() => {
-          console.log("[AuthModal] Reloading page to update UI with new auth state...");
-          // Use window.location.href for a complete reload that reinitializes everything
-          window.location.href = window.location.origin + window.location.pathname;
-        }, 1000);
+          console.log("[AuthModal] Reloading page to establish session and route to:", redirectTo);
+          window.location.href = redirectTo;
+        }, 200);
+        
+        return;
       }
     } catch (err) {
-      console.error(err);
-      const message = err instanceof Error ? err.message : `Failed to ${mode === "login" ? "sign in" : "sign up"}.`;
-      if (message.toLowerCase().includes("invalidaccountid")) {
-        setError(mode === "login" ? "Account not found. Please sign up first." : "Sign up failed. Please retry.");
-      } else if (message.toLowerCase().includes("invalid credentials") || message.toLowerCase().includes("invalidsecret")) {
-        setError("Invalid email or password.");
-      } else if (message.toLowerCase().includes("already exists")) {
-        setError("Account already exists. Please log in instead.");
-      } else if (message.toLowerCase().includes("invalid password") || (password.length < 8 && mode === "signup")) {
-        setError("Password must be at least 8 characters long.");
-      } else {
-        setError(message);
+      console.error("Auth error:", err);
+      let message = err instanceof Error ? err.message : `Failed to ${mode === "login" ? "sign in" : "sign up"}.`;
+      
+      // Provide user-friendly error messages
+      if (message.includes("InvalidSecret")) {
+        message = "Invalid email or password. Please check your credentials and try again.";
+      } else if (message.includes("InvalidAccountId")) {
+        message = "Account not found. Please sign up first.";
+      } else if (message.includes("already exists")) {
+        message = "Account already exists. Please sign in instead.";
+      } else if (message.includes("invalid password") || message.includes("password")) {
+        message = "Password must be at least 8 characters long.";
       }
+      
+      setError(message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Prevent closing when clicking inside modal - use stopPropagation instead
-  const handleModalClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleClose = () => {
+    setError(null);
+    setSuccess(false);
+    onClose();
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center">
-      {/* Backdrop with blur */}
+    <>
+      {/* Backdrop with blur effect */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
+        className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm"
+        onClick={handleClose}
       />
-
+      
       {/* Modal */}
-      <div 
-        ref={modalRef} 
-        onClick={handleModalClick}
-        className="relative z-10 w-full max-w-md rounded-2xl border bg-white p-8 shadow-2xl mx-4"
-      >
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 rounded-full p-1 text-muted-foreground transition hover:bg-slate-100"
-          aria-label="Close"
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div
+          className="relative w-full max-w-md space-y-8 rounded-2xl border bg-white p-8 shadow-xl animate-in fade-in-0 zoom-in-95 duration-200"
+          onClick={(e) => e.stopPropagation()}
         >
-          <X className="h-5 w-5" />
-        </button>
+          {/* Close button */}
+          <button
+            onClick={handleClose}
+            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </button>
 
-        <div className="space-y-6">
           <div className="space-y-2 text-center">
             <h1 className="text-3xl font-semibold">
-              {mode === "login" ? "Welcome back" : "Create your account"}
+              {mode === "login" ? "Welcome back" : "Create account"}
             </h1>
             <p className="text-sm text-muted-foreground">
               {mode === "login"
                 ? "Sign in to your Mediumish account"
-                : "Welcome! Please fill in the details to get started."}
+                : "Sign up to start writing"}
             </p>
           </div>
 
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "signup" && (
               <div className="space-y-2">
                 <label htmlFor="username" className="text-sm font-medium">
@@ -146,12 +170,10 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode, onAuthSuccess }
                 <Input
                   id="username"
                   placeholder="Choose a username"
-                  type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   disabled={loading}
-                  autoComplete="username"
                 />
               </div>
             )}
@@ -162,13 +184,12 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode, onAuthSuccess }
               </label>
               <Input
                 id="email"
-                placeholder="Enter your email address"
                 type="email"
+                placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
-                autoComplete="email"
               />
             </div>
 
@@ -179,31 +200,25 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode, onAuthSuccess }
               <div className="relative">
                 <Input
                   id="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder={
                     mode === "login"
                       ? "Enter your password"
-                      : "Enter your password (min 8 characters)"
+                      : "Enter password (min 8 characters)"
                   }
-                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={mode === "signup" ? 8 : undefined}
                   disabled={loading}
-                  autoComplete={mode === "login" ? "current-password" : "new-password"}
                   className="pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
               {mode === "signup" && (
@@ -213,11 +228,24 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode, onAuthSuccess }
               )}
             </div>
 
-            {error ? (
-              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
-                {error}
+            {success && (
+              <div className="rounded-lg bg-green-50 p-3 text-sm text-green-600">
+                <p className="font-medium">Success!</p>
+                <p>Redirecting...</p>
               </div>
-            ) : null}
+            )}
+
+            {error && (
+              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                <p className="font-medium">Error</p>
+                <p>{error}</p>
+                {mode === "login" && error.includes("Invalid email or password") && (
+                  <p className="mt-2 text-xs">
+                    Don't remember your password? Try signing up with a new account or use the email you signed up with.
+                  </p>
+                )}
+              </div>
+            )}
 
             <Button
               type="submit"
@@ -226,9 +254,11 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode, onAuthSuccess }
             >
               {loading
                 ? mode === "login"
-                  ? "Signing in…"
-                  : "Creating account…"
-                : "Continue"}
+                  ? "Signing in..."
+                  : "Creating account..."
+                : mode === "login"
+                  ? "Sign in"
+                  : "Sign up"}
             </Button>
           </form>
 
@@ -238,7 +268,10 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode, onAuthSuccess }
                 Don&apos;t have an account?{" "}
                 <button
                   type="button"
-                  onClick={onSwitchMode}
+                  onClick={() => {
+                    setMode("signup");
+                    setError(null);
+                  }}
                   className="font-semibold text-slate-900 hover:underline"
                 >
                   Sign up
@@ -249,7 +282,10 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode, onAuthSuccess }
                 Already have an account?{" "}
                 <button
                   type="button"
-                  onClick={onSwitchMode}
+                  onClick={() => {
+                    setMode("login");
+                    setError(null);
+                  }}
                   className="font-semibold text-slate-900 hover:underline"
                 >
                   Sign in
@@ -259,7 +295,6 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode, onAuthSuccess }
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
-

@@ -17,10 +17,12 @@ import {
 import { Edit, Mail, FileText, Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useAuthModal } from "@/contexts/auth-modal-context";
 
 export default function ProfilePage() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
+  const { openModal } = useAuthModal();
   const [postView, setPostView] = useState<"published" | "drafts">("published");
 
   // Get user's posts
@@ -40,12 +42,12 @@ export default function ProfilePage() {
   // Determine which posts to display based on view
   const displayedPosts = postView === "published" ? publishedPosts : draftPosts;
 
-  // Redirect to auth if not authenticated (use useEffect to avoid render-time navigation)
+  // Open auth modal if not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push("/auth?redirect=/profile");
+      openModal("login");
     }
-  }, [isLoading, isAuthenticated, router]);
+  }, [isLoading, isAuthenticated, openModal]);
 
   // Return null while redirecting or loading
   if (!isLoading && !isAuthenticated) {
