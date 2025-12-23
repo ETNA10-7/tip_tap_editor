@@ -2,6 +2,7 @@ import { query, mutation } from "./_generated/server";
 import { auth } from "./auth";
 import { Id } from "./_generated/dataModel";
 import { v } from "convex/values";
+import { validateUsername, ensureUniqueUsername } from "./utils";
 
 /**
  * Check if a session exists and get the userId.
@@ -165,6 +166,163 @@ export const updateProfile = mutation({
     
     // Return the updated user document
     return await ctx.db.get(userId);
+  },
+});
+
+/**
+ * Get user by username.
+ * 
+ * Searches for a user by their username field first.
+ * If not found, generates a slug from name/email and matches against that.
+ * This allows backward compatibility for users without explicit usernames.
+ * 
+ * @param args.username - The username to search for
+ * @returns User document with author info, or null if not found
+ */
+export const getByUsername = query({
+  args: { username: v.string() },
+  handler: async (ctx, args) => {
+    const searchUsername = args.username.toLowerCase().trim();
+    
+    if (!searchUsername) {
+      return null;
+    }
+
+    // First, try to find by explicit username field
+    const userByUsername = await ctx.db
+      .query("users")
+      .withIndex("username", (q: any) => q.eq("username", searchUsername))
+      .first();
+
+    if (userByUsername) {
+      return userByUsername;
+    }
+
+    // If not found, search all users and match by generated slug
+    // This allows backward compatibility for users without explicit usernames
+    const allUsers = await ctx.db.query("users").collect();
+    
+    for (const user of allUsers) {
+      // Generate slug from name or email
+      let generatedSlug = "";
+      if (user.name) {
+        generatedSlug = user.name
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, "-")
+          .replace(/[^a-z0-9-]/g, "")
+          .replace(/-+/g, "-")
+          .replace(/^-+|-+$/g, "");
+      } else if (user.email) {
+        // Use email prefix (part before @)
+        const emailPrefix = user.email.split("@")[0];
+        generatedSlug = emailPrefix
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9-]/g, "")
+          .replace(/-+/g, "-")
+          .replace(/^-+|-+$/g, "");
+      }
+
+      if (generatedSlug === searchUsername) {
+        return user;
+      }
+    }
+
+    return null;
+  },
+});
+
+/**
+ * Update the current user's username.
+ * 
+ * Only the authenticated user can update their own username.
+ * Validates username format and ensures uniqueness.
+ * 
+ * @param args.username - The new username (must be 3-30 chars, lowercase, alphanumeric + hyphens)
+ * @returns Updated user document
+ */
+export const updateUsername = mutation({
+  args: {
+    username: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Get the current authenticated user ID
+    const userId = await auth.getUserId(ctx);
+    
+    if (!userId) {
+      throw new Error("Not authenticated. Please sign in to update your username.");
+    }
+    
+    // Get the current user document
+    const user = await ctx.db.get(userId);
+    
+    if (!user) {
+      throw new Error("User not found in database.");
+    }
+    
+    // Validate username format
+    const validation = validateUsername(args.username);
+    if (!validation.isValid) {
+      throw new Error(validation.error || "Invalid username format");
+    }
+    
+    // Normalize username (lowercase, trimmed)
+    const normalizedUsername = args.username.trim().toLowerCase();
+    
+    // Ensure username is unique (excluding current user)
+    const uniqueUsername = await ensureUniqueUsername(ctx, normalizedUsername, userId);
+    
+    // Update the user document
+    await ctx.db.patch(userId, {
+      username: uniqueUsername,
+    });
+    
+    console.log("[updateUsername] ✅ Username updated for user:", userId);
+    console.log("[updateUsername] New username:", uniqueUsername);
+    
+    // Return the updated user document
+    return await ctx.db.get(userId);
+  },
+});
+
+/**
+ * Check if a username is available.
+ * 
+ * @param args.username - The username to check
+ * @returns Object with available boolean and message
+ */
+export const checkUsernameAvailability = query({
+  args: { username: v.string() },
+  handler: async (ctx, args) => {
+    // Validate username format first
+    const validation = validateUsername(args.username);
+    if (!validation.isValid) {
+      return {
+        available: false,
+        message: validation.error || "Invalid username format",
+      };
+    }
+    
+    const normalizedUsername = args.username.trim().toLowerCase();
+    
+    // Check if username exists
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("username", (q: any) => q.eq("username", normalizedUsername))
+      .first();
+    
+    if (existing) {
+      return {
+        available: false,
+        message: "This username is already taken",
+      };
+    }
+    
+    return {
+      available: true,
+      message: "Username is available",
+    };
   },
 });
 

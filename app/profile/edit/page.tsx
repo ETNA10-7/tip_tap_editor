@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
@@ -16,30 +16,60 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ProfileAvatar } from "@/components/profile-avatar";
-import { ArrowLeft, Save, User, Image as ImageIcon, FileText } from "lucide-react";
+import { ArrowLeft, Save, User, Image as ImageIcon, FileText, AtSign, Check, X } from "lucide-react";
 import Link from "next/link";
 
 export default function EditProfilePage() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const updateProfile = useMutation(api.users.updateProfile);
+  const updateUsername = useMutation(api.users.updateUsername);
 
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [image, setImage] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
+
+  // Check username availability
+  const usernameAvailability = useQuery(
+    api.users.checkUsernameAvailability,
+    username.trim().length >= 3 && username.trim() !== user?.username
+      ? { username: username.trim() }
+      : "skip"
+  );
 
   // Load user data into form
   useEffect(() => {
     if (user) {
       setName(user.name || "");
+      setUsername(user.username || "");
       setBio(user.bio || "");
       setImage(user.image || "");
     }
   }, [user]);
+
+  // Validate username on change
+  useEffect(() => {
+    if (username.trim().length > 0 && username.trim().length < 3) {
+      setUsernameError("Username must be at least 3 characters long");
+    } else if (username.trim().length > 30) {
+      setUsernameError("Username must be no more than 30 characters long");
+    } else if (username.trim() && !/^[a-z0-9-]+$/.test(username.trim().toLowerCase())) {
+      setUsernameError("Username can only contain lowercase letters, numbers, and hyphens");
+    } else if (username.trim() && (username.trim().startsWith("-") || username.trim().endsWith("-"))) {
+      setUsernameError("Username cannot start or end with a hyphen");
+    } else if (username.trim() && username.trim().includes("--")) {
+      setUsernameError("Username cannot contain consecutive hyphens");
+    } else {
+      setUsernameError(null);
+    }
+  }, [username]);
 
   // Redirect to auth if not authenticated
   useEffect(() => {
@@ -66,6 +96,35 @@ export default function EditProfilePage() {
     setSaving(true);
 
     try {
+      // Update username if it changed
+      if (username.trim() && username.trim() !== user?.username) {
+        if (usernameError) {
+          setError("Please fix username errors before saving");
+          setSaving(false);
+          return;
+        }
+        
+        if (usernameAvailability && !usernameAvailability.available) {
+          setError(usernameAvailability.message || "Username is not available");
+          setSaving(false);
+          return;
+        }
+
+        try {
+          await updateUsername({ username: username.trim() });
+        } catch (err) {
+          console.error("Username update error:", err);
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Failed to update username. Please try again."
+          );
+          setSaving(false);
+          return;
+        }
+      }
+
+      // Update profile (name, bio, image)
       await updateProfile({
         name: name.trim() || undefined,
         bio: bio.trim() || undefined,
@@ -206,6 +265,60 @@ export default function EditProfilePage() {
               />
               <p className="text-xs text-muted-foreground">
                 This is how your name will appear on your profile and posts.
+              </p>
+            </div>
+
+            {/* Username Field */}
+            <div className="space-y-2">
+              <label htmlFor="username" className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                <AtSign className="h-4 w-4" />
+                Username
+              </label>
+              <div className="relative">
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="your-username"
+                  value={username}
+                  onChange={(e) => {
+                    // Convert to lowercase and remove invalid characters as user types
+                    const value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "");
+                    setUsername(value);
+                  }}
+                  disabled={saving}
+                  maxLength={30}
+                  className={usernameError ? "border-red-500" : ""}
+                />
+                {username.trim() && username.trim() !== user?.username && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {usernameAvailability === undefined ? (
+                      <span className="text-xs text-muted-foreground">Checking...</span>
+                    ) : usernameAvailability.available ? (
+                      <div className="flex items-center gap-1 text-green-600">
+                        <Check className="h-4 w-4" />
+                        <span className="text-xs">Available</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1 text-red-600">
+                        <X className="h-4 w-4" />
+                        <span className="text-xs">Taken</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              {usernameError && (
+                <p className="text-xs text-red-600">{usernameError}</p>
+              )}
+              {!usernameError && username.trim() && username.trim() !== user?.username && usernameAvailability && (
+                <p className={`text-xs ${usernameAvailability.available ? "text-green-600" : "text-red-600"}`}>
+                  {usernameAvailability.message}
+                </p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Your username will be used in your profile URL: /users/{username || "your-username"}
+                <br />
+                Must be 3-30 characters, lowercase letters, numbers, and hyphens only.
               </p>
             </div>
 

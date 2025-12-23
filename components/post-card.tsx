@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { format } from "date-fns";
 import { Id } from "@/convex/_generated/dataModel";
+import { ProfileAvatar } from "@/components/profile-avatar";
+
+type Author = {
+  _id: Id<"users">;
+  name: string;
+  image?: string | null;
+  username?: string | null;
+} | null;
 
 type Post = {
   _id: Id<"posts">;
@@ -9,6 +17,7 @@ type Post = {
   excerpt?: string;
   featuredImage?: string;
   createdAt: number;
+  author?: Author; // Author information
 };
 
 /**
@@ -26,6 +35,35 @@ function getPostSlug(post: Post): string {
     .replace(/[^a-z0-9-]/g, "")
     .replace(/-+/g, "-")
     .replace(/^-+|-+$/g, "") || "post";
+}
+
+/**
+ * Generate a username slug from author info for profile links.
+ * Uses stored username if available, otherwise generates from name.
+ */
+function getAuthorUsername(author: Author): string {
+  if (!author) return "anonymous";
+  
+  // Use stored username if available
+  if (author.username) {
+    return author.username;
+  }
+  
+  // Generate from name if available
+  if (author.name) {
+    const username = author.name
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    return username || "user";
+  }
+  
+  // Fallback: use a portion of the user ID (convert to string first)
+  const userIdStr = String(author._id);
+  return userIdStr.slice(-8); // Use last 8 characters as fallback
 }
 
 export function PostCard({ post }: { post: Post }) {
@@ -48,6 +86,19 @@ export function PostCard({ post }: { post: Post }) {
         </Link>
       )}
       <div className="p-5">
+        {/* Author Info */}
+        {post.author && (
+          <Link
+            href={`/users/${getAuthorUsername(post.author)}`}
+            className="flex items-center gap-2 mb-3 hover:opacity-80 transition-opacity"
+          >
+            <ProfileAvatar user={post.author} size="sm" />
+            <span className="text-sm text-slate-600 font-medium">
+              {post.author.name}
+            </span>
+          </Link>
+        )}
+        
         <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
           {format(new Date(post.createdAt), "PP")}
         </div>

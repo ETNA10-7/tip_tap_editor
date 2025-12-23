@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { ProfileMenu } from "@/components/profile-menu";
+import { ProfileAvatar } from "@/components/profile-avatar";
 import { Search } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -139,11 +140,35 @@ export function SiteHeader() {
                         onClick={() => handleResultClick(post.slug || generateSlug(post.title))}
                         className="w-full text-left px-4 py-2.5 hover:bg-slate-50 transition-colors"
                       >
-                        <div className="font-medium text-slate-900 text-sm line-clamp-1">
-                          {post.title}
-                        </div>
-                        <div className="text-xs text-slate-500 mt-0.5">
-                          {format(new Date(post.createdAt), "MMM d, yyyy")}
+                        <div className="flex items-start gap-3">
+                          <ProfileAvatar
+                            user={
+                              post.author
+                                ? {
+                                    _id: post.author._id,
+                                    name: post.author.name,
+                                    image: post.author.image,
+                                    email: undefined,
+                                    username: post.author.username,
+                                  } as any
+                                : null
+                            }
+                            size="sm"
+                          />
+                          <div className="flex flex-col gap-1">
+                            <div className="font-medium text-slate-900 text-sm line-clamp-1">
+                              {post.title}
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-slate-600">
+                              <span className="font-medium text-slate-700">
+                                {post.author?.name || "Anonymous"}
+                              </span>
+                              <span className="text-slate-300">•</span>
+                              <span className="text-slate-500">
+                                {format(new Date(post.createdAt), "MMM d, yyyy")}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </button>
                     ))}

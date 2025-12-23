@@ -140,16 +140,32 @@ export const remove = mutation({
 
 export const list = query(async (ctx) => {
   const posts = await ctx.db.query("posts").order("desc").collect();
-  // Generate slugs on-the-fly for posts that don't have them (for display purposes)
-  // The slug will be saved when the post is accessed via getBySlug
-  return posts.map((post) => {
-    if (!post.slug) {
-      // Generate a temporary slug for display (will be saved when post is accessed)
-      const tempSlug = generateSlug(post.title);
-      return { ...post, slug: tempSlug };
-    }
-    return post;
-  });
+  
+  // Fetch author information for each post
+  const postsWithAuthors = await Promise.all(
+    posts.map(async (post) => {
+      const author = await ctx.db.get(post.authorId);
+      const authorInfo = author
+        ? {
+            _id: author._id,
+            name: author.name || "Anonymous",
+            image: author.image,
+            username: author.username,
+          }
+        : null;
+
+      // Generate slugs on-the-fly for posts that don't have them (for display purposes)
+      const slug = post.slug || generateSlug(post.title);
+
+      return {
+        ...post,
+        slug,
+        author: authorInfo,
+      };
+    })
+  );
+
+  return postsWithAuthors;
 });
 
 /**
@@ -192,14 +208,30 @@ export const search = query({
     // Combine: title matches first, then content matches
     const matchingPosts = [...titleMatches, ...contentMatches];
 
-    // Generate slugs for posts that don't have them
-    return matchingPosts.map((post) => {
-      if (!post.slug) {
-        const tempSlug = generateSlug(post.title);
-        return { ...post, slug: tempSlug };
-      }
-      return post;
-    });
+    // Fetch author information and generate slugs for posts that don't have them
+    const postsWithAuthors = await Promise.all(
+      matchingPosts.map(async (post) => {
+        const author = await ctx.db.get(post.authorId);
+          const authorInfo = author
+            ? {
+                _id: author._id,
+                name: author.name || "Anonymous",
+                image: author.image,
+                username: author.username,
+              }
+            : null;
+
+        const slug = post.slug || generateSlug(post.title);
+
+        return {
+          ...post,
+          slug,
+          author: authorInfo,
+        };
+      })
+    );
+
+    return postsWithAuthors;
   },
 });
 
@@ -216,16 +248,75 @@ export const listByUser = query(async (ctx) => {
     .withIndex("authorId", (q: any) => q.eq("authorId", userId))
     .order("desc")
     .collect();
-  // Generate slugs on-the-fly for posts that don't have them (for display purposes)
-  // The slug will be saved when the post is accessed via getBySlug
-  return posts.map((post) => {
-    if (!post.slug) {
-      // Generate a temporary slug for display (will be saved when post is accessed)
-      const tempSlug = generateSlug(post.title);
-      return { ...post, slug: tempSlug };
-    }
-    return post;
-  });
+  
+  // Fetch author information for each post
+  const postsWithAuthors = await Promise.all(
+    posts.map(async (post) => {
+      const author = await ctx.db.get(post.authorId);
+      const authorInfo = author
+        ? {
+            _id: author._id,
+            name: author.name || "Anonymous",
+            image: author.image,
+            username: author.username,
+          }
+        : null;
+
+      // Generate slugs on-the-fly for posts that don't have them (for display purposes)
+      const slug = post.slug || generateSlug(post.title);
+
+      return {
+        ...post,
+        slug,
+        author: authorInfo,
+      };
+    })
+  );
+
+  return postsWithAuthors;
+});
+
+/**
+ * Get all posts created by a specific author (for public profiles).
+ * This is different from listByUser which only shows the current user's posts.
+ * 
+ * @param args.authorId - The ID of the author whose posts to fetch
+ */
+export const listByAuthorId = query({
+  args: { authorId: v.id("users") },
+  handler: async (ctx, args) => {
+    const posts = await ctx.db
+      .query("posts")
+      .withIndex("authorId", (q: any) => q.eq("authorId", args.authorId))
+      .order("desc")
+      .collect();
+    
+    // Fetch author information for each post
+    const postsWithAuthors = await Promise.all(
+      posts.map(async (post) => {
+        const author = await ctx.db.get(post.authorId);
+          const authorInfo = author
+            ? {
+                _id: author._id,
+                name: author.name || "Anonymous",
+                image: author.image,
+                username: author.username,
+              }
+            : null;
+
+        // Generate slugs on-the-fly for posts that don't have them
+        const slug = post.slug || generateSlug(post.title);
+
+        return {
+          ...post,
+          slug,
+          author: authorInfo,
+        };
+      })
+    );
+
+    return postsWithAuthors;
+  },
 });
 
 export const get = query({
@@ -239,8 +330,16 @@ export const get = query({
 
     // Get author information
     const author = await ctx.db.get(post.authorId);
+    const authorInfo = author
+      ? {
+          _id: author._id,
+          name: author.name || "Anonymous",
+          image: author.image,
+          username: author.username,
+        }
+      : null;
 
-    return { post, author, canEdit };
+    return { post, author: authorInfo, canEdit };
   },
 });
 
@@ -337,8 +436,16 @@ export const getBySlug = query({
 
     // Get author information
     const author = await ctx.db.get(post.authorId);
+    const authorInfo = author
+      ? {
+          _id: author._id,
+          name: author.name || "Anonymous",
+          image: author.image,
+          username: author.username,
+        }
+      : null;
 
-    return { post, author, canEdit };
+    return { post, author: authorInfo, canEdit };
   },
 });
 

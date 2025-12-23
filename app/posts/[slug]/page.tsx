@@ -23,6 +23,35 @@ function calculateReadingTime(htmlContent: string): number {
   return Math.max(1, minutes); // At least 1 minute
 }
 
+/**
+ * Generate a username slug from author info for profile links.
+ * Uses stored username if available, otherwise generates from name.
+ */
+function getAuthorUsername(author: { name?: string | null; username?: string | null; _id: string } | null): string {
+  if (!author) return "anonymous";
+  
+  // Use stored username if available
+  if (author.username) {
+    return author.username;
+  }
+  
+  // Generate from name if available
+  if (author.name) {
+    const username = author.name
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    return username || "user";
+  }
+  
+  // Fallback: use a portion of the user ID
+  const userIdStr = String(author._id);
+  return userIdStr.slice(-8);
+}
+
 export default function PostDetailPage() {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
@@ -116,21 +145,26 @@ export default function PostDetailPage() {
           {/* Author Info */}
           {result.author && (
             <div className="flex items-center gap-3 pt-4 border-t border-slate-200">
-              <ProfileAvatar user={result.author} size="md" />
-              <div className="flex-1">
-                <p className="font-semibold text-slate-900">
-                  {result.author.name || "Anonymous"}
-                </p>
-                <div className="flex items-center gap-2 text-sm text-slate-500">
-                  <span>{format(new Date(result.post.createdAt), "MMM d, yyyy")}</span>
-                  {readingTime && (
-                    <>
-                      <span>•</span>
-                      <span>{readingTime} min read</span>
-                    </>
-                  )}
+              <Link
+                href={`/users/${getAuthorUsername(result.author)}`}
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+              >
+                <ProfileAvatar user={result.author} size="md" />
+                <div className="flex-1">
+                  <p className="font-semibold text-slate-900">
+                    {result.author.name || "Anonymous"}
+                  </p>
+                  <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <span>{format(new Date(result.post.createdAt), "MMM d, yyyy")}</span>
+                    {readingTime && (
+                      <>
+                        <span>•</span>
+                        <span>{readingTime} min read</span>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </Link>
             </div>
           )}
 

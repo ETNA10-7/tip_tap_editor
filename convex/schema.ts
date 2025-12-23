@@ -25,8 +25,10 @@ export default defineSchema({
     phoneVerificationTime: v.optional(v.number()),
     isAnonymous: v.optional(v.boolean()),
     bio: v.optional(v.string()), // User biography/description
+    username: v.optional(v.string()), // URL-friendly username for public profiles
   })
-    .index("email", ["email"]),
+    .index("email", ["email"])
+    .index("username", ["username"]), // Index for fast username lookups
   note: defineTable({
     title: v.string(),
     body: v.string(),
