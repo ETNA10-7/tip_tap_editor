@@ -133,9 +133,16 @@ export default function PostDetailPage() {
         )}
         
         <div className="space-y-4">
-          <h1 className="text-5xl font-bold leading-tight tracking-tight text-slate-900">
-            {result.post.title}
-          </h1>
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="text-5xl font-bold leading-tight tracking-tight text-slate-900">
+              {result.post.title}
+            </h1>
+            {result.post.published === false && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                Draft
+              </span>
+            )}
+          </div>
           {result.post.excerpt && (
             <p className="text-xl text-slate-600 leading-relaxed">
               {result.post.excerpt}

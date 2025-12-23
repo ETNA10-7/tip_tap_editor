@@ -15,6 +15,7 @@ import {
 import { Mail, FileText, Calendar } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
+import { useAuth } from "@/hooks/useAuth";
 
 /**
  * Get the earliest creation date from user's posts or authAccounts
@@ -29,6 +30,7 @@ function getJoinDate(user: any): Date | null {
 export default function UserProfilePage() {
   const params = useParams<{ username: string }>();
   const username = params?.username as string | undefined;
+  const { user: currentUser } = useAuth();
 
   // Fetch user by username
   const user = useQuery(
@@ -36,14 +38,29 @@ export default function UserProfilePage() {
     username ? { username } : "skip"
   );
 
-  // Fetch user's posts if user exists
-  const posts = useQuery(
-    api.posts.listByAuthorId,
-    user ? { authorId: user._id } : "skip"
+  // Check if viewing own profile
+  const isOwnProfile = currentUser && user && currentUser._id === user._id;
+
+  // Fetch posts:
+  // - If viewing own profile: use listByUser to get all posts (including drafts)
+  // - If viewing other user's profile: use listByAuthorId (only published posts)
+  const allPosts = useQuery(
+    isOwnProfile
+      ? api.posts.listByUser
+      : api.posts.listByAuthorId,
+    user
+      ? isOwnProfile
+        ? {}
+        : { authorId: user._id }
+      : "skip"
   );
 
+  // Separate published and draft posts when viewing own profile
+  const publishedPosts = allPosts?.filter(post => post.published !== false) ?? [];
+  const draftPosts = allPosts?.filter(post => post.published === false) ?? [];
+
   // Loading state
-  if (user === undefined || posts === undefined) {
+  if (user === undefined || allPosts === undefined) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-center py-12">
@@ -137,29 +154,29 @@ export default function UserProfilePage() {
         </CardContent>
       </Card>
 
-      {/* Posts Section */}
+      {/* Published Posts Section */}
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Posts
+                {isOwnProfile ? "Published Posts" : "Posts"}
               </CardTitle>
               <CardDescription className="mt-1">
-                {posts === undefined
+                {allPosts === undefined
                   ? "Loading posts..."
-                  : posts.length === 0
+                  : publishedPosts.length === 0
                   ? "No posts yet"
-                  : `${posts.length} ${posts.length === 1 ? "post" : "posts"} published`}
+                  : `${publishedPosts.length} ${publishedPosts.length === 1 ? "post" : "posts"} published`}
               </CardDescription>
             </div>
           </div>
         </CardHeader>
 
         <CardContent>
-          {/* Posts Grid */}
-          {posts === undefined ? (
+          {/* Published Posts Grid */}
+          {allPosts === undefined ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center space-y-2">
                 <div className="animate-pulse text-muted-foreground">
@@ -167,7 +184,7 @@ export default function UserProfilePage() {
                 </div>
               </div>
             </div>
-          ) : posts.length === 0 ? (
+          ) : publishedPosts.length === 0 ? (
             <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-12 text-center">
               <div className="space-y-4">
                 <div className="mx-auto w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center">
@@ -175,23 +192,54 @@ export default function UserProfilePage() {
                 </div>
                 <div className="space-y-2">
                   <p className="text-slate-700 font-medium">
-                    {user.name || "This user"} hasn&apos;t published any posts yet.
+                    {isOwnProfile
+                      ? "You haven't published any posts yet."
+                      : `${user.name || "This user"} hasn't published any posts yet.`}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Check back later for new content!
+                    {isOwnProfile
+                      ? "Start writing to share your thoughts!"
+                      : "Check back later for new content!"}
                   </p>
                 </div>
               </div>
             </div>
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {posts.map((post) => (
+              {publishedPosts.map((post) => (
                 <PostCard key={post._id} post={post} />
               ))}
             </div>
           )}
         </CardContent>
       </Card>
+
+      {/* Draft Posts Section (only shown when viewing own profile) */}
+      {isOwnProfile && draftPosts.length > 0 && (
+        <Card>
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Drafts
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  {draftPosts.length} {draftPosts.length === 1 ? "draft" : "drafts"} saved
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {draftPosts.map((post) => (
+                <PostCard key={post._id} post={post} />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

@@ -18,6 +18,7 @@ export default function CreatePage() {
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
   const [featuredImage, setFeaturedImage] = useState("");
+  const [published, setPublished] = useState(true); // Default to published
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,6 +60,7 @@ export default function CreatePage() {
         content,
         excerpt: excerpt.trim() || undefined,
         featuredImage: featuredImage.trim() || undefined,
+        published,
       });
       // Redirect to slug-based URL
       if (createdPost?.slug) {
@@ -172,13 +174,27 @@ export default function CreatePage() {
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
-      <button
-        onClick={handleSubmit}
-        disabled={saving || !isAuthenticated}
-        className="rounded-full bg-slate-900 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {saving ? "Saving…" : "Publish"}
-      </button>
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="publish-toggle"
+            checked={published}
+            onChange={(e) => setPublished(e.target.checked)}
+            className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+          />
+          <label htmlFor="publish-toggle" className="text-sm font-medium text-slate-700 cursor-pointer">
+            {published ? "Publish" : "Save as Draft"}
+          </label>
+        </div>
+        <button
+          onClick={handleSubmit}
+          disabled={saving || !isAuthenticated}
+          className="rounded-full bg-slate-900 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {saving ? "Saving…" : published ? "Publish" : "Save Draft"}
+        </button>
+      </div>
     </div>
   );
 }

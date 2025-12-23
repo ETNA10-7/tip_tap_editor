@@ -23,6 +23,7 @@ export default function PostEditPage() {
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
   const [featuredImage, setFeaturedImage] = useState("");
+  const [published, setPublished] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +35,8 @@ export default function PostEditPage() {
       setExcerpt(result.post.excerpt ?? "");
       setContent(result.post.content ?? "");
       setFeaturedImage(result.post.featuredImage ?? "");
+      // published defaults to true if undefined (for backward compatibility)
+      setPublished(result.post.published !== false);
     }
   }, [result]);
 
@@ -91,6 +94,7 @@ export default function PostEditPage() {
         excerpt: excerpt.trim() || undefined,
         content,
         featuredImage: featuredImage.trim() || undefined,
+        published,
       });
       // Redirect to the new slug (in case title changed and slug was regenerated)
       router.push(`/posts/${updated.slug}`);
@@ -164,12 +168,24 @@ export default function PostEditPage() {
 
       {/* Actions */}
       <div className="mb-6 flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="publish-toggle"
+            checked={published}
+            onChange={(e) => setPublished(e.target.checked)}
+            className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+          />
+          <label htmlFor="publish-toggle" className="text-sm font-medium text-slate-700 cursor-pointer">
+            {published ? "Publish" : "Save as Draft"}
+          </label>
+        </div>
         <button
           onClick={handleSave}
           disabled={saving}
           className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow disabled:cursor-not-allowed disabled:opacity-60 hover:bg-slate-800 transition-colors"
         >
-          {saving ? "Saving…" : "Save"}
+          {saving ? "Saving…" : published ? "Publish" : "Save Draft"}
         </button>
         <Link
           href={`/posts/${slug}`}

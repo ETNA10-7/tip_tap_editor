@@ -41,6 +41,7 @@ export default defineSchema({
     excerpt: v.optional(v.string()),
     featuredImage: v.optional(v.string()), // Featured image URL for Medium-like display
     authorId: v.id("users"),
+    published: v.optional(v.boolean()), // Draft/published status (defaults to true for backward compatibility)
     createdAt: v.number(),
     updatedAt: v.number(),
   })

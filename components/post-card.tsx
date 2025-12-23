@@ -17,6 +17,7 @@ type Post = {
   excerpt?: string;
   featuredImage?: string;
   createdAt: number;
+  published?: boolean; // Draft/published status
   author?: Author; // Author information
 };
 
@@ -99,8 +100,15 @@ export function PostCard({ post }: { post: Post }) {
           </Link>
         )}
         
-        <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
-          {format(new Date(post.createdAt), "PP")}
+        <div className="flex items-center gap-2 mb-2">
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">
+            {format(new Date(post.createdAt), "PP")}
+          </div>
+          {post.published === false && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+              Draft
+            </span>
+          )}
         </div>
         <Link
           href={`/posts/${slug}`}

@@ -39,6 +39,7 @@ export const create = mutation({
     content: v.string(),
     excerpt: v.optional(v.string()),
     featuredImage: v.optional(v.string()),
+    published: v.optional(v.boolean()), // Defaults to true if not provided
   },
   handler: async (ctx, args) => {
     const userId = await auth.getUserId(ctx);
@@ -55,6 +56,9 @@ export const create = mutation({
     const baseSlug = generateSlug(args.title);
     const slug = await ensureUniqueSlug(ctx, baseSlug);
 
+    // Default to published=true for backward compatibility
+    const published = args.published !== undefined ? args.published : true;
+
     const id = await ctx.db.insert("posts", {
       title: args.title,
       slug,
@@ -62,6 +66,7 @@ export const create = mutation({
       excerpt,
       featuredImage: args.featuredImage,
       authorId: userId,
+      published,
       createdAt: now,
       updatedAt: now,
     });
@@ -79,6 +84,7 @@ export const update = mutation({
     content: v.optional(v.string()),
     excerpt: v.optional(v.string()),
     featuredImage: v.optional(v.string()),
+    published: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const userId = await auth.getUserId(ctx);
@@ -116,6 +122,7 @@ export const update = mutation({
     if (rest.content !== undefined) patch.content = rest.content;
     if (rest.excerpt !== undefined) patch.excerpt = rest.excerpt;
     if (rest.featuredImage !== undefined) patch.featuredImage = rest.featuredImage;
+    if (rest.published !== undefined) patch.published = rest.published;
 
     await ctx.db.patch(id, patch);
     return await ctx.db.get(id);
@@ -139,11 +146,14 @@ export const remove = mutation({
 });
 
 export const list = query(async (ctx) => {
-  const posts = await ctx.db.query("posts").order("desc").collect();
+  const allPosts = await ctx.db.query("posts").order("desc").collect();
+  
+  // Filter only published posts (published === true or undefined for backward compatibility)
+  const publishedPosts = allPosts.filter(post => post.published !== false);
   
   // Fetch author information for each post
   const postsWithAuthors = await Promise.all(
-    posts.map(async (post) => {
+    publishedPosts.map(async (post) => {
       const author = await ctx.db.get(post.authorId);
       const authorInfo = author
         ? {
@@ -208,9 +218,12 @@ export const search = query({
     // Combine: title matches first, then content matches
     const matchingPosts = [...titleMatches, ...contentMatches];
 
+    // Filter only published posts (published === true or undefined for backward compatibility)
+    const publishedMatchingPosts = matchingPosts.filter(post => post.published !== false);
+
     // Fetch author information and generate slugs for posts that don't have them
     const postsWithAuthors = await Promise.all(
-      matchingPosts.map(async (post) => {
+      publishedMatchingPosts.map(async (post) => {
         const author = await ctx.db.get(post.authorId);
           const authorInfo = author
             ? {
@@ -279,21 +292,25 @@ export const listByUser = query(async (ctx) => {
 /**
  * Get all posts created by a specific author (for public profiles).
  * This is different from listByUser which only shows the current user's posts.
+ * Only returns published posts (not drafts).
  * 
  * @param args.authorId - The ID of the author whose posts to fetch
  */
 export const listByAuthorId = query({
   args: { authorId: v.id("users") },
   handler: async (ctx, args) => {
-    const posts = await ctx.db
+    const allPosts = await ctx.db
       .query("posts")
       .withIndex("authorId", (q: any) => q.eq("authorId", args.authorId))
       .order("desc")
       .collect();
     
+    // Filter only published posts (published === true or undefined for backward compatibility)
+    const publishedPosts = allPosts.filter(post => post.published !== false);
+    
     // Fetch author information for each post
     const postsWithAuthors = await Promise.all(
-      posts.map(async (post) => {
+      publishedPosts.map(async (post) => {
         const author = await ctx.db.get(post.authorId);
           const authorInfo = author
             ? {
@@ -433,6 +450,17 @@ export const getBySlug = query({
 
     const userId = await auth.getUserId(ctx);
     const canEdit = !!userId && post.authorId === userId;
+    const isAuthor = !!userId && post.authorId === userId;
+
+    // Check if post is a draft
+    // If published is explicitly false, it's a draft
+    const isDraft = post.published === false;
+
+    // If it's a draft and user is not the author, don't allow viewing
+    if (isDraft && !isAuthor) {
+      console.log(`[getBySlug] ❌ Post is a draft and user is not the author`);
+      return null;
+    }
 
     // Get author information
     const author = await ctx.db.get(post.authorId);
