@@ -209,10 +209,12 @@ export default function ProfilePage() {
               </div>
             </div>
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {displayedPosts.map((post) => (
-                <PostCard key={post._id} post={post} />
-              ))}
+            <div className="posts-scrollable overflow-y-auto max-h-[450px] pr-2">
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {displayedPosts.map((post) => (
+                  <PostCard key={post._id} post={post} />
+                ))}
+              </div>
             </div>
           )}
         </CardContent>
