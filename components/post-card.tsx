@@ -71,7 +71,7 @@ export function PostCard({ post }: { post: Post }) {
   const slug = getPostSlug(post);
   
   return (
-    <article className="group rounded-xl border bg-white overflow-hidden shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
+    <article className="group rounded-xl border border-slate-700 bg-slate-800/50 backdrop-blur-sm overflow-hidden shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
       {post.featuredImage && (
         <Link href={`/posts/${slug}`} className="block">
           <div className="relative w-full h-48 overflow-hidden bg-slate-100">
@@ -94,7 +94,7 @@ export function PostCard({ post }: { post: Post }) {
             className="flex items-center gap-2 mb-3 hover:opacity-80 transition-opacity"
           >
             <ProfileAvatar user={post.author} size="sm" />
-            <span className="text-sm text-slate-600 font-medium">
+            <span className="text-sm text-slate-300 font-medium">
               {post.author.name}
             </span>
           </Link>
@@ -112,18 +112,18 @@ export function PostCard({ post }: { post: Post }) {
         </div>
         <Link
           href={`/posts/${slug}`}
-          className="block text-xl font-bold leading-tight text-slate-900 hover:text-slate-700 transition-colors"
+          className="block text-xl font-bold leading-tight text-white hover:text-slate-200 transition-colors"
         >
           {post.title}
         </Link>
         {post.excerpt ? (
-          <p className="mt-2 text-sm text-slate-600 line-clamp-3 leading-relaxed">
+          <p className="mt-2 text-sm text-slate-300 line-clamp-3 leading-relaxed">
             {post.excerpt}
           </p>
         ) : null}
         <Link
           href={`/posts/${slug}`}
-          className="mt-4 inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+          className="mt-4 inline-flex items-center text-sm font-medium text-blue-400 hover:text-blue-300 hover:underline transition-colors"
         >
           Read story →
         </Link>

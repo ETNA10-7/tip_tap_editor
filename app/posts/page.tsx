@@ -57,14 +57,14 @@ export default function PostsPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-3xl font-semibold">
+          <h1 className="text-3xl font-semibold text-white">
             {searchQuery 
               ? `Search results for "${searchQuery}"` 
               : view === "mine" && isAuthenticated
                 ? "My posts"
                 : "All posts"}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-slate-400">
             {searchQuery
               ? `Found ${posts.length} ${posts.length === 1 ? "post" : "posts"}`
               : view === "mine" && isAuthenticated
@@ -79,6 +79,9 @@ export default function PostsPage() {
               variant={view === "all" ? "default" : "outline"}
               size="sm"
               onClick={() => setView("all")}
+              className={view === "all" 
+                ? "bg-blue-600 text-white hover:bg-blue-700" 
+                : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white"}
             >
               All posts
             </Button>
@@ -87,6 +90,9 @@ export default function PostsPage() {
               size="sm"
               onClick={() => setView("mine")}
               disabled={!isAuthenticated}
+              className={view === "mine" 
+                ? "bg-blue-600 text-white hover:bg-blue-700" 
+                : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white"}
             >
               My posts
             </Button>
@@ -101,15 +107,15 @@ export default function PostsPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-slate-900">Published Posts</h2>
-                <p className="text-sm text-muted-foreground mt-1">
+                <h2 className="text-xl font-semibold text-white">Published Posts</h2>
+                <p className="text-sm text-slate-400 mt-1">
                   {publishedPosts.length} {publishedPosts.length === 1 ? "post" : "posts"} published
                 </p>
               </div>
             </div>
             {publishedPosts.length === 0 ? (
-              <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
-                <p className="text-muted-foreground">
+              <div className="rounded-xl border-2 border-dashed border-slate-700 bg-slate-800/30 p-8 text-center">
+                <p className="text-slate-400">
                   You haven't published any posts yet.
                 </p>
               </div>
@@ -126,15 +132,15 @@ export default function PostsPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-slate-900">Drafts</h2>
-                <p className="text-sm text-muted-foreground mt-1">
+                <h2 className="text-xl font-semibold text-white">Drafts</h2>
+                <p className="text-sm text-slate-400 mt-1">
                   {draftPosts.length} {draftPosts.length === 1 ? "draft" : "drafts"} saved
                 </p>
               </div>
             </div>
             {draftPosts.length === 0 ? (
-              <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
-                <p className="text-muted-foreground">
+              <div className="rounded-xl border-2 border-dashed border-slate-700 bg-slate-800/30 p-8 text-center">
+                <p className="text-slate-400">
                   You don't have any drafts yet.
                 </p>
               </div>
@@ -148,7 +154,7 @@ export default function PostsPage() {
           </div>
         </div>
       ) : posts.length === 0 ? (
-        <p className="text-muted-foreground">
+        <p className="text-slate-400">
           {searchQuery
             ? `No posts found matching "${searchQuery}"`
             : "No posts yet."}

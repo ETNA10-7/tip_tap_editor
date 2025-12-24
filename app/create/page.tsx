@@ -103,9 +103,9 @@ export default function CreatePage() {
             Please sign in to write a post.
           </p>
         </div>
-        <div className="rounded-xl border bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <div className="rounded-xl border border-amber-500/50 bg-amber-500/20 px-4 py-3 text-sm text-amber-300">
           You need to be signed in to write a post.{" "}
-          <Link href="/auth?redirect=/create" className="font-semibold underline">
+          <Link href="/auth?redirect=/create" className="font-semibold underline hover:text-amber-200">
             Sign in or sign up
           </Link>{" "}
           to continue.
@@ -117,8 +117,8 @@ export default function CreatePage() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h1 className="text-3xl font-semibold">Write a post</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl font-semibold text-white">Write a post</h1>
+        <p className="text-slate-400">
           Compose with TipTap, save to Convex, and publish instantly.
         </p>
       </div>
@@ -131,17 +131,17 @@ export default function CreatePage() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="A headline-worthy title"
-          className="w-full rounded-lg border px-3 py-2 text-lg"
+          className="w-full rounded-lg border border-slate-600 bg-slate-800/50 px-3 py-2 text-lg text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
         />
         <textarea
           value={excerpt}
           onChange={(e) => setExcerpt(e.target.value)}
           placeholder="Optional: a short teaser for your post"
-          className="w-full rounded-lg border px-3 py-2"
+          className="w-full rounded-lg border border-slate-600 bg-slate-800/50 px-3 py-2 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
           rows={3}
         />
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">
+          <label className="text-sm font-medium text-slate-300">
             Featured Image URL (Optional)
           </label>
           <input
@@ -149,9 +149,9 @@ export default function CreatePage() {
             value={featuredImage}
             onChange={(e) => setFeaturedImage(e.target.value)}
             placeholder="https://example.com/image.jpg"
-            className="w-full rounded-lg border px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-slate-600 bg-slate-800/50 px-3 py-2 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-slate-400">
             Add a featured image that will appear at the top of your post
           </p>
           {featuredImage && (
@@ -159,7 +159,7 @@ export default function CreatePage() {
               <img
                 src={featuredImage}
                 alt="Featured image preview"
-                className="max-w-full h-auto rounded-lg border"
+                className="max-w-full h-auto rounded-lg border border-slate-700"
                 onError={(e) => {
                   e.currentTarget.style.display = "none";
                 }}
@@ -170,7 +170,7 @@ export default function CreatePage() {
         <RichTextEditor content={content} onChange={setContent} />
       </div>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm text-red-400">{error}</p> : null}
 
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
@@ -179,16 +179,16 @@ export default function CreatePage() {
             id="publish-toggle"
             checked={published}
             onChange={(e) => setPublished(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+            className="h-4 w-4 rounded border-slate-600 bg-slate-800/50 text-blue-500 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-900"
           />
-          <label htmlFor="publish-toggle" className="text-sm font-medium text-slate-700 cursor-pointer">
+          <label htmlFor="publish-toggle" className="text-sm font-medium text-slate-300 cursor-pointer">
             {published ? "Publish" : "Save as Draft"}
           </label>
         </div>
         <button
           onClick={handleSubmit}
           disabled={saving || !isAuthenticated}
-          className="rounded-full bg-slate-900 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
         >
           {saving ? "Saving…" : published ? "Publish" : "Save Draft"}
         </button>

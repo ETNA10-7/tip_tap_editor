@@ -94,9 +94,9 @@ export function SiteHeader() {
   const showDropdown = isSearchFocused && debouncedQuery.trim().length >= 1 && searchResults !== undefined;
 
   return (
-    <header className="border-b bg-white/90 backdrop-blur sticky top-0 z-40">
+    <header className="border-b border-slate-700 bg-slate-900/95 backdrop-blur sticky top-0 z-40">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 gap-4">
-        <Link href="/" className="text-lg font-semibold tracking-tight flex-shrink-0">
+        <Link href="/" className="text-lg font-semibold tracking-tight flex-shrink-0 text-white">
           Mediumish
         </Link>
 
@@ -104,8 +104,8 @@ export function SiteHeader() {
         <form onSubmit={handleSearch} className="flex-1 max-w-md mx-4">
           <div className="relative" ref={searchContainerRef}>
             <Search 
-              className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors ${
-                isSearchFocused ? "text-foreground" : ""
+              className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 transition-colors ${
+                isSearchFocused ? "text-slate-300" : ""
               }`}
             />
             <input
@@ -114,33 +114,33 @@ export function SiteHeader() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
-              className="w-full pl-10 pr-4 py-2 rounded-full border border-slate-200 bg-slate-50 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-all"
+              className="w-full pl-10 pr-4 py-2 rounded-full border border-slate-600 bg-slate-800/50 text-white text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all"
             />
             
             {/* Search Results Dropdown */}
             {showDropdown && (
-              <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-1.5 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
                 {/* Arrow pointing up */}
-                <div className="absolute -top-1.5 left-6 w-3 h-3 bg-white border-l border-t border-slate-200 rotate-45"></div>
+                <div className="absolute -top-1.5 left-6 w-3 h-3 bg-slate-800 border-l border-t border-slate-700 rotate-45"></div>
                 
                 {searchResults === undefined ? (
-                  <div className="px-4 py-3 text-sm text-slate-500">
+                  <div className="px-4 py-3 text-sm text-slate-400">
                     Searching...
                   </div>
                 ) : searchResults.length === 0 ? (
-                  <div className="px-4 py-3 text-sm text-slate-500">
+                  <div className="px-4 py-3 text-sm text-slate-400">
                     No posts found
                   </div>
                 ) : (
                   <div className="py-1">
-                    <div className="px-4 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-100">
+                    <div className="px-4 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-700">
                       Posts
                     </div>
                     {searchResults.slice(0, 3).map((post) => (
                       <button
                         key={post._id}
                         onClick={() => handleResultClick(post.slug || generateSlug(post.title))}
-                        className="w-full text-left px-4 py-2.5 hover:bg-slate-50 transition-colors"
+                        className="w-full text-left px-4 py-2.5 hover:bg-slate-700/50 transition-colors"
                       >
                         <div className="flex items-start gap-3">
                           <ProfileAvatar
@@ -158,15 +158,15 @@ export function SiteHeader() {
                             size="sm"
                           />
                           <div className="flex flex-col gap-1">
-                            <div className="font-medium text-slate-900 text-sm line-clamp-1">
+                            <div className="font-medium text-white text-sm line-clamp-1">
                               {post.title}
                             </div>
-                            <div className="flex items-center gap-2 text-xs text-slate-600">
-                              <span className="font-medium text-slate-700">
+                            <div className="flex items-center gap-2 text-xs text-slate-400">
+                              <span className="font-medium text-slate-300">
                                 {post.author?.name || "Anonymous"}
                               </span>
-                              <span className="text-slate-300">•</span>
-                              <span className="text-slate-500">
+                              <span className="text-slate-600">•</span>
+                              <span className="text-slate-400">
                                 {format(new Date(post.createdAt), "MMM d, yyyy")}
                               </span>
                             </div>
@@ -177,7 +177,7 @@ export function SiteHeader() {
                     {searchResults.length > 3 && (
                       <button
                         onClick={handleSearch}
-                        className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition-colors border-t border-slate-100 font-medium"
+                        className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 transition-colors border-t border-slate-700 font-medium"
                       >
                         View all {searchResults.length} results
                       </button>
@@ -189,12 +189,12 @@ export function SiteHeader() {
           </div>
         </form>
 
-        <nav className="flex items-center gap-6 text-sm font-medium text-muted-foreground flex-shrink-0">
+        <nav className="flex items-center gap-6 text-sm font-medium text-slate-300 flex-shrink-0">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="transition hover:text-foreground"
+              className="transition hover:text-white"
             >
               {item.label}
             </Link>
@@ -209,7 +209,7 @@ export function SiteHeader() {
             // Show sign in / sign up button when not authenticated
             <Button 
               variant="outline" 
-              className="rounded-full"
+              className="rounded-full border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white"
               onClick={() => openModal("login")}
             >
               Sign in / Sign up

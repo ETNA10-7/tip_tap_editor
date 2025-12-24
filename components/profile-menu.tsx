@@ -85,7 +85,7 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
       {/* Clickable Avatar */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 rounded-full transition-transform hover:scale-105 active:scale-95"
+        className="relative focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded-full transition-transform hover:scale-105 active:scale-95"
         aria-label="Profile menu"
         aria-expanded={isOpen}
         aria-haspopup="true"
@@ -93,20 +93,20 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
         <ProfileAvatar user={user} size="md" />
         {/* Active indicator ring when menu is open */}
         {isOpen && (
-          <span className="absolute inset-0 rounded-full ring-2 ring-slate-900 ring-offset-2" />
+          <span className="absolute inset-0 rounded-full ring-2 ring-slate-500 ring-offset-2 ring-offset-slate-900" />
         )}
       </button>
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 rounded-lg border border-slate-200 bg-white shadow-lg z-50 transition-all duration-200 ease-out">
+        <div className="absolute right-0 mt-2 w-56 rounded-lg border border-slate-700 bg-slate-800 shadow-xl z-50 transition-all duration-200 ease-out">
           <div className="py-1">
             {/* User Info Section */}
-            <div className="px-4 py-3 border-b border-slate-100">
-              <p className="text-sm font-semibold text-slate-900 truncate">
+            <div className="px-4 py-3 border-b border-slate-700">
+              <p className="text-sm font-semibold text-white truncate">
                 {user.name || "User"}
               </p>
-              <p className="text-xs text-slate-500 truncate">
+              <p className="text-xs text-slate-400 truncate">
                 {user.email}
               </p>
             </div>
@@ -114,7 +114,7 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
             {/* Menu Items */}
             <button
               onClick={handleProfileClick}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-700/50 transition-colors"
             >
               <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
                 <User className="h-4 w-4" />
@@ -124,14 +124,14 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
 
             <button
               onClick={handleEditProfileClick}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-700/50 transition-colors"
             >
               <div className="relative flex-shrink-0 w-4 h-4 flex items-center justify-center">
                 <Settings className="h-4 w-4" />
                 {/* Red notification dot - shows when profile is incomplete */}
                 {needsProfileSetup && (
                   <span 
-                    className="absolute bg-red-500 rounded-full border-2 border-white shadow-sm" 
+                    className="absolute bg-red-500 rounded-full border-2 border-slate-800 shadow-sm" 
                     style={{ 
                       width: '8px',
                       height: '8px',
@@ -146,7 +146,7 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
 
             <button
               onClick={handleBookmarksClick}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-700/50 transition-colors"
             >
               <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
                 <Bookmark className="h-4 w-4" />
@@ -155,12 +155,12 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
             </button>
 
             {/* Divider */}
-            <div className="my-1 border-t border-slate-100" />
+            <div className="my-1 border-t border-slate-700" />
 
             {/* Logout */}
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/20 transition-colors"
             >
               <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
                 <LogOut className="h-4 w-4" />

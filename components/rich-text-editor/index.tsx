@@ -46,7 +46,7 @@ export default function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          "min-h-[220px] rounded-xl border bg-slate-50 px-3 py-3 text-base",
+          "min-h-[220px] rounded-xl border border-slate-600 bg-slate-800/50 px-3 py-3 text-base text-white prose prose-invert max-w-none",
       },
     },
     onUpdate: ({ editor }) => {

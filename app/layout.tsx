@@ -33,7 +33,7 @@ export default function RootLayout({
         <ConvexClientProvider>
           <AuthModalProvider>
             <SiteHeader />
-            <main className="mx-auto min-h-screen max-w-5xl px-4 py-10">
+            <main className="mx-auto min-h-screen max-w-5xl px-4 py-10 text-white">
               {children}
             </main>
             <AuthModalWrapper />

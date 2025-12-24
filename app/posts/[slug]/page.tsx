@@ -159,7 +159,7 @@ export default function PostDetailPage() {
         
         <div className="space-y-4">
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-5xl font-bold leading-tight tracking-tight text-slate-900">
+            <h1 className="text-5xl font-bold leading-tight tracking-tight text-white">
               {result.post.title}
             </h1>
             {result.post.published === false && (
@@ -169,7 +169,7 @@ export default function PostDetailPage() {
             )}
           </div>
           {result.post.excerpt && (
-            <p className="text-xl text-slate-600 leading-relaxed">
+            <p className="text-xl text-slate-200 leading-relaxed">
               {result.post.excerpt}
             </p>
           )}
@@ -183,10 +183,10 @@ export default function PostDetailPage() {
               >
                 <ProfileAvatar user={result.author} size="md" />
                 <div className="flex-1">
-                  <p className="font-semibold text-slate-900">
+                  <p className="font-semibold text-white">
                     {result.author.name || "Anonymous"}
                   </p>
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
+                  <div className="flex items-center gap-2 text-sm text-slate-300">
                     <span>{format(new Date(result.post.createdAt), "MMM d, yyyy")}</span>
                     {readingTime && (
                       <>
@@ -201,7 +201,7 @@ export default function PostDetailPage() {
           )}
 
           {/* Interaction Bar - Medium-like */}
-          <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+          <div className="flex items-center justify-between pt-4 border-t border-slate-700">
             <div className="flex items-center gap-6">
               {/* Clap/Heart Button */}
               <button
@@ -217,13 +217,13 @@ export default function PostDetailPage() {
                   }
                 }}
                 disabled={!user || isClapping}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-colors ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all duration-200 ${
                   hasClapped
-                    ? "bg-red-50 border-red-200 text-red-600"
-                    : "border-slate-300 text-slate-600 hover:bg-slate-50"
+                    ? "bg-red-500/20 border-red-500/50 text-red-400 hover:bg-red-500/30"
+                    : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:border-slate-500"
                 } ${!user ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
               >
-                <Heart className={`h-5 w-5 ${hasClapped ? "fill-current" : ""}`} />
+                <Heart className={`h-5 w-5 ${hasClapped ? "fill-red-400 text-red-400" : ""}`} />
                 <span className="text-sm font-medium">
                   {result.post.claps || 0}
                 </span>
@@ -234,7 +234,7 @@ export default function PostDetailPage() {
                 onClick={() => {
                   commentsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
                 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-300 text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:border-slate-500 transition-all duration-200 cursor-pointer"
               >
                 <MessageCircle className="h-5 w-5" />
                 <span className="text-sm font-medium">
@@ -258,14 +258,14 @@ export default function PostDetailPage() {
                   }
                 }}
                 disabled={!user || isBookmarking}
-                className={`p-2 rounded-full border transition-colors ${
+                className={`p-2.5 rounded-full border transition-all duration-200 ${
                   hasBookmarked
-                    ? "bg-slate-100 border-slate-300 text-slate-900"
-                    : "border-slate-300 text-slate-600 hover:bg-slate-50"
+                    ? "bg-yellow-500/20 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/30"
+                    : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:border-slate-500"
                 } ${!user ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                 title={hasBookmarked ? "Remove bookmark" : "Save for later"}
               >
-                <Bookmark className={`h-5 w-5 ${hasBookmarked ? "fill-current" : ""}`} />
+                <Bookmark className={`h-5 w-5 ${hasBookmarked ? "fill-yellow-400 text-yellow-400" : ""}`} />
               </button>
 
               {/* Share Button */}
@@ -293,7 +293,7 @@ export default function PostDetailPage() {
                     }
                   }
                 }}
-                className="p-2 rounded-full border border-slate-300 text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+                className="p-2.5 rounded-full border border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:border-slate-500 transition-all duration-200 cursor-pointer"
                 title="Share post"
               >
                 <Share2 className="h-5 w-5" />
@@ -317,10 +317,10 @@ export default function PostDetailPage() {
 
       {/* Medium-like Content Section */}
       <div className="prose prose-lg prose-slate max-w-none 
-        prose-headings:font-bold prose-headings:text-slate-900
-        prose-p:text-slate-700 prose-p:leading-relaxed
-        prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
-        prose-strong:text-slate-900
+        prose-headings:font-bold prose-headings:text-white
+        prose-p:text-slate-200 prose-p:leading-relaxed
+        prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
+        prose-strong:text-white
         prose-img:rounded-lg prose-img:my-8 prose-img:shadow-lg
         prose-blockquote:border-l-4 prose-blockquote:border-slate-300 prose-blockquote:pl-4
         prose-code:text-sm prose-code:bg-slate-100 prose-code:px-1 prose-code:rounded
@@ -339,7 +339,7 @@ export default function PostDetailPage() {
       <div className="mt-12 pt-8 border-t border-slate-200">
         <Link 
           href="/posts" 
-          className="inline-flex items-center text-slate-600 hover:text-slate-900 transition-colors"
+          className="inline-flex items-center text-slate-300 hover:text-white transition-colors"
         >
           ← Back to posts
         </Link>

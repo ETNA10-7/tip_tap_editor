@@ -30,82 +30,83 @@ import {
   
     const Options = [
       {
-        icon: <Heading1 className="size-4" />,
+        icon: <Heading1 className="size-4 text-white" />,
         onClick: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
         preesed: editor.isActive("heading", { level: 1 }),
       },
       {
-        icon: <Heading2 className="size-4" />,
+        icon: <Heading2 className="size-4 text-white" />,
         onClick: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
         preesed: editor.isActive("heading", { level: 2 }),
       },
       {
-        icon: <Heading3 className="size-4" />,
+        icon: <Heading3 className="size-4 text-white" />,
         onClick: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
         preesed: editor.isActive("heading", { level: 3 }),
       },
       {
-        icon: <Bold className="size-4" />,
+        icon: <Bold className="size-4 text-white" />,
         onClick: () => editor.chain().focus().toggleBold().run(),
         preesed: editor.isActive("bold"),
       },
       {
-        icon: <Italic className="size-4" />,
+        icon: <Italic className="size-4 text-white" />,
         onClick: () => editor.chain().focus().toggleItalic().run(),
         preesed: editor.isActive("italic"),
       },
       {
-        icon: <Strikethrough className="size-4" />,
+        icon: <Strikethrough className="size-4 text-white" />,
         onClick: () => editor.chain().focus().toggleStrike().run(),
         preesed: editor.isActive("strike"),
       },
       {
-        icon: <AlignLeft className="size-4" />,
+        icon: <AlignLeft className="size-4 text-white" />,
         onClick: () => editor.chain().focus().setTextAlign("left").run(),
         preesed: editor.isActive({ textAlign: "left" }),
       },
       {
-        icon: <AlignCenter className="size-4" />,
+        icon: <AlignCenter className="size-4 text-white" />,
         onClick: () => editor.chain().focus().setTextAlign("center").run(),
         preesed: editor.isActive({ textAlign: "center" }),
       },
       {
-        icon: <AlignRight className="size-4" />,
+        icon: <AlignRight className="size-4 text-white" />,
         onClick: () => editor.chain().focus().setTextAlign("right").run(),
         preesed: editor.isActive({ textAlign: "right" }),
       },
       {
-        icon: <List className="size-4" />,
+        icon: <List className="size-4 text-white" />,
         onClick: () => editor.chain().focus().toggleBulletList().run(),
         preesed: editor.isActive("bulletList"),
       },
       {
-        icon: <ListOrdered className="size-4" />,
+        icon: <ListOrdered className="size-4 text-white" />,
         onClick: () => editor.chain().focus().toggleOrderedList().run(),
         preesed: editor.isActive("orderedList"),
       },
       {
-        icon: <Highlighter className="size-4" />,
+        icon: <Highlighter className="size-4 text-white" />,
         onClick: () => editor.chain().focus().toggleHighlight().run(),
         preesed: editor.isActive("highlight"),
       },
     ];
   
     return (
-      <div className="border rounded-md p-1 mb-1 bg-slate-50 space-x-2 z-50 flex flex-wrap items-center gap-1">
+      <div className="border border-slate-600 rounded-md p-1 mb-1 bg-slate-800 space-x-2 z-50 flex flex-wrap items-center gap-1">
         {Options.map((option, index) => (
           <Toggle
             key={index}
             pressed={option.preesed}
             onPressedChange={option.onClick}
+            className="data-[state=on]:bg-slate-700 data-[state=on]:text-white text-white hover:bg-slate-700"
           >
             {option.icon}
           </Toggle>
         ))}
-        <div className="w-px h-6 bg-slate-300 mx-1" />
+        <div className="w-px h-6 bg-slate-600 mx-1" />
         <button
           onClick={addImage}
-          className="p-1.5 rounded hover:bg-slate-200 transition-colors"
+          className="p-1.5 rounded hover:bg-slate-700 transition-colors text-white"
           title="Insert image"
           type="button"
         >

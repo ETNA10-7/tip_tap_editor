@@ -117,7 +117,78 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    color: #ffffff;
+    background: #0f0f0f;
+    min-height: 100vh;
+    position: relative;
+    /* Optimize scrolling performance */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+    /* Enable hardware acceleration for scrolling */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  
+  main {
+    position: relative;
+    z-index: 1;
+    color: #ffffff;
+  }
+  
+  /* Ensure all text is visible on dark background */
+  h1, h2, h3, h4, h5, h6 {
+    color: #ffffff !important;
+  }
+  
+  p, span, div, label, li {
+    color: #e5e5e5;
+  }
+  
+  /* Allow white background buttons to have black text */
+  a.bg-white,
+  button.bg-white,
+  .bg-white a,
+  .bg-white button {
+    color: #000000 !important;
+  }
+  
+  /* Override all dark text colors to be light */
+  .text-slate-900, .text-slate-800, .text-slate-700, .text-slate-600, .text-slate-500 {
+    color: #e5e5e5 !important;
+  }
+  
+  .text-gray-900, .text-gray-800, .text-gray-700, .text-gray-600, .text-gray-500 {
+    color: #e5e5e5 !important;
+  }
+  
+  .text-black:not(.bg-white):not([class*="bg-white"]) {
+    color: #ffffff !important;
+  }
+  
+  /* White background elements should have black text */
+  .bg-white,
+  [class*="bg-white"] {
+    color: #000000 !important;
+  }
+  
+  .bg-white *,
+  [class*="bg-white"] * {
+    color: #000000 !important;
+  }
+  
+  /* Override muted text to be lighter */
+  .text-muted-foreground {
+    color: #a3a3a3 !important;
+  }
+  
+  /* Ensure borders are visible */
+  .border-slate-200, .border-slate-300 {
+    border-color: rgba(255, 255, 255, 0.2) !important;
   }
 }
 
@@ -143,4 +214,31 @@
 
 .posts-scrollable::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* Rich Text Editor Dark Theme Styles */
+.ProseMirror {
+  color: #ffffff !important;
+  outline: none;
+}
+
+.ProseMirror p {
+  color: #e5e5e5 !important;
+}
+
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4,
+.ProseMirror h5,
+.ProseMirror h6 {
+  color: #ffffff !important;
+}
+
+.ProseMirror a {
+  color: #60a5fa !important;
+}
+
+.ProseMirror::placeholder {
+  color: #9ca3af !important;
 }
