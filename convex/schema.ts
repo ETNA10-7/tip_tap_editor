@@ -42,6 +42,7 @@ export default defineSchema({
     featuredImage: v.optional(v.string()), // Featured image URL for Medium-like display
     authorId: v.id("users"),
     published: v.optional(v.boolean()), // Draft/published status (defaults to true for backward compatibility)
+    claps: v.optional(v.number()), // Number of claps/likes (denormalized for performance)
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -67,4 +68,20 @@ export default defineSchema({
     .index("commentId", ["commentId"])
     .index("userId", ["userId"])
     .index("commentId_userId", ["commentId", "userId"]), // Unique constraint for one clap per user per comment
+  postClaps: defineTable({
+    postId: v.id("posts"),
+    userId: v.id("users"),
+    createdAt: v.number(),
+  })
+    .index("postId", ["postId"])
+    .index("userId", ["userId"])
+    .index("postId_userId", ["postId", "userId"]), // Unique constraint for one clap per user per post
+  bookmarks: defineTable({
+    postId: v.id("posts"),
+    userId: v.id("users"),
+    createdAt: v.number(),
+  })
+    .index("postId", ["postId"])
+    .index("userId", ["userId"])
+    .index("postId_userId", ["postId", "userId"]), // Unique constraint for one bookmark per user per post
 });

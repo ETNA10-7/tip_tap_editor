@@ -12,6 +12,7 @@ import type * as auth from "../auth.js";
 import type * as comments from "../comments.js";
 import type * as http from "../http.js";
 import type * as mutation from "../mutation.js";
+import type * as postInteractions from "../postInteractions.js";
 import type * as posts from "../posts.js";
 import type * as query from "../query.js";
 import type * as users from "../users.js";
@@ -28,6 +29,7 @@ declare const fullApi: ApiFromModules<{
   comments: typeof comments;
   http: typeof http;
   mutation: typeof mutation;
+  postInteractions: typeof postInteractions;
   posts: typeof posts;
   query: typeof query;
   users: typeof users;

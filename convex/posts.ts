@@ -67,6 +67,7 @@ export const create = mutation({
       featuredImage: args.featuredImage,
       authorId: userId,
       published,
+      claps: 0,
       createdAt: now,
       updatedAt: now,
     });

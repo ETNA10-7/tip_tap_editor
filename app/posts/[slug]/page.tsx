@@ -7,7 +7,10 @@ import Link from "next/link";
 import { ProfileAvatar } from "@/components/profile-avatar";
 import { PostComments } from "@/components/post-comments";
 import { format } from "date-fns";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
+import { Heart, MessageCircle, Bookmark, Share2 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+
 
 /**
  * Calculate reading time from HTML content
@@ -56,9 +59,31 @@ export default function PostDetailPage() {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
   const slug = params?.slug as string | undefined;
+  const { user } = useAuth();
+  const commentsRef = useRef<HTMLDivElement>(null);
 
   const result = useQuery(api.posts.getBySlug, slug ? { slug } : "skip");
   const ensureSlug = useMutation(api.posts.ensurePostSlug);
+  
+  // Post interactions
+  const postId = result?.post?._id;
+  const hasClapped = useQuery(
+    api.postInteractions.hasClapped,
+    postId ? { postId } : "skip"
+  );
+  const hasBookmarked = useQuery(
+    api.postInteractions.hasBookmarked,
+    postId ? { postId } : "skip"
+  );
+  const commentCount = useQuery(
+    api.postInteractions.getCommentCount,
+    postId ? { postId } : "skip"
+  );
+  const toggleClap = useMutation(api.postInteractions.toggleClap);
+  const toggleBookmark = useMutation(api.postInteractions.toggleBookmark);
+  
+  const [isClapping, setIsClapping] = useState(false);
+  const [isBookmarking, setIsBookmarking] = useState(false);
 
   // Calculate reading time
   const readingTime = useMemo(() => {
@@ -175,6 +200,107 @@ export default function PostDetailPage() {
             </div>
           )}
 
+          {/* Interaction Bar - Medium-like */}
+          <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+            <div className="flex items-center gap-6">
+              {/* Clap/Heart Button */}
+              <button
+                onClick={async () => {
+                  if (!user || !postId || isClapping) return;
+                  setIsClapping(true);
+                  try {
+                    await toggleClap({ postId });
+                  } catch (error) {
+                    console.error("Failed to toggle clap:", error);
+                  } finally {
+                    setIsClapping(false);
+                  }
+                }}
+                disabled={!user || isClapping}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-colors ${
+                  hasClapped
+                    ? "bg-red-50 border-red-200 text-red-600"
+                    : "border-slate-300 text-slate-600 hover:bg-slate-50"
+                } ${!user ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+              >
+                <Heart className={`h-5 w-5 ${hasClapped ? "fill-current" : ""}`} />
+                <span className="text-sm font-medium">
+                  {result.post.claps || 0}
+                </span>
+              </button>
+
+              {/* Comments Count - Clickable */}
+              <button
+                onClick={() => {
+                  commentsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+                className="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-300 text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+              >
+                <MessageCircle className="h-5 w-5" />
+                <span className="text-sm font-medium">
+                  {commentCount ?? 0}
+                </span>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {/* Bookmark Button */}
+              <button
+                onClick={async () => {
+                  if (!user || !postId || isBookmarking) return;
+                  setIsBookmarking(true);
+                  try {
+                    await toggleBookmark({ postId });
+                  } catch (error) {
+                    console.error("Failed to toggle bookmark:", error);
+                  } finally {
+                    setIsBookmarking(false);
+                  }
+                }}
+                disabled={!user || isBookmarking}
+                className={`p-2 rounded-full border transition-colors ${
+                  hasBookmarked
+                    ? "bg-slate-100 border-slate-300 text-slate-900"
+                    : "border-slate-300 text-slate-600 hover:bg-slate-50"
+                } ${!user ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                title={hasBookmarked ? "Remove bookmark" : "Save for later"}
+              >
+                <Bookmark className={`h-5 w-5 ${hasBookmarked ? "fill-current" : ""}`} />
+              </button>
+
+              {/* Share Button */}
+              <button
+                onClick={async () => {
+                  const url = window.location.href;
+                  if (navigator.share) {
+                    try {
+                      await navigator.share({
+                        title: result.post.title,
+                        text: result.post.excerpt || result.post.title,
+                        url,
+                      });
+                    } catch (error) {
+                      // User cancelled or error occurred
+                      console.log("Share cancelled or failed");
+                    }
+                  } else {
+                    // Fallback: copy to clipboard
+                    try {
+                      await navigator.clipboard.writeText(url);
+                      alert("Link copied to clipboard!");
+                    } catch (error) {
+                      console.error("Failed to copy:", error);
+                    }
+                  }
+                }}
+                className="p-2 rounded-full border border-slate-300 text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+                title="Share post"
+              >
+                <Share2 className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+
           {/* Edit/Delete Actions */}
           {result.canEdit && (
             <div className="flex items-center gap-3 pt-4">
@@ -205,7 +331,9 @@ export default function PostDetailPage() {
       </div>
 
       {/* Comments Section */}
-      <PostComments postId={result.post._id} />
+      <div ref={commentsRef} id="comments-section">
+        <PostComments postId={result.post._id} />
+      </div>
 
       {/* Footer Navigation */}
       <div className="mt-12 pt-8 border-t border-slate-200">
