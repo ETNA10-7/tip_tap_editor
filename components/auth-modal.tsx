@@ -19,14 +19,18 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
   const searchParams = useSearchParams();
   const { signIn } = useAuthActions();
   const { user, isLoading } = useAuth();
-  const [mode, setMode] = useState<"login" | "signup">(initialMode);
+  const [view, setView] = useState<"login" | "signup" | "forgot" | "reset-verification">(initialMode);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [resetCode, setResetCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
 
   // Get redirect destination from URL params or default to current path
   const redirectTo = searchParams?.get("redirect") || (typeof window !== "undefined" ? window.location.pathname : "/");
@@ -37,10 +41,14 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
       setEmail("");
       setUsername("");
       setPassword("");
+      setResetCode("");
+      setNewPassword("");
       setError(null);
       setSuccess(false);
       setShowPassword(false);
-      setMode(initialMode);
+      setShowNewPassword(false);
+      setResetEmailSent(false);
+      setView(initialMode);
     }
   }, [isOpen, initialMode]);
 
@@ -78,29 +86,62 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
     setSuccess(false);
 
     try {
-      const result = await signIn("password", {
-        flow: mode === "login" ? "signIn" : "signUp",
-        email: email.trim().toLowerCase(),
-        password,
-        ...(mode === "signup" && username.trim() ? { username: username.trim() } : {}),
-      });
-
-      if (result.signingIn) {
-        console.log("[AuthModal] ✅ Sign-in successful, session stored");
-        setSuccess(true);
+      if (view === "forgot") {
+        // Request password reset code
+        await signIn("password", {
+          flow: "reset",
+          email: email.trim().toLowerCase(),
+        });
+        setResetEmailSent(true);
         setLoading(false);
-        
-        // Reload page to establish session
-        setTimeout(() => {
-          console.log("[AuthModal] Reloading page to establish session and route to:", redirectTo);
-          window.location.href = redirectTo;
-        }, 200);
-        
         return;
+      } else if (view === "reset-verification") {
+        // Verify reset code and set new password
+        const result = await signIn("password", {
+          flow: "reset-verification",
+          email: email.trim().toLowerCase(),
+          code: resetCode.trim(),
+          newPassword,
+        });
+
+        if (result.signingIn) {
+          console.log("[AuthModal] ✅ Password reset successful, session stored");
+          setSuccess(true);
+          setLoading(false);
+          
+          // Reload page to establish session
+          setTimeout(() => {
+            console.log("[AuthModal] Reloading page to establish session and route to:", redirectTo);
+            window.location.href = redirectTo;
+          }, 200);
+          return;
+        }
+      } else {
+        // Regular sign in or sign up
+        const result = await signIn("password", {
+          flow: view === "login" ? "signIn" : "signUp",
+          email: email.trim().toLowerCase(),
+          password,
+          ...(view === "signup" && username.trim() ? { username: username.trim() } : {}),
+        });
+
+        if (result.signingIn) {
+          console.log("[AuthModal] ✅ Sign-in successful, session stored");
+          setSuccess(true);
+          setLoading(false);
+          
+          // Reload page to establish session
+          setTimeout(() => {
+            console.log("[AuthModal] Reloading page to establish session and route to:", redirectTo);
+            window.location.href = redirectTo;
+          }, 200);
+          
+          return;
+        }
       }
     } catch (err) {
       console.error("Auth error:", err);
-      let message = err instanceof Error ? err.message : `Failed to ${mode === "login" ? "sign in" : "sign up"}.`;
+      let message = err instanceof Error ? err.message : `Failed to ${view === "login" ? "sign in" : view === "signup" ? "sign up" : "reset password"}.`;
       
       // Provide user-friendly error messages
       if (message.includes("InvalidSecret")) {
@@ -111,6 +152,8 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
         message = "Account already exists. Please sign in instead.";
       } else if (message.includes("invalid password") || message.includes("password")) {
         message = "Password must be at least 8 characters long.";
+      } else if (message.includes("code") || message.includes("Code") || message.includes("verification")) {
+        message = "Invalid reset code. Please check your email and try again.";
       }
       
       setError(message);
@@ -152,17 +195,28 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
 
           <div className="space-y-2 text-center">
             <h1 className="text-3xl font-semibold">
-              {mode === "login" ? "Welcome back" : "Create account"}
+              {view === "login" 
+                ? "Welcome back" 
+                : view === "signup"
+                ? "Create account"
+                : view === "forgot"
+                ? "Reset password"
+                : "Enter reset code"}
             </h1>
             <p className="text-sm text-muted-foreground">
-              {mode === "login"
+              {view === "login"
                 ? "Sign in to your Mediumish account"
-                : "Sign up to start writing"}
+                : view === "signup"
+                ? "Sign up to start writing"
+                : view === "forgot"
+                ? "Enter your email to receive a reset code"
+                : "Enter the code sent to your email and your new password"}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === "signup" && (
+            {/* Signup username field */}
+            {view === "signup" && (
               <div className="space-y-2">
                 <label htmlFor="username" className="text-sm font-medium">
                   Username
@@ -178,6 +232,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
               </div>
             )}
 
+            {/* Email field (always shown) */}
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
                 Email address
@@ -189,44 +244,127 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                disabled={loading}
+                disabled={loading || resetEmailSent}
               />
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
-                Password
-              </label>
-              <div className="relative">
+            {/* Reset code field (only for reset-verification) */}
+            {view === "reset-verification" && (
+              <div className="space-y-2">
+                <label htmlFor="resetCode" className="text-sm font-medium">
+                  Reset code
+                </label>
                 <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder={
-                    mode === "login"
-                      ? "Enter your password"
-                      : "Enter password (min 8 characters)"
-                  }
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id="resetCode"
+                  type="text"
+                  placeholder="Enter the code from your email"
+                  value={resetCode}
+                  onChange={(e) => setResetCode(e.target.value)}
                   required
-                  minLength={mode === "signup" ? 8 : undefined}
                   disabled={loading}
-                  className="pr-10"
+                  maxLength={8}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
+                <p className="text-xs text-muted-foreground">
+                  Check your email for the reset code
+                </p>
               </div>
-              {mode === "signup" && (
+            )}
+
+            {/* Password field (for login/signup) */}
+            {(view === "login" || view === "signup") && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="password" className="text-sm font-medium">
+                    Password
+                  </label>
+                  {view === "login" && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setView("forgot");
+                        setError(null);
+                      }}
+                      className="text-xs text-slate-600 hover:text-slate-900 hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder={
+                      view === "login"
+                        ? "Enter your password"
+                        : "Enter password (min 8 characters)"
+                    }
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={view === "signup" ? 8 : undefined}
+                    disabled={loading}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                {view === "signup" && (
+                  <p className="text-xs text-muted-foreground">
+                    Must be at least 8 characters long
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* New password field (for reset-verification) */}
+            {view === "reset-verification" && (
+              <div className="space-y-2">
+                <label htmlFor="newPassword" className="text-sm font-medium">
+                  New password
+                </label>
+                <div className="relative">
+                  <Input
+                    id="newPassword"
+                    type={showNewPassword ? "text" : "password"}
+                    placeholder="Enter new password (min 8 characters)"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    minLength={8}
+                    disabled={loading}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  >
+                    {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
                 <p className="text-xs text-muted-foreground">
                   Must be at least 8 characters long
                 </p>
-              )}
-            </div>
+              </div>
+            )}
+
+            {resetEmailSent && (
+              <div className="rounded-lg bg-blue-50 p-3 text-sm text-blue-600">
+                <p className="font-medium">Reset code generated!</p>
+                <p className="mt-1">
+                  <strong>Development Mode:</strong> Check your Convex dashboard logs for the reset code.
+                </p>
+                <p className="mt-1 text-xs">
+                  In production, this code would be sent to your email. Click "Enter code" below to continue.
+                </p>
+              </div>
+            )}
 
             {success && (
               <div className="rounded-lg bg-green-50 p-3 text-sm text-green-600">
@@ -239,9 +377,19 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
               <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
                 <p className="font-medium">Error</p>
                 <p>{error}</p>
-                {mode === "login" && error.includes("Invalid email or password") && (
+                {view === "login" && error.includes("Invalid email or password") && (
                   <p className="mt-2 text-xs">
-                    Don't remember your password? Try signing up with a new account or use the email you signed up with.
+                    Don't remember your password?{" "}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setView("forgot");
+                        setError(null);
+                      }}
+                      className="underline"
+                    >
+                      Reset it here
+                    </button>
                   </p>
                 )}
               </div>
@@ -249,27 +397,39 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
 
             <Button
               type="submit"
-              disabled={loading || (mode === "signup" && password.length < 8)}
+              disabled={
+                loading || 
+                (view === "signup" && password.length < 8) ||
+                (view === "reset-verification" && (newPassword.length < 8 || !resetCode.trim()))
+              }
               className="w-full"
             >
               {loading
-                ? mode === "login"
+                ? view === "login"
                   ? "Signing in..."
-                  : "Creating account..."
-                : mode === "login"
+                  : view === "signup"
+                  ? "Creating account..."
+                  : view === "forgot"
+                  ? "Sending code..."
+                  : "Resetting password..."
+                : view === "login"
                   ? "Sign in"
-                  : "Sign up"}
+                  : view === "signup"
+                  ? "Sign up"
+                  : view === "forgot"
+                  ? "Send reset code"
+                  : "Reset password"}
             </Button>
           </form>
 
           <div className="text-center text-sm text-muted-foreground">
-            {mode === "login" ? (
+            {view === "login" ? (
               <>
                 Don&apos;t have an account?{" "}
                 <button
                   type="button"
                   onClick={() => {
-                    setMode("signup");
+                    setView("signup");
                     setError(null);
                   }}
                   className="font-semibold text-slate-900 hover:underline"
@@ -277,18 +437,63 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
                   Sign up
                 </button>
               </>
-            ) : (
+            ) : view === "signup" ? (
               <>
                 Already have an account?{" "}
                 <button
                   type="button"
                   onClick={() => {
-                    setMode("login");
+                    setView("login");
                     setError(null);
                   }}
                   className="font-semibold text-slate-900 hover:underline"
                 >
                   Sign in
+                </button>
+              </>
+            ) : view === "forgot" ? (
+              <>
+                Remember your password?{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setView("login");
+                    setError(null);
+                    setResetEmailSent(false);
+                  }}
+                  className="font-semibold text-slate-900 hover:underline"
+                >
+                  Sign in
+                </button>
+                {resetEmailSent && (
+                  <>
+                    {" • "}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setView("reset-verification");
+                        setError(null);
+                      }}
+                      className="font-semibold text-slate-900 hover:underline"
+                    >
+                      Enter code
+                    </button>
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setView("forgot");
+                    setError(null);
+                    setResetCode("");
+                    setNewPassword("");
+                  }}
+                  className="font-semibold text-slate-900 hover:underline"
+                >
+                  ← Back to reset request
                 </button>
               </>
             )}
