@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { ProfileAvatar } from "@/components/profile-avatar";
 import { Doc } from "@/convex/_generated/dataModel";
-import { LogOut, User, Settings } from "lucide-react";
+import { LogOut, User, Settings, Bookmark } from "lucide-react";
 
 type User = Doc<"users"> | null | undefined;
 
@@ -66,6 +66,11 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
   const handleEditProfileClick = () => {
     setIsOpen(false);
     router.push("/profile/edit");
+  };
+
+  const handleBookmarksClick = () => {
+    setIsOpen(false);
+    router.push("/bookmarks");
   };
 
   if (!user) {
@@ -137,6 +142,16 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
                 )}
               </div>
               <span className="flex-1 text-left">Edit Profile</span>
+            </button>
+
+            <button
+              onClick={handleBookmarksClick}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+            >
+              <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
+                <Bookmark className="h-4 w-4" />
+              </div>
+              <span className="flex-1 text-left">My Bookmarks</span>
             </button>
 
             {/* Divider */}

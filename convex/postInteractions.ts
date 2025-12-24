@@ -157,3 +157,53 @@ export const getCommentCount = query({
   },
 });
 
+/**
+ * Get all bookmarked posts for the current user
+ */
+export const getBookmarkedPosts = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) {
+      return [];
+    }
+
+    // Get all bookmarks for this user
+    const bookmarks = await ctx.db
+      .query("bookmarks")
+      .withIndex("userId", (q: any) => q.eq("userId", userId))
+      .collect();
+
+    // Sort by createdAt descending (most recent first)
+    bookmarks.sort((a, b) => b.createdAt - a.createdAt);
+
+    // Get the posts for these bookmarks
+    const posts = await Promise.all(
+      bookmarks.map(async (bookmark) => {
+        const post = await ctx.db.get(bookmark.postId);
+        if (!post) return null;
+
+        // Get author information
+        const author = await ctx.db.get(post.authorId);
+        const authorInfo = author
+          ? {
+              _id: author._id,
+              name: author.name || "Anonymous",
+              image: author.image,
+              username: author.username,
+            }
+          : null;
+
+        return {
+          post,
+          author: authorInfo,
+          bookmarkedAt: bookmark.createdAt,
+        };
+      })
+    );
+
+    // Filter out null posts and return
+    return posts.filter((p): p is NonNullable<typeof p> => p !== null);
+  },
+});
+
