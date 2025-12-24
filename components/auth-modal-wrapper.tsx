@@ -9,3 +9,4 @@ export function AuthModalWrapper() {
   return <AuthModal isOpen={isOpen} onClose={closeModal} initialMode={mode} />;
 }
 
+

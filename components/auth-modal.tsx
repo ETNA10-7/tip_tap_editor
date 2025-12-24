@@ -259,10 +259,13 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
                   type="text"
                   placeholder="Enter the code from your email"
                   value={resetCode}
-                  onChange={(e) => setResetCode(e.target.value)}
+                  onChange={(e) => {
+                    // Remove any spaces from the reset code (codes don't contain spaces)
+                    const cleaned = e.target.value.replace(/\s/g, "");
+                    setResetCode(cleaned);
+                  }}
                   required
                   disabled={loading}
-                  maxLength={8}
                 />
                 <p className="text-xs text-muted-foreground">
                   Check your email for the reset code
