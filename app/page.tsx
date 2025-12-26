@@ -46,13 +46,15 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { PostCard } from "@/components/post-card";
 import { ProfileSetupPrompt } from "@/components/profile-setup-prompt";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
   const posts = useQuery(api.posts.list) ?? [];
   const latest = posts.slice(0, 3);
+  const { isAuthenticated } = useAuth();
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 bg-white min-h-screen -mx-4 -my-10 px-4 py-10">
       {/* Profile Setup Prompt - Shows for authenticated users who haven't set up their profile */}
       <ProfileSetupPrompt />
 
@@ -71,7 +73,7 @@ export default function Home() {
           <div className="flex flex-wrap gap-3 pt-1">
             <Link
               href="/create"
-              className="rounded-full bg-white px-5 py-2 text-sm font-semibold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg hover:bg-slate-100"
+              className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black shadow-md transition hover:-translate-y-0.5 hover:shadow-lg hover:bg-slate-100"
             >
               Start writing
             </Link>
@@ -87,15 +89,15 @@ export default function Home() {
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-white">Latest posts</h2>
-          <Link href="/posts" className="text-sm text-blue-400 hover:text-blue-300 hover:underline">
+          <h2 className="text-xl font-semibold text-slate-900">Latest posts</h2>
+          <Link href="/posts" className="text-sm text-blue-600 hover:text-blue-700 hover:underline">
             View all
           </Link>
         </div>
         {latest.length === 0 ? (
-          <p className="text-slate-400">
+          <p className="text-slate-600">
             No posts yet. Be the first to{" "}
-            <Link href="/create" className="underline text-blue-400 hover:text-blue-300">
+            <Link href="/create" className="underline text-blue-600 hover:text-blue-700">
               write one
             </Link>
             .
