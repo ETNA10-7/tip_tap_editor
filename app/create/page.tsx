@@ -179,7 +179,7 @@ export default function CreatePage() {
             id="publish-toggle"
             checked={published}
             onChange={(e) => setPublished(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-600 bg-slate-800/50 text-blue-500 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+            className="h-4 w-4 rounded border-slate-600 bg-slate-800/50 text-teal-500 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-900"
           />
           <label htmlFor="publish-toggle" className="text-sm font-medium text-slate-300 cursor-pointer">
             {published ? "Publish" : "Save as Draft"}
@@ -188,7 +188,7 @@ export default function CreatePage() {
         <button
           onClick={handleSubmit}
           disabled={saving || !isAuthenticated}
-          className="rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-full bg-teal-600 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-teal-700 hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
         >
           {saving ? "Saving…" : published ? "Publish" : "Save Draft"}
         </button>

@@ -5,6 +5,7 @@ import { ConvexClientProvider } from "./ConvexClientProvider";
 import { SiteHeader } from "@/components/site-header";
 import { AuthModalProvider } from "@/contexts/auth-modal-context";
 import { AuthModalWrapper } from "@/components/auth-modal-wrapper";
+import { ThemeProvider } from "@/contexts/theme-context";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -31,13 +32,15 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ConvexClientProvider>
-          <AuthModalProvider>
-            <SiteHeader />
-            <main className="mx-auto min-h-screen max-w-5xl px-4 py-10 text-white">
-              {children}
-            </main>
-            <AuthModalWrapper />
-          </AuthModalProvider>
+          <ThemeProvider>
+            <AuthModalProvider>
+              <SiteHeader />
+              <main className="mx-auto min-h-screen max-w-5xl px-4 py-10 text-white dark:text-white">
+                {children}
+              </main>
+              <AuthModalWrapper />
+            </AuthModalProvider>
+          </ThemeProvider>
         </ConvexClientProvider>
       </body>
     </html>

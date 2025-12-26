@@ -288,7 +288,7 @@ function CommentItem({
                 onClick={() => handleClap(comment._id)}
                 className={`flex items-center gap-1 transition-colors ${
                   comment.hasClapped
-                    ? "text-blue-600 hover:text-blue-700"
+                    ? "text-teal-600 hover:text-teal-700"
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
@@ -401,7 +401,7 @@ function CommentItem({
                         onClick={() => handleClap(reply._id)}
                         className={`flex items-center gap-1 transition-colors ${
                           reply.hasClapped
-                            ? "text-blue-600 hover:text-blue-700"
+                            ? "text-teal-600 hover:text-teal-700"
                             : "text-slate-600 hover:text-slate-900"
                         }`}
                       >

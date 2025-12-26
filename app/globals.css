@@ -47,6 +47,8 @@
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
+  /* Leafy light green for homepage - soft, easy on the eyes */
+  --leafy-green: #B8DB80;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -116,9 +118,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+  
+  /* Default light theme styles */
   body {
-    color: #ffffff;
-    background: #0f0f0f;
+    color: #1f2937;
+    background: #ffffff;
     min-height: 100vh;
     position: relative;
     /* Optimize scrolling performance */
@@ -133,19 +137,36 @@
     -webkit-overflow-scrolling: touch;
   }
   
-  
   main {
     position: relative;
     z-index: 1;
-    color: #ffffff;
+    color: #1f2937;
   }
   
-  /* Ensure all text is visible on dark background */
+  /* Light theme text colors */
   h1, h2, h3, h4, h5, h6 {
-    color: #ffffff !important;
+    color: #111827;
   }
   
   p, span, div, label, li {
+    color: #4b5563;
+  }
+  
+  /* Dark theme overrides */
+  .dark body {
+    color: #ffffff;
+    background: #0f0f0f;
+  }
+  
+  .dark main {
+    color: #ffffff;
+  }
+  
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+    color: #ffffff !important;
+  }
+  
+  .dark p, .dark span, .dark div, .dark label, .dark li {
     color: #e5e5e5;
   }
   
@@ -157,16 +178,16 @@
     color: #000000 !important;
   }
   
-  /* Override all dark text colors to be light */
-  .text-slate-900, .text-slate-800, .text-slate-700, .text-slate-600, .text-slate-500 {
+  /* Override text colors for dark theme */
+  .dark .text-slate-900, .dark .text-slate-800, .dark .text-slate-700, .dark .text-slate-600, .dark .text-slate-500 {
     color: #e5e5e5 !important;
   }
   
-  .text-gray-900, .text-gray-800, .text-gray-700, .text-gray-600, .text-gray-500 {
+  .dark .text-gray-900, .dark .text-gray-800, .dark .text-gray-700, .dark .text-gray-600, .dark .text-gray-500 {
     color: #e5e5e5 !important;
   }
   
-  .text-black:not(.bg-white):not([class*="bg-white"]) {
+  .dark .text-black:not(.bg-white):not([class*="bg-white"]) {
     color: #ffffff !important;
   }
   
@@ -181,13 +202,21 @@
     color: #000000 !important;
   }
   
-  /* Override muted text to be lighter */
+  /* Override muted text */
   .text-muted-foreground {
+    color: #6b7280 !important;
+  }
+  
+  .dark .text-muted-foreground {
     color: #a3a3a3 !important;
   }
   
   /* Ensure borders are visible */
   .border-slate-200, .border-slate-300 {
+    border-color: #e5e7eb !important;
+  }
+  
+  .dark .border-slate-200, .dark .border-slate-300 {
     border-color: rgba(255, 255, 255, 0.2) !important;
   }
 }

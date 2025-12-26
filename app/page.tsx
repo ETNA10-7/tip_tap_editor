@@ -54,7 +54,13 @@ export default function Home() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="space-y-10 bg-white min-h-screen -mx-4 -my-10 px-4 py-10">
+    <>
+      {/* Leafy light green background overlay for homepage only */}
+      <div 
+        className="fixed inset-0 -z-10"
+        style={{ backgroundColor: 'var(--leafy-green, #B8DB80)' }}
+      />
+      <div className="space-y-10 relative z-0">
       {/* Profile Setup Prompt - Shows for authenticated users who haven't set up their profile */}
       <ProfileSetupPrompt />
 
@@ -89,15 +95,15 @@ export default function Home() {
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-slate-900">Latest posts</h2>
-          <Link href="/posts" className="text-sm text-blue-600 hover:text-blue-700 hover:underline">
+          <h2 className="text-xl font-semibold text-white">Latest posts</h2>
+          <Link href="/posts" className="text-sm text-teal-400 hover:text-teal-300 hover:underline">
             View all
           </Link>
         </div>
         {latest.length === 0 ? (
-          <p className="text-slate-600">
+          <p className="text-slate-400">
             No posts yet. Be the first to{" "}
-            <Link href="/create" className="underline text-blue-600 hover:text-blue-700">
+            <Link href="/create" className="underline text-teal-400 hover:text-teal-300">
               write one
             </Link>
             .
@@ -110,7 +116,8 @@ export default function Home() {
           </div>
         )}
       </section>
-    </div>
+      </div>
+    </>
   );
 }
 

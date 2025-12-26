@@ -59,12 +59,12 @@ export function ProfileSetupPrompt() {
   };
 
   return (
-    <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-md">
+    <Card className="border-teal-200 bg-gradient-to-br from-teal-50 to-cyan-50 shadow-md">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">
-            <div className="rounded-full bg-blue-100 p-2">
-              <Sparkles className="h-5 w-5 text-blue-600" />
+            <div className="rounded-full bg-teal-100 p-2">
+              <Sparkles className="h-5 w-5 text-teal-600" />
             </div>
             <div className="flex-1 space-y-1">
               <CardTitle className="text-lg text-slate-900">
@@ -105,6 +105,7 @@ export function ProfileSetupPrompt() {
     </Card>
   );
 }
+
 
 
 

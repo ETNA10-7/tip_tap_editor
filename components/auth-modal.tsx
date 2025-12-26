@@ -358,7 +358,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
             )}
 
             {resetEmailSent && (
-              <div className="rounded-lg bg-blue-50 p-3 text-sm text-blue-600">
+              <div className="rounded-lg bg-teal-50 p-3 text-sm text-teal-600">
                 <p className="font-medium">Reset code generated!</p>
                 <p className="mt-1">
                   <strong>Development Mode:</strong> Check your Convex dashboard logs for the reset code.

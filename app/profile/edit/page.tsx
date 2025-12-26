@@ -234,9 +234,9 @@ export default function EditProfilePage() {
                           </ol>
                           <p className="mt-2 font-medium text-slate-700">Popular image sources:</p>
                           <ul className="list-disc list-inside space-y-1 ml-2">
-                            <li><a href="https://www.pexels.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Pexels</a> - Free stock photos</li>
-                            <li><a href="https://unsplash.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Unsplash</a> - Free high-quality images</li>
-                            <li><a href="https://imgur.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Imgur</a> - Upload your own images</li>
+                            <li><a href="https://www.pexels.com" target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">Pexels</a> - Free stock photos</li>
+                            <li><a href="https://unsplash.com" target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">Unsplash</a> - Free high-quality images</li>
+                            <li><a href="https://imgur.com" target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">Imgur</a> - Upload your own images</li>
                             <li>Any website with publicly accessible images</li>
                           </ul>
                           <p className="mt-2 text-xs italic">Note: Make sure the image URL is publicly accessible and ends with an image file extension (.jpg, .png, .gif, .webp, etc.)</p>

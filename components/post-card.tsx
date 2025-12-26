@@ -123,7 +123,7 @@ export function PostCard({ post }: { post: Post }) {
         ) : null}
         <Link
           href={`/posts/${slug}`}
-          className="mt-4 inline-flex items-center text-sm font-medium text-blue-400 hover:text-blue-300 hover:underline transition-colors"
+          className="mt-4 inline-flex items-center text-sm font-medium text-teal-400 hover:text-teal-300 hover:underline transition-colors"
         >
           Read story →
         </Link>

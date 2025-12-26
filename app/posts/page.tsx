@@ -80,7 +80,7 @@ export default function PostsPage() {
               size="sm"
               onClick={() => setView("all")}
               className={view === "all" 
-                ? "bg-blue-600 text-white hover:bg-blue-700" 
+                ? "bg-teal-600 text-white hover:bg-teal-700" 
                 : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white"}
             >
               All posts
@@ -91,7 +91,7 @@ export default function PostsPage() {
               onClick={() => setView("mine")}
               disabled={!isAuthenticated}
               className={view === "mine" 
-                ? "bg-blue-600 text-white hover:bg-blue-700" 
+                ? "bg-teal-600 text-white hover:bg-teal-700" 
                 : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white"}
             >
               My posts

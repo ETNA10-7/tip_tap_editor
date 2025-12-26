@@ -319,7 +319,7 @@ export default function PostDetailPage() {
       <div className="prose prose-lg prose-slate max-w-none 
         prose-headings:font-bold prose-headings:text-white
         prose-p:text-slate-200 prose-p:leading-relaxed
-        prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
+        prose-a:text-teal-400 prose-a:no-underline hover:prose-a:underline
         prose-strong:text-white
         prose-img:rounded-lg prose-img:my-8 prose-img:shadow-lg
         prose-blockquote:border-l-4 prose-blockquote:border-slate-300 prose-blockquote:pl-4
