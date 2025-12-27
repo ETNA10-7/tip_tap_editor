@@ -187,8 +187,41 @@
     color: #e5e5e5 !important;
   }
   
-  .dark .text-black:not(.bg-white):not([class*="bg-white"]) {
+  .dark .text-black:not(.bg-white):not([class*="bg-white"]):not(.homepage-override) {
     color: #ffffff !important;
+  }
+  
+  /* Homepage header overrides - ensure text stays black */
+  header.homepage-header .homepage-text-black,
+  header.homepage-header a[href="/"],
+  header.homepage-header a.text-black {
+    color: #000000 !important;
+  }
+  
+  header.homepage-header input.homepage-search-input,
+  header.homepage-header input[type="text"] {
+    color: #000000 !important;
+    caret-color: #000000 !important;
+  }
+  
+  /* Navigation links on homepage header */
+  header.homepage-header nav a {
+    color: #1f2937 !important;
+  }
+  
+  header.homepage-header nav a:hover {
+    color: #000000 !important;
+  }
+  
+  /* Profile dropdown text on homepage */
+  .homepage-dropdown p.text-black,
+  .homepage-dropdown p[class*="text-black"],
+  .homepage-dropdown p {
+    color: #000000 !important;
+  }
+  
+  .homepage-dropdown p.text-gray-700 {
+    color: #374151 !important;
   }
   
   /* White background elements should have black text */
