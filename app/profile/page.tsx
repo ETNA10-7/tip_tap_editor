@@ -18,11 +18,14 @@ import { Edit, Mail, FileText, Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuthModal } from "@/contexts/auth-modal-context";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function ProfilePage() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const { openModal } = useAuthModal();
+  const { theme } = useTheme();
+  const isLightMode = theme === "light";
   const [postView, setPostView] = useState<"published" | "drafts">("published");
 
   // Get user's posts
@@ -57,16 +60,32 @@ export default function ProfilePage() {
   // Show loading state
   if (isLoading || !user) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-center py-12">
-          <p className="text-muted-foreground">Loading profile...</p>
+      <>
+        {isLightMode && (
+          <div 
+            className="fixed inset-0 -z-10"
+            style={{ backgroundColor: 'var(--leafy-green, #B8DB80)' }}
+          />
+        )}
+        <div className="space-y-6 relative z-0">
+          <div className="flex items-center justify-center py-12">
+            <p className={isLightMode ? "text-black" : "text-muted-foreground"}>Loading profile...</p>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <>
+      {/* Green background overlay for light mode only */}
+      {isLightMode && (
+        <div 
+          className="fixed inset-0 -z-10"
+          style={{ backgroundColor: 'var(--leafy-green, #B8DB80)' }}
+        />
+      )}
+      <div className="space-y-8 relative z-0">
       {/* Profile Header Card */}
       <Card className="overflow-hidden">
         <CardContent className="pt-8 pb-6">
@@ -80,11 +99,11 @@ export default function ProfilePage() {
             <div className="flex-1 space-y-4 min-w-0">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div className="space-y-1 min-w-0">
-                  <h1 className="text-3xl font-bold text-slate-900 truncate">
+                  <h1 className={`text-3xl font-bold truncate ${isLightMode ? "text-black" : "text-slate-900"}`}>
                     {user.name || "User"}
                   </h1>
                   {user.email && (
-                    <div className="flex items-center gap-2 text-muted-foreground">
+                    <div className={`flex items-center gap-2 ${isLightMode ? "text-black" : "text-muted-foreground"}`}>
                       <Mail className="h-4 w-4 flex-shrink-0" />
                       <span className="truncate">{user.email}</span>
                     </div>
@@ -102,17 +121,17 @@ export default function ProfilePage() {
               {/* Bio */}
               {user.bio ? (
                 <div className="pt-2">
-                  <p className="text-slate-700 leading-relaxed">
+                  <p className={`leading-relaxed ${isLightMode ? "text-black" : "text-slate-700"}`}>
                     {user.bio}
                   </p>
                 </div>
               ) : (
                 <div className="pt-2">
-                  <p className="text-muted-foreground italic">
+                  <p className={`italic ${isLightMode ? "text-black" : "text-muted-foreground"}`}>
                     No bio yet.{" "}
                     <Link
                       href="/profile/edit"
-                      className="text-slate-900 hover:underline font-medium"
+                      className={`hover:underline font-medium ${isLightMode ? "text-blue-700" : "text-slate-900"}`}
                     >
                       Add one
                     </Link>{" "}
@@ -189,12 +208,12 @@ export default function ProfilePage() {
                   <FileText className="h-8 w-8 text-slate-400" />
                 </div>
                 <div className="space-y-2">
-                  <p className="text-slate-700 font-medium">
+                  <p className={`font-medium ${isLightMode ? "text-black" : "text-slate-700"}`}>
                     {postView === "published"
                       ? "You haven't published any posts yet."
                       : "You don't have any drafts yet."}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className={`text-sm ${isLightMode ? "text-black" : "text-muted-foreground"}`}>
                     {postView === "published"
                       ? "Start sharing your thoughts with the world!"
                       : "Create a draft to save your work in progress."}
@@ -221,7 +240,8 @@ export default function ProfilePage() {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   );
 }
 

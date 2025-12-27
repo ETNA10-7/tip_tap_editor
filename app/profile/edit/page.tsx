@@ -18,10 +18,13 @@ import {
 import { ProfileAvatar } from "@/components/profile-avatar";
 import { ArrowLeft, Save, User, Image as ImageIcon, FileText, AtSign, Check, X } from "lucide-react";
 import Link from "next/link";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function EditProfilePage() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
+  const { theme } = useTheme();
+  const isLightMode = theme === "light";
   const updateProfile = useMutation(api.users.updateProfile);
   const updateUsername = useMutation(api.users.updateUsername);
 
@@ -154,21 +157,29 @@ export default function EditProfilePage() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Link href="/profile">
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Edit Profile</h1>
-          <p className="text-muted-foreground mt-1">
-            Update your profile information and tell readers about yourself.
-          </p>
+    <>
+      {/* Green background overlay for light mode only */}
+      {isLightMode && (
+        <div 
+          className="fixed inset-0 -z-10"
+          style={{ backgroundColor: 'var(--leafy-green, #B8DB80)' }}
+        />
+      )}
+      <div className="space-y-6 relative z-0">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <Link href="/profile">
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
+          <div>
+            <h1 className={`text-3xl font-bold ${isLightMode ? "text-black" : "text-slate-900"}`}>Edit Profile</h1>
+            <p className={`mt-1 ${isLightMode ? "text-black" : "text-muted-foreground"}`}>
+              Update your profile information and tell readers about yourself.
+            </p>
+          </div>
         </div>
-      </div>
 
       {/* Profile Edit Form Card */}
       <Card>
@@ -392,7 +403,8 @@ export default function EditProfilePage() {
           </form>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   );
 }
 

@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { Heart, MessageCircle, Bookmark, Share2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/contexts/theme-context";
 
 
 /**
@@ -60,7 +61,9 @@ export default function PostDetailPage() {
   const router = useRouter();
   const slug = params?.slug as string | undefined;
   const { user } = useAuth();
+  const { theme } = useTheme();
   const commentsRef = useRef<HTMLDivElement>(null);
+  const isLightMode = theme === "light";
 
   const result = useQuery(api.posts.getBySlug, slug ? { slug } : "skip");
   const ensureSlug = useMutation(api.posts.ensurePostSlug);
@@ -116,32 +119,56 @@ export default function PostDetailPage() {
   if (result === undefined) {
     console.log("[PostDetailPage] Loading...");
     return (
-      <div className="max-w-4xl mx-auto">
-        <p className="text-muted-foreground">Loading…</p>
-      </div>
+      <>
+        {isLightMode && (
+          <div 
+            className="fixed inset-0 -z-10"
+            style={{ backgroundColor: 'var(--leafy-green, #B8DB80)' }}
+          />
+        )}
+        <div className="max-w-4xl mx-auto relative z-0">
+          <p className={isLightMode ? "text-black" : "text-muted-foreground"}>Loading…</p>
+        </div>
+      </>
     );
   }
 
   if (result === null) {
     console.log("[PostDetailPage] Post not found for slug:", slug);
     return (
-      <div className="max-w-4xl mx-auto space-y-4">
-        <p className="text-muted-foreground">Post not found for slug: {slug}</p>
-        <p className="text-sm text-muted-foreground">
-          Check the Convex dev server logs for debugging information.
-        </p>
-        <Link
-          href="/posts"
-          className="text-primary underline"
-        >
-          Back to posts
-        </Link>
-      </div>
+      <>
+        {isLightMode && (
+          <div 
+            className="fixed inset-0 -z-10"
+            style={{ backgroundColor: 'var(--leafy-green, #B8DB80)' }}
+          />
+        )}
+        <div className="max-w-4xl mx-auto space-y-4 relative z-0">
+          <p className={isLightMode ? "text-black" : "text-muted-foreground"}>Post not found for slug: {slug}</p>
+          <p className={`text-sm ${isLightMode ? "text-black" : "text-muted-foreground"}`}>
+            Check the Convex dev server logs for debugging information.
+          </p>
+          <Link
+            href="/posts"
+            className={`${isLightMode ? "text-blue-700 hover:text-blue-800" : "text-primary"} underline`}
+          >
+            Back to posts
+          </Link>
+        </div>
+      </>
     );
   }
 
   return (
-    <article className="max-w-4xl mx-auto">
+    <>
+      {/* Green background overlay for light mode only */}
+      {isLightMode && (
+        <div 
+          className="fixed inset-0 -z-10"
+          style={{ backgroundColor: 'var(--leafy-green, #B8DB80)' }}
+        />
+      )}
+      <article className="max-w-4xl mx-auto relative z-0">
       {/* Medium-like Header Section */}
       <header className="mb-8">
         {result.post.featuredImage && (
@@ -159,7 +186,7 @@ export default function PostDetailPage() {
         
         <div className="space-y-4">
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-5xl font-bold leading-tight tracking-tight text-white">
+            <h1 className={`text-5xl font-bold leading-tight tracking-tight ${isLightMode ? "text-black" : "text-white"}`}>
               {result.post.title}
             </h1>
             {result.post.published === false && (
@@ -169,24 +196,24 @@ export default function PostDetailPage() {
             )}
           </div>
           {result.post.excerpt && (
-            <p className="text-xl text-slate-200 leading-relaxed">
+            <p className={`text-xl leading-relaxed ${isLightMode ? "text-black" : "text-slate-200"}`}>
               {result.post.excerpt}
             </p>
           )}
           
           {/* Author Info */}
           {result.author && (
-            <div className="flex items-center gap-3 pt-4 border-t border-slate-200">
+            <div className={`flex items-center gap-3 pt-4 border-t ${isLightMode ? "border-gray-300" : "border-slate-200"}`}>
               <Link
                 href={`/users/${getAuthorUsername(result.author)}`}
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity"
               >
                 <ProfileAvatar user={result.author} size="md" />
                 <div className="flex-1">
-                  <p className="font-semibold text-white">
+                  <p className={`font-semibold ${isLightMode ? "text-black" : "text-white"}`}>
                     {result.author.name || "Anonymous"}
                   </p>
-                  <div className="flex items-center gap-2 text-sm text-slate-300">
+                  <div className={`flex items-center gap-2 text-sm ${isLightMode ? "text-black" : "text-slate-300"}`}>
                     <span>{format(new Date(result.post.createdAt), "MMM d, yyyy")}</span>
                     {readingTime && (
                       <>
@@ -201,7 +228,7 @@ export default function PostDetailPage() {
           )}
 
           {/* Interaction Bar - Medium-like */}
-          <div className="flex items-center justify-between pt-4 border-t border-slate-700">
+          <div className={`flex items-center justify-between pt-4 border-t ${isLightMode ? "border-gray-300" : "border-slate-700"}`}>
             <div className="flex items-center gap-6">
               {/* Clap/Heart Button */}
               <button
@@ -219,8 +246,10 @@ export default function PostDetailPage() {
                 disabled={!user || isClapping}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all duration-200 ${
                   hasClapped
-                    ? "bg-red-500/20 border-red-500/50 text-red-400 hover:bg-red-500/30"
-                    : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:border-slate-500"
+                    ? "bg-red-500/20 border-red-500/50 text-red-600 hover:bg-red-500/30"
+                    : isLightMode
+                      ? "border-gray-300 bg-white text-black hover:bg-gray-50 hover:border-gray-400"
+                      : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:border-slate-500"
                 } ${!user ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
               >
                 <Heart className={`h-5 w-5 ${hasClapped ? "fill-red-400 text-red-400" : ""}`} />
@@ -234,7 +263,11 @@ export default function PostDetailPage() {
                 onClick={() => {
                   commentsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
                 }}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:border-slate-500 transition-all duration-200 cursor-pointer"
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all duration-200 cursor-pointer ${
+                  isLightMode
+                    ? "border-gray-300 bg-white text-black hover:bg-gray-50 hover:border-gray-400"
+                    : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:border-slate-500"
+                }`}
               >
                 <MessageCircle className="h-5 w-5" />
                 <span className="text-sm font-medium">
@@ -260,8 +293,10 @@ export default function PostDetailPage() {
                 disabled={!user || isBookmarking}
                 className={`p-2.5 rounded-full border transition-all duration-200 ${
                   hasBookmarked
-                    ? "bg-yellow-500/20 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/30"
-                    : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:border-slate-500"
+                    ? "bg-yellow-500/20 border-yellow-500/50 text-yellow-600 hover:bg-yellow-500/30"
+                    : isLightMode
+                      ? "border-gray-300 bg-white text-black hover:bg-gray-50 hover:border-gray-400"
+                      : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:border-slate-500"
                 } ${!user ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                 title={hasBookmarked ? "Remove bookmark" : "Save for later"}
               >
@@ -293,7 +328,11 @@ export default function PostDetailPage() {
                     }
                   }
                 }}
-                className="p-2.5 rounded-full border border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:border-slate-500 transition-all duration-200 cursor-pointer"
+                className={`p-2.5 rounded-full border transition-all duration-200 cursor-pointer ${
+                  isLightMode
+                    ? "border-gray-300 bg-white text-black hover:bg-gray-50 hover:border-gray-400"
+                    : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:border-slate-500"
+                }`}
                 title="Share post"
               >
                 <Share2 className="h-5 w-5" />
@@ -336,15 +375,20 @@ export default function PostDetailPage() {
       </div>
 
       {/* Footer Navigation */}
-      <div className="mt-12 pt-8 border-t border-slate-200">
+      <div className={`mt-12 pt-8 border-t ${isLightMode ? "border-gray-300" : "border-slate-200"}`}>
         <Link 
           href="/posts" 
-          className="inline-flex items-center text-slate-300 hover:text-white transition-colors"
+          className={`inline-flex items-center transition-colors ${
+            isLightMode
+              ? "text-blue-700 hover:text-blue-800"
+              : "text-slate-300 hover:text-white"
+          }`}
         >
           ← Back to posts
         </Link>
       </div>
     </article>
+    </>
   );
 }
 
