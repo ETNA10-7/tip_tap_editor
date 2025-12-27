@@ -67,14 +67,20 @@ function getAuthorUsername(author: Author): string {
   return userIdStr.slice(-8); // Use last 8 characters as fallback
 }
 
-export function PostCard({ post }: { post: Post }) {
+export function PostCard({ post, isHomepage = false }: { post: Post; isHomepage?: boolean }) {
   const slug = getPostSlug(post);
   
   return (
-    <article className="group rounded-xl border border-slate-700 bg-slate-800/50 backdrop-blur-sm overflow-hidden shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
+    <article className={`group rounded-xl border overflow-hidden shadow-sm transition-all hover:shadow-lg hover:-translate-y-1 ${
+      isHomepage
+        ? "border-gray-200 bg-white"
+        : "border-slate-700 bg-slate-800/50 backdrop-blur-sm"
+    }`}>
       {post.featuredImage && (
         <Link href={`/posts/${slug}`} className="block">
-          <div className="relative w-full h-48 overflow-hidden bg-slate-100">
+          <div className={`relative w-full h-48 overflow-hidden ${
+            isHomepage ? "bg-gray-100" : "bg-slate-100"
+          }`}>
             <img
               src={post.featuredImage}
               alt={post.title}
@@ -94,14 +100,18 @@ export function PostCard({ post }: { post: Post }) {
             className="flex items-center gap-2 mb-3 hover:opacity-80 transition-opacity"
           >
             <ProfileAvatar user={post.author} size="sm" />
-            <span className="text-sm text-slate-300 font-medium">
+            <span className={`text-sm font-medium ${
+              isHomepage ? "!text-black" : "text-slate-300"
+            }`}>
               {post.author.name}
             </span>
           </Link>
         )}
         
         <div className="flex items-center gap-2 mb-2">
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">
+          <div className={`text-xs uppercase tracking-wide ${
+            isHomepage ? "!text-black" : "text-muted-foreground"
+          }`}>
             {format(new Date(post.createdAt), "PP")}
           </div>
           {post.published === false && (
@@ -112,18 +122,28 @@ export function PostCard({ post }: { post: Post }) {
         </div>
         <Link
           href={`/posts/${slug}`}
-          className="block text-xl font-bold leading-tight text-white hover:text-slate-200 transition-colors"
+          className={`block text-xl font-bold leading-tight transition-colors ${
+            isHomepage 
+              ? "!text-black hover:text-gray-700" 
+              : "text-white hover:text-slate-200"
+          }`}
         >
           {post.title}
         </Link>
         {post.excerpt ? (
-          <p className="mt-2 text-sm text-slate-300 line-clamp-3 leading-relaxed">
+          <p className={`mt-2 text-sm line-clamp-3 leading-relaxed ${
+            isHomepage ? "!text-black" : "text-slate-300"
+          }`}>
             {post.excerpt}
           </p>
         ) : null}
         <Link
           href={`/posts/${slug}`}
-          className="mt-4 inline-flex items-center text-sm font-medium text-teal-400 hover:text-teal-300 hover:underline transition-colors"
+          className={`mt-4 inline-flex items-center text-sm font-medium hover:underline transition-colors ${
+            isHomepage
+              ? "text-blue-700 hover:text-blue-800"
+              : "text-teal-400 hover:text-teal-300"
+          }`}
         >
           Read story →
         </Link>

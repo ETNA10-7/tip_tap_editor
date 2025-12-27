@@ -187,7 +187,7 @@
     color: #e5e5e5 !important;
   }
   
-  .dark .text-black:not(.bg-white):not([class*="bg-white"]):not(.homepage-override) {
+  .dark .text-black:not(.bg-white):not([class*="bg-white"]):not(.homepage-override):not(.profile-dropdown):not(.profile-dropdown *) {
     color: #ffffff !important;
   }
   
@@ -224,6 +224,80 @@
     color: #374151 !important;
   }
   
+  /* Homepage section headings */
+  section h2.text-black,
+  section h2[class*="text-black"] {
+    color: #000000 !important;
+  }
+  
+  /* Ensure search icon is white in dark mode (non-homepage) */
+  header:not(.homepage-header) .dark svg.text-white,
+  header:not(.homepage-header) svg.text-white {
+    color: #ffffff !important;
+  }
+  
+  /* Ensure navigation links are white in dark mode (non-homepage) */
+  header:not(.homepage-header) nav.text-white,
+  header:not(.homepage-header) nav.text-white a {
+    color: #ffffff !important;
+  }
+  
+  /* Profile dropdown - Always white background with dark text */
+  .profile-dropdown,
+  .profile-dropdown * {
+    color: #000000 !important;
+  }
+  
+  /* Override any dark mode rules for profile dropdown - ensure ALL text is black */
+  .dark .profile-dropdown,
+  .dark .profile-dropdown *,
+  .dark .profile-dropdown p,
+  .dark .profile-dropdown span,
+  .dark .profile-dropdown button,
+  .dark .profile-dropdown .text-black {
+    color: #000000 !important;
+  }
+  
+  /* Specifically target profile dropdown username - highest priority */
+  .profile-dropdown-name,
+  .profile-dropdown .profile-dropdown-name,
+  .dark .profile-dropdown-name,
+  .dark .profile-dropdown .profile-dropdown-name,
+  .profile-dropdown p.profile-dropdown-name,
+  .dark .profile-dropdown p.profile-dropdown-name,
+  .profile-dropdown p.text-black.profile-dropdown-name,
+  .dark .profile-dropdown p.text-black.profile-dropdown-name,
+  .profile-dropdown p.text-sm.font-semibold.profile-dropdown-name,
+  .dark .profile-dropdown p.text-sm.font-semibold.profile-dropdown-name {
+    color: #000000 !important;
+    font-weight: 600 !important;
+  }
+  
+  .profile-dropdown-email {
+    color: #4b5563 !important;
+  }
+  
+  .profile-dropdown button {
+    color: #374151 !important;
+  }
+  
+  .profile-dropdown button.text-red-600,
+  .profile-dropdown button .text-red-600 {
+    color: #dc2626 !important;
+  }
+  
+  .profile-dropdown svg.text-gray-700 {
+    color: #374151 !important;
+  }
+  
+  .profile-dropdown svg.text-red-600 {
+    color: #dc2626 !important;
+  }
+  
+  .profile-dropdown:hover button {
+    color: #374151 !important;
+  }
+  
   /* White background elements should have black text */
   .bg-white,
   [class*="bg-white"] {
@@ -232,6 +306,16 @@
   
   .bg-white *,
   [class*="bg-white"] * {
+    color: #000000 !important;
+  }
+  
+  /* Override dark mode text-black for white backgrounds */
+  .dark .bg-white.text-black,
+  .dark .bg-white .text-black,
+  .dark [class*="bg-white"].text-black,
+  .dark [class*="bg-white"] .text-black,
+  .dark .bg-white p.text-black,
+  .dark [class*="bg-white"] p.text-black {
     color: #000000 !important;
   }
   

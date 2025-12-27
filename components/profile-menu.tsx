@@ -107,26 +107,19 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
         )}
       </button>
 
-      {/* Dropdown Menu */}
+      {/* Dropdown Menu - Always white background with dark text */}
       {isOpen && (
-        <div className={`absolute right-0 mt-2 w-56 rounded-lg border shadow-xl z-50 transition-all duration-200 ease-out ${
-          isHomepage
-            ? "border-gray-200 bg-white homepage-dropdown"
-            : "border-slate-700 bg-slate-800"
-        }`}>
+        <div className="profile-dropdown absolute right-0 mt-2 w-56 rounded-lg border border-gray-200 bg-white shadow-xl z-50 transition-all duration-200 ease-out">
           <div className="py-1">
             {/* User Info Section */}
-            <div className={`px-4 py-3 border-b ${
-              isHomepage ? "border-gray-200" : "border-slate-700"
-            }`}>
-              <p className={`text-sm font-semibold truncate ${
-                isHomepage ? "!text-black" : "text-white"
-              }`}>
+            <div className="px-4 py-3 border-b border-gray-200">
+              <p 
+                className="profile-dropdown-name text-sm font-semibold truncate text-black"
+                style={{ color: '#000000' }}
+              >
                 {user.name || "User"}
               </p>
-              <p className={`text-xs truncate ${
-                isHomepage ? "!text-gray-700" : "text-slate-400"
-              }`}>
+              <p className="profile-dropdown-email text-xs truncate text-gray-600">
                 {user.email}
               </p>
             </div>
@@ -134,38 +127,24 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
             {/* Menu Items */}
             <button
               onClick={handleProfileClick}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
-                isHomepage
-                  ? "text-gray-700 hover:bg-gray-100"
-                  : "text-slate-300 hover:bg-slate-700/50"
-              }`}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
             >
               <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
-                <User className={`h-4 w-4 ${
-                  isHomepage ? "text-gray-700" : "text-slate-300"
-                }`} />
+                <User className="h-4 w-4 text-gray-700" />
               </div>
               <span className="flex-1 text-left">View Profile</span>
             </button>
 
             <button
               onClick={handleEditProfileClick}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
-                isHomepage
-                  ? "text-gray-700 hover:bg-gray-100"
-                  : "text-slate-300 hover:bg-slate-700/50"
-              }`}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
             >
               <div className="relative flex-shrink-0 w-4 h-4 flex items-center justify-center">
-                <Settings className={`h-4 w-4 ${
-                  isHomepage ? "text-gray-700" : "text-slate-300"
-                }`} />
+                <Settings className="h-4 w-4 text-gray-700" />
                 {/* Red notification dot - shows when profile is incomplete */}
                 {needsProfileSetup && (
                   <span 
-                    className={`absolute bg-red-500 rounded-full border-2 shadow-sm ${
-                      isHomepage ? "border-white" : "border-slate-800"
-                    }`}
+                    className="absolute bg-red-500 rounded-full border-2 border-white shadow-sm"
                     style={{ 
                       width: '8px',
                       height: '8px',
@@ -180,38 +159,24 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
 
             <button
               onClick={handleBookmarksClick}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
-                isHomepage
-                  ? "text-gray-700 hover:bg-gray-100"
-                  : "text-slate-300 hover:bg-slate-700/50"
-              }`}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
             >
               <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
-                <Bookmark className={`h-4 w-4 ${
-                  isHomepage ? "text-gray-700" : "text-slate-300"
-                }`} />
+                <Bookmark className="h-4 w-4 text-gray-700" />
               </div>
               <span className="flex-1 text-left">My Bookmarks</span>
             </button>
 
             {/* Divider */}
-            <div className={`my-1 border-t ${
-              isHomepage ? "border-gray-200" : "border-slate-700"
-            }`} />
+            <div className="my-1 border-t border-gray-200" />
 
             {/* Logout */}
             <button
               onClick={handleLogout}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
-                isHomepage
-                  ? "text-red-600 hover:bg-red-50"
-                  : "text-red-400 hover:bg-red-500/20"
-              }`}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
             >
               <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
-                <LogOut className={`h-4 w-4 ${
-                  isHomepage ? "text-red-600" : "text-red-400"
-                }`} />
+                <LogOut className="h-4 w-4 text-red-600" />
               </div>
               <span className="flex-1 text-left">Logout</span>
             </button>

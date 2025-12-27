@@ -64,7 +64,7 @@ export default function PostsPage() {
                 ? "My posts"
                 : "All posts"}
           </h1>
-          <p className="text-slate-400">
+          <p className="text-white">
             {searchQuery
               ? `Found ${posts.length} ${posts.length === 1 ? "post" : "posts"}`
               : view === "mine" && isAuthenticated
@@ -108,14 +108,14 @@ export default function PostsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-white">Published Posts</h2>
-                <p className="text-sm text-slate-400 mt-1">
+                <p className="text-sm text-white mt-1">
                   {publishedPosts.length} {publishedPosts.length === 1 ? "post" : "posts"} published
                 </p>
               </div>
             </div>
             {publishedPosts.length === 0 ? (
               <div className="rounded-xl border-2 border-dashed border-slate-700 bg-slate-800/30 p-8 text-center">
-                <p className="text-slate-400">
+                <p className="text-white">
                   You haven't published any posts yet.
                 </p>
               </div>
@@ -133,14 +133,14 @@ export default function PostsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-white">Drafts</h2>
-                <p className="text-sm text-slate-400 mt-1">
+                <p className="text-sm text-white mt-1">
                   {draftPosts.length} {draftPosts.length === 1 ? "draft" : "drafts"} saved
                 </p>
               </div>
             </div>
             {draftPosts.length === 0 ? (
               <div className="rounded-xl border-2 border-dashed border-slate-700 bg-slate-800/30 p-8 text-center">
-                <p className="text-slate-400">
+                <p className="text-white">
                   You don't have any drafts yet.
                 </p>
               </div>
@@ -154,7 +154,7 @@ export default function PostsPage() {
           </div>
         </div>
       ) : posts.length === 0 ? (
-        <p className="text-slate-400">
+        <p className="text-white">
           {searchQuery
             ? `No posts found matching "${searchQuery}"`
             : "No posts yet."}

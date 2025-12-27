@@ -95,15 +95,15 @@ export default function Home() {
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-white">Latest posts</h2>
-          <Link href="/posts" className="text-sm text-teal-400 hover:text-teal-300 hover:underline">
-            View all
+          <h2 className="text-xl font-semibold !text-black">Latest posts</h2>
+          <Link href="/posts" className="inline-flex items-center text-sm font-medium text-blue-700 hover:text-blue-800 hover:underline transition-colors">
+            View all →
           </Link>
         </div>
         {latest.length === 0 ? (
           <p className="text-slate-400">
             No posts yet. Be the first to{" "}
-            <Link href="/create" className="underline text-teal-400 hover:text-teal-300">
+            <Link href="/create" className="underline text-blue-700 hover:text-blue-800">
               write one
             </Link>
             .
@@ -111,7 +111,7 @@ export default function Home() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {latest.map((post) => (
-              <PostCard key={post._id} post={post} />
+              <PostCard key={post._id} post={post} isHomepage={true} />
             ))}
           </div>
         )}

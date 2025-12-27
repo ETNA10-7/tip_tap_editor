@@ -119,7 +119,7 @@ export function SiteHeader() {
               className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${
                 isHomepage
                   ? `text-gray-400 ${isSearchFocused ? "text-gray-500" : ""}`
-                  : `text-slate-400 dark:text-slate-400 text-gray-400 ${isSearchFocused ? "text-slate-300 dark:text-slate-300 text-gray-500" : ""}`
+                  : `text-white ${isSearchFocused ? "text-white" : ""}`
               }`}
             />
             <input
@@ -246,7 +246,7 @@ export function SiteHeader() {
         <nav className={`flex items-center gap-6 text-sm font-medium flex-shrink-0 ${
           isHomepage
             ? "text-gray-600"
-            : "text-slate-300 dark:text-slate-300 text-gray-600"
+            : "text-white"
         }`}>
           {navItems.map((item) => (
             <Link
@@ -255,7 +255,7 @@ export function SiteHeader() {
               className={`transition ${
                 isHomepage
                   ? "hover:text-gray-900"
-                  : "hover:text-white dark:hover:text-white hover:text-gray-900"
+                  : "hover:text-gray-200"
               }`}
             >
               {item.label}
