@@ -14,6 +14,7 @@ import { format } from "date-fns";
 import { useAuthModal } from "@/contexts/auth-modal-context";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { usePathname } from "next/navigation";
+import { useTheme } from "@/contexts/theme-context";
 
 /**
  * Generate slug from title (client-side, matches server-side logic)
@@ -39,11 +40,13 @@ export function SiteHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const { openModal } = useAuthModal();
+  const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const isHomepage = pathname === "/";
+  const isLightMode = theme === "light" && !isHomepage;
 
   // Debounce search query (300ms delay)
   useEffect(() => {
@@ -99,15 +102,15 @@ export function SiteHeader() {
 
   return (
     <header className={`border-b sticky top-0 z-40 backdrop-blur ${isHomepage ? "homepage-header" : ""} ${
-      isHomepage 
+      isHomepage || isLightMode
         ? "border-gray-200 bg-white" 
-        : "border-slate-700 bg-slate-900/95 dark:border-slate-700 dark:bg-slate-900/95 border-gray-200 bg-white/95"
+        : "border-slate-700 bg-slate-900/95 dark:border-slate-700 dark:bg-slate-900/95"
     }`}>
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 gap-4">
         <Link href="/" className={`text-lg font-semibold tracking-tight flex-shrink-0 homepage-text-black ${
-          isHomepage 
+          isHomepage || isLightMode
             ? "!text-black" 
-            : "text-white dark:text-white text-gray-900"
+            : "text-white dark:text-white"
         }`}>
           Mediumish
         </Link>
@@ -117,7 +120,7 @@ export function SiteHeader() {
           <div className="relative" ref={searchContainerRef}>
             <Search 
               className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${
-                isHomepage
+                isHomepage || isLightMode
                   ? `text-gray-400 ${isSearchFocused ? "text-gray-500" : ""}`
                   : `text-white ${isSearchFocused ? "text-white" : ""}`
               }`}
@@ -129,9 +132,9 @@ export function SiteHeader() {
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               className={`w-full pl-10 pr-4 py-2 rounded-full border text-sm focus:outline-none focus:ring-2 transition-all ${
-                isHomepage
-                  ? "border-gray-200 bg-gray-50 !text-black placeholder:text-gray-400 focus:ring-gray-300 focus:border-gray-300 caret-black homepage-search-input"
-                  : "border-slate-600 bg-slate-800/50 text-white placeholder:text-slate-400 focus:ring-slate-500 focus:border-slate-500 dark:border-slate-600 dark:bg-slate-800/50 dark:text-white dark:placeholder:text-slate-400 dark:focus:ring-slate-500 dark:focus:border-slate-500 border-gray-200 bg-gray-50 text-gray-900 placeholder:text-gray-400 focus:ring-gray-300 focus:border-gray-300"
+                isHomepage || isLightMode
+                  ? "border-black bg-gray-50 !text-black placeholder:text-gray-400 focus:ring-black focus:border-black caret-black homepage-search-input"
+                  : "border-slate-600 bg-slate-800/50 text-white placeholder:text-slate-400 focus:ring-slate-500 focus:border-slate-500 dark:border-slate-600 dark:bg-slate-800/50 dark:text-white dark:placeholder:text-slate-400 dark:focus:ring-slate-500 dark:focus:border-slate-500"
               }`}
             />
             
@@ -197,26 +200,26 @@ export function SiteHeader() {
                           />
                           <div className="flex flex-col gap-1">
                             <div className={`font-medium text-sm line-clamp-1 ${
-                              isHomepage
+                              isHomepage || isLightMode
                                 ? "text-gray-900"
-                                : "text-white dark:text-white text-gray-900"
+                                : "text-white dark:text-white"
                             }`}>
                               {post.title}
                             </div>
                             <div className={`flex items-center gap-2 text-xs ${
-                              isHomepage
+                              isHomepage || isLightMode
                                 ? "text-gray-500"
-                                : "text-slate-400 dark:text-slate-400 text-gray-500"
+                                : "text-slate-400 dark:text-slate-400"
                             }`}>
                               <span className={`font-medium ${
-                                isHomepage
+                                isHomepage || isLightMode
                                   ? "text-gray-700"
-                                  : "text-slate-300 dark:text-slate-300 text-gray-700"
+                                  : "text-slate-300 dark:text-slate-300"
                               }`}>
                                 {post.author?.name || "Anonymous"}
                               </span>
-                              <span className={isHomepage ? "text-gray-400" : "text-slate-600 dark:text-slate-600 text-gray-400"}>•</span>
-                              <span className={isHomepage ? "text-gray-500" : "text-slate-400 dark:text-slate-400 text-gray-500"}>
+                              <span className={isHomepage || isLightMode ? "text-gray-400" : "text-slate-600 dark:text-slate-600"}>•</span>
+                              <span className={isHomepage || isLightMode ? "text-gray-500" : "text-slate-400 dark:text-slate-400"}>
                                 {format(new Date(post.createdAt), "MMM d, yyyy")}
                               </span>
                             </div>
@@ -228,9 +231,9 @@ export function SiteHeader() {
                       <button
                         onClick={handleSearch}
                         className={`w-full text-left px-4 py-2 text-sm font-medium transition-colors border-t ${
-                          isHomepage
+                          isHomepage || isLightMode
                             ? "text-gray-700 hover:bg-gray-100 border-gray-200"
-                            : "text-slate-300 hover:bg-slate-700/50 border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700/50 dark:border-slate-700 text-gray-700 hover:bg-gray-100 border-gray-200"
+                            : "text-slate-300 hover:bg-slate-700/50 border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700/50 dark:border-slate-700"
                         }`}
                       >
                         View all {searchResults.length} results
@@ -244,7 +247,7 @@ export function SiteHeader() {
         </form>
 
         <nav className={`flex items-center gap-6 text-sm font-medium flex-shrink-0 ${
-          isHomepage
+          isHomepage || isLightMode
             ? "text-gray-600"
             : "text-white"
         }`}>
@@ -253,7 +256,7 @@ export function SiteHeader() {
               key={item.href}
               href={item.href}
               className={`transition ${
-                isHomepage
+                isHomepage || isLightMode
                   ? "hover:text-gray-900"
                   : "hover:text-gray-200"
               }`}

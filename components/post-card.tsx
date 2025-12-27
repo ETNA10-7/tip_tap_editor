@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { format } from "date-fns";
 import { Id } from "@/convex/_generated/dataModel";
 import { ProfileAvatar } from "@/components/profile-avatar";
+import { useTheme } from "@/contexts/theme-context";
 
 type Author = {
   _id: Id<"users">;
@@ -69,17 +72,20 @@ function getAuthorUsername(author: Author): string {
 
 export function PostCard({ post, isHomepage = false }: { post: Post; isHomepage?: boolean }) {
   const slug = getPostSlug(post);
+  const { theme } = useTheme();
+  const isLightMode = theme === "light" && !isHomepage;
+  const useLightStyling = isHomepage || isLightMode;
   
   return (
     <article className={`group rounded-xl border overflow-hidden shadow-sm transition-all hover:shadow-lg hover:-translate-y-1 ${
-      isHomepage
+      useLightStyling
         ? "border-gray-200 bg-white"
         : "border-slate-700 bg-slate-800/50 backdrop-blur-sm"
     }`}>
       {post.featuredImage && (
         <Link href={`/posts/${slug}`} className="block">
           <div className={`relative w-full h-48 overflow-hidden ${
-            isHomepage ? "bg-gray-100" : "bg-slate-100"
+            useLightStyling ? "bg-gray-100" : "bg-slate-100"
           }`}>
             <img
               src={post.featuredImage}
@@ -101,7 +107,7 @@ export function PostCard({ post, isHomepage = false }: { post: Post; isHomepage?
           >
             <ProfileAvatar user={post.author} size="sm" />
             <span className={`text-sm font-medium ${
-              isHomepage ? "!text-black" : "text-slate-300"
+              useLightStyling ? "!text-black" : "text-slate-300"
             }`}>
               {post.author.name}
             </span>
@@ -110,7 +116,7 @@ export function PostCard({ post, isHomepage = false }: { post: Post; isHomepage?
         
         <div className="flex items-center gap-2 mb-2">
           <div className={`text-xs uppercase tracking-wide ${
-            isHomepage ? "!text-black" : "text-muted-foreground"
+            useLightStyling ? "!text-black" : "text-muted-foreground"
           }`}>
             {format(new Date(post.createdAt), "PP")}
           </div>
@@ -123,7 +129,7 @@ export function PostCard({ post, isHomepage = false }: { post: Post; isHomepage?
         <Link
           href={`/posts/${slug}`}
           className={`block text-xl font-bold leading-tight transition-colors ${
-            isHomepage 
+            useLightStyling
               ? "!text-black hover:text-gray-700" 
               : "text-white hover:text-slate-200"
           }`}
@@ -132,7 +138,7 @@ export function PostCard({ post, isHomepage = false }: { post: Post; isHomepage?
         </Link>
         {post.excerpt ? (
           <p className={`mt-2 text-sm line-clamp-3 leading-relaxed ${
-            isHomepage ? "!text-black" : "text-slate-300"
+            useLightStyling ? "!text-black" : "text-slate-300"
           }`}>
             {post.excerpt}
           </p>
@@ -140,7 +146,7 @@ export function PostCard({ post, isHomepage = false }: { post: Post; isHomepage?
         <Link
           href={`/posts/${slug}`}
           className={`mt-4 inline-flex items-center text-sm font-medium hover:underline transition-colors ${
-            isHomepage
+            useLightStyling
               ? "text-blue-700 hover:text-blue-800"
               : "text-teal-400 hover:text-teal-300"
           }`}

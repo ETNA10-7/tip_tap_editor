@@ -20,13 +20,17 @@ export function ThemeToggle() {
       variant="outline"
       size="icon"
       onClick={toggleTheme}
-      className="rounded-full border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white dark:border-slate-600 dark:bg-slate-800/50 dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:border-gray-200 dark:bg-gray-50 dark:text-gray-600 dark:hover:bg-gray-100 dark:hover:text-gray-900"
+      className={`rounded-full ${
+        theme === "dark"
+          ? "border-slate-600 bg-slate-800/50 text-white hover:bg-slate-700/50 hover:text-white"
+          : "border-gray-200 bg-gray-50 text-gray-900 hover:bg-gray-100 hover:text-gray-900"
+      }`}
       aria-label="Toggle theme"
     >
       {theme === "dark" ? (
-        <Sun className="h-4 w-4" />
+        <Sun className="h-4 w-4 text-white" />
       ) : (
-        <Moon className="h-4 w-4" />
+        <Moon className="h-4 w-4 text-gray-900" />
       )}
     </Button>
   );

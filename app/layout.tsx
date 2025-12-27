@@ -35,7 +35,7 @@ export default function RootLayout({
           <ThemeProvider>
             <AuthModalProvider>
               <SiteHeader />
-              <main className="mx-auto min-h-screen max-w-5xl px-4 py-10 text-white dark:text-white">
+              <main className="mx-auto min-h-screen max-w-5xl px-4 py-10 text-gray-900 dark:text-white">
                 {children}
               </main>
               <AuthModalWrapper />
