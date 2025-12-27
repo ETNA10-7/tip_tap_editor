@@ -9,14 +9,18 @@ export const lightTheme = {
   // Base colors
   colors: {
     // Background colors
-    background: '#ffffff',
-    body: '#ffffff',
+    background: '#B8DB80', // green background for pages in light mode
+    body: '#ffffff', // white (default, but pages use green)
+    // Homepage green color (leafy light green)
+    homepageGreen: '#B8DB80',
+    // Page background (green for posts and other pages in light mode)
+    pageBackground: '#B8DB80',
     
     // Text colors
     text: {
-      primary: '#1f2937', // gray-800
-      secondary: '#4b5563', // gray-600
-      muted: '#6b7280', // gray-500
+      primary: '#000000', // black (for headings on green background)
+      secondary: '#000000', // black (for body text on green background)
+      muted: '#000000', // black (for muted text on green background)
       placeholder: '#9ca3af', // gray-400
     },
     
@@ -32,25 +36,32 @@ export const lightTheme = {
     // Button colors
     button: {
       primary: {
-        background: '#1f2937', // gray-800
+        background: '#14b8a6', // teal-600 (for active filter buttons)
         text: '#ffffff',
-        hover: '#111827', // gray-900
+        hover: '#0d9488', // teal-700
       },
       secondary: {
-        background: 'rgba(0, 0, 0, 0.05)',
-        border: 'rgba(0, 0, 0, 0.2)',
-        text: '#1f2937',
+        background: '#ffffff', // white for inactive buttons
+        border: '#d1d5db', // gray-300
+        text: '#374151', // gray-700
         hover: {
-          background: 'rgba(0, 0, 0, 0.1)',
-          border: 'rgba(0, 0, 0, 0.3)',
+          background: '#f9fafb', // gray-50
+          border: '#d1d5db', // gray-300
+          text: '#111827', // gray-900
         },
       },
     },
     
     // Card colors
     card: {
-      background: '#ffffff',
-      border: 'rgba(0, 0, 0, 0.1)',
+      background: '#ffffff', // white
+      border: '#e5e7eb', // gray-200
+      text: {
+        primary: '#000000', // black for titles
+        secondary: '#000000', // black for text
+        muted: '#000000', // black for dates/author
+      },
+      link: '#1d4ed8', // blue-700 for "Read story →"
     },
     
     // Hero section
@@ -65,21 +76,26 @@ export const lightTheme = {
     
     // Link colors
     link: {
-      default: '#2563eb', // blue-600
-      hover: '#1d4ed8', // blue-700
+      default: '#1d4ed8', // blue-700 (for "Read story →" and "View all →")
+      hover: '#1e40af', // blue-800
     },
     
     // Header colors
     header: {
-      background: 'rgba(255, 255, 255, 0.95)',
+      background: '#ffffff', // white
       border: '#e5e7eb', // gray-200
-      text: '#1f2937', // gray-800
+      text: '#000000', // black
       textMuted: '#6b7280', // gray-500
       search: {
         background: '#f9fafb', // gray-50
-        border: '#e5e7eb', // gray-200
-        text: '#1f2937', // gray-800
+        border: '#000000', // black border (like homepage)
+        text: '#000000', // black
         placeholder: '#9ca3af', // gray-400
+        icon: '#6b7280', // gray-500
+      },
+      nav: {
+        text: '#4b5563', // gray-600
+        hover: '#111827', // gray-900
       },
     },
     
@@ -110,6 +126,7 @@ export const lightTheme = {
   cssVariables: {
     '--background': 'oklch(1 0 0)',
     '--foreground': 'oklch(0.145 0 0)',
+    '--leafy-green': '#B8DB80', // Homepage green color
     '--card': 'oklch(1 0 0)',
     '--card-foreground': 'oklch(0.145 0 0)',
     '--popover': 'oklch(1 0 0)',
@@ -143,13 +160,13 @@ export const lightTheme = {
 
   // Tailwind class overrides (for components)
   classOverrides: {
-    body: 'bg-white text-gray-800',
-    main: 'text-gray-800',
-    headings: 'text-gray-900',
-    text: 'text-gray-600',
-    muted: 'text-gray-500',
+    body: 'bg-white text-black',
+    main: 'text-black', // black text on green background
+    headings: 'text-black', // black headings on green background
+    text: 'text-black', // black text on green background
+    muted: 'text-black', // black muted text on green background
     borders: 'border-gray-200',
-    links: 'text-blue-600 hover:text-blue-700',
+    links: 'text-blue-700 hover:text-blue-800', // blue-700 for links
   },
 
   // Component-specific styles
@@ -169,15 +186,20 @@ export const lightTheme = {
       muted: 'text-gray-600',
     },
     header: {
-      background: 'bg-white/95 backdrop-blur',
+      background: 'bg-white',
       border: 'border-gray-200',
-      text: 'text-gray-800',
+      text: 'text-black',
       textMuted: 'text-gray-500',
       search: {
         background: 'bg-gray-50',
-        border: 'border-gray-200',
-        text: 'text-gray-800',
+        border: 'border-black', // black border like homepage
+        text: 'text-black',
         placeholder: 'text-gray-400',
+        icon: 'text-gray-400',
+      },
+      nav: {
+        text: 'text-gray-600',
+        hover: 'hover:text-gray-900',
       },
     },
     editor: {
@@ -198,17 +220,18 @@ export const lightTheme = {
     },
     button: {
       primary: {
-        background: 'bg-gray-800',
+        background: 'bg-teal-600', // teal for active filter buttons
         text: 'text-white',
-        hover: 'hover:bg-gray-900',
+        hover: 'hover:bg-teal-700',
       },
       secondary: {
-        background: 'bg-gray-100',
+        background: 'bg-white', // white for inactive buttons
         border: 'border-gray-300',
-        text: 'text-gray-800',
+        text: 'text-gray-700',
         hover: {
-          background: 'hover:bg-gray-200',
-          border: 'hover:border-gray-400',
+          background: 'hover:bg-gray-50',
+          border: 'hover:border-gray-300',
+          text: 'hover:text-gray-900',
         },
       },
     },
@@ -217,23 +240,26 @@ export const lightTheme = {
   // Global CSS overrides
   globalStyles: {
     body: {
-      color: '#1f2937',
-      background: '#ffffff',
+      color: '#000000', // black text
+      background: '#ffffff', // white (but pages use green overlay)
     },
     headings: {
-      color: '#111827',
+      color: '#000000', // black headings
     },
     text: {
-      color: '#4b5563',
+      color: '#000000', // black text on green background
     },
     muted: {
-      color: '#6b7280',
+      color: '#000000', // black muted text
     },
     borders: {
-      borderColor: 'rgba(0, 0, 0, 0.1)',
+      borderColor: '#e5e7eb', // gray-200
     },
     whiteBackground: {
-      color: '#1f2937',
+      color: '#000000', // black text on white cards
+    },
+    pageBackground: {
+      backgroundColor: '#B8DB80', // green background for pages
     },
   },
 
@@ -253,18 +279,18 @@ export const lightTheme = {
 
   // Rich Text Editor styles
   proseMirror: {
-    color: '#1f2937',
+    color: '#000000', // black text
     paragraph: {
-      color: '#4b5563',
+      color: '#000000', // black paragraphs
     },
     headings: {
-      color: '#111827',
+      color: '#000000', // black headings
     },
     link: {
-      color: '#2563eb',
+      color: '#1d4ed8', // blue-700
     },
     placeholder: {
-      color: '#9ca3af',
+      color: '#9ca3af', // gray-400
     },
   },
 } as const;

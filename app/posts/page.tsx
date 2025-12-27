@@ -7,12 +7,15 @@ import { useAuth } from "@/hooks/useAuth";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function PostsPage() {
   const { user, isAuthenticated } = useAuth();
+  const { theme } = useTheme();
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search") || "";
   const [view, setView] = useState<"all" | "mine">("all");
+  const isLightMode = theme === "light";
 
   // Reset to "all" when running a search
   useEffect(() => {
@@ -54,17 +57,25 @@ export default function PostsPage() {
   }, [view, isAuthenticated, userPosts, posts]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-semibold text-white">
-            {searchQuery 
-              ? `Search results for "${searchQuery}"` 
-              : view === "mine" && isAuthenticated
-                ? "My posts"
-                : "All posts"}
-          </h1>
-          <p className="text-white">
+    <>
+      {/* Green background overlay for light mode only */}
+      {isLightMode && (
+        <div 
+          className="fixed inset-0 -z-10"
+          style={{ backgroundColor: 'var(--leafy-green, #B8DB80)' }}
+        />
+      )}
+      <div className="space-y-6 relative z-0">
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-1">
+            <h1 className={`text-3xl font-semibold ${isLightMode ? "text-black" : "text-white"}`}>
+              {searchQuery 
+                ? `Search results for "${searchQuery}"` 
+                : view === "mine" && isAuthenticated
+                  ? "My posts"
+                  : "All posts"}
+            </h1>
+            <p className={isLightMode ? "text-black" : "text-white"}>
             {searchQuery
               ? `Found ${posts.length} ${posts.length === 1 ? "post" : "posts"}`
               : view === "mine" && isAuthenticated
@@ -81,7 +92,9 @@ export default function PostsPage() {
               onClick={() => setView("all")}
               className={view === "all" 
                 ? "bg-teal-600 text-white hover:bg-teal-700" 
-                : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white"}
+                : isLightMode
+                  ? "border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                  : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white"}
             >
               All posts
             </Button>
@@ -92,7 +105,9 @@ export default function PostsPage() {
               disabled={!isAuthenticated}
               className={view === "mine" 
                 ? "bg-teal-600 text-white hover:bg-teal-700" 
-                : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white"}
+                : isLightMode
+                  ? "border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                  : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white"}
             >
               My posts
             </Button>
@@ -107,15 +122,19 @@ export default function PostsPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-white">Published Posts</h2>
-                <p className="text-sm text-white mt-1">
+                <h2 className={`text-xl font-semibold ${isLightMode ? "text-black" : "text-white"}`}>Published Posts</h2>
+                <p className={`text-sm mt-1 ${isLightMode ? "text-black" : "text-white"}`}>
                   {publishedPosts.length} {publishedPosts.length === 1 ? "post" : "posts"} published
                 </p>
               </div>
             </div>
             {publishedPosts.length === 0 ? (
-              <div className="rounded-xl border-2 border-dashed border-slate-700 bg-slate-800/30 p-8 text-center">
-                <p className="text-white">
+              <div className={`rounded-xl border-2 border-dashed p-8 text-center ${
+                isLightMode 
+                  ? "border-gray-300 bg-white/50" 
+                  : "border-slate-700 bg-slate-800/30"
+              }`}>
+                <p className={isLightMode ? "text-black" : "text-white"}>
                   You haven't published any posts yet.
                 </p>
               </div>
@@ -132,15 +151,19 @@ export default function PostsPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-white">Drafts</h2>
-                <p className="text-sm text-white mt-1">
+                <h2 className={`text-xl font-semibold ${isLightMode ? "text-black" : "text-white"}`}>Drafts</h2>
+                <p className={`text-sm mt-1 ${isLightMode ? "text-black" : "text-white"}`}>
                   {draftPosts.length} {draftPosts.length === 1 ? "draft" : "drafts"} saved
                 </p>
               </div>
             </div>
             {draftPosts.length === 0 ? (
-              <div className="rounded-xl border-2 border-dashed border-slate-700 bg-slate-800/30 p-8 text-center">
-                <p className="text-white">
+              <div className={`rounded-xl border-2 border-dashed p-8 text-center ${
+                isLightMode 
+                  ? "border-gray-300 bg-white/50" 
+                  : "border-slate-700 bg-slate-800/30"
+              }`}>
+                <p className={isLightMode ? "text-black" : "text-white"}>
                   You don't have any drafts yet.
                 </p>
               </div>
@@ -154,7 +177,7 @@ export default function PostsPage() {
           </div>
         </div>
       ) : posts.length === 0 ? (
-        <p className="text-white">
+        <p className={isLightMode ? "text-black" : "text-white"}>
           {searchQuery
             ? `No posts found matching "${searchQuery}"`
             : "No posts yet."}
@@ -166,7 +189,8 @@ export default function PostsPage() {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
 
