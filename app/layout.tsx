@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import { SiteHeader } from "@/components/site-header";
@@ -38,7 +39,9 @@ export default function RootLayout({
               <main className="mx-auto min-h-screen max-w-5xl px-4 py-10 text-gray-900 dark:text-white">
                 {children}
               </main>
-              <AuthModalWrapper />
+              <Suspense fallback={null}>
+                <AuthModalWrapper />
+              </Suspense>
             </AuthModalProvider>
           </ThemeProvider>
         </ConvexClientProvider>

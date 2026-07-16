@@ -97,7 +97,7 @@ export default function PostEditPage() {
         published,
       });
       // Redirect to the new slug (in case title changed and slug was regenerated)
-      router.push(`/posts/${updated.slug}`);
+      router.push(`/posts/${updated?.slug ?? slug}`);
     } catch (err) {
       console.error(err);
       setError("Failed to save changes.");

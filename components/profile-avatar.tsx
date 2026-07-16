@@ -2,19 +2,23 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
-import { Doc } from "@/convex/_generated/dataModel";
-
 /**
  * Profile Avatar Component
- * 
+ *
  * Displays a user's profile picture or falls back to their initials.
- * 
+ *
  * @param user - User document with name, image, and email fields
  * @param size - Size of the avatar (default: "md")
  * @param className - Additional CSS classes
  * @param showFallback - Whether to show fallback initials (default: true)
  */
-type User = Doc<"users"> | null | undefined;
+type User = {
+  _id: string;
+  name?: string | null;
+  image?: string | null;
+  email?: string | null;
+  username?: string | null;
+} | null | undefined;
 
 interface ProfileAvatarProps {
   user: User;

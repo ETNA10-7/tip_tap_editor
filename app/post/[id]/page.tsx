@@ -23,27 +23,6 @@ export default function PostDetailPage() {
       router.replace(`/posts/${result.post.slug}`);
     }
   }, [result, router]);
-  const updatePost = useMutation(api.posts.update);
-  const deletePost = useMutation(api.posts.remove);
-
-  const [editing, setEditing] = useState(false);
-  const [title, setTitle] = useState("");
-  const [excerpt, setExcerpt] = useState("");
-  const [content, setContent] = useState("");
-  const [featuredImage, setFeaturedImage] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // keep local form state in sync when data loads or changes
-  useEffect(() => {
-    if (result?.post) {
-      setTitle(result.post.title ?? "");
-      setExcerpt(result.post.excerpt ?? "");
-      setContent(result.post.content ?? "");
-      setFeaturedImage(result.post.featuredImage ?? "");
-    }
-  }, [result]);
 
   if (!id) return null;
 

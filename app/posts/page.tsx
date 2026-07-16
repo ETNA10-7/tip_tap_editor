@@ -5,11 +5,11 @@ import { api } from "@/convex/_generated/api";
 import { PostCard } from "@/components/post-card";
 import { useAuth } from "@/hooks/useAuth";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/theme-context";
 
-export default function PostsPage() {
+function PostsPage() {
   const { user, isAuthenticated } = useAuth();
   const { theme } = useTheme();
   const searchParams = useSearchParams();
@@ -191,6 +191,20 @@ export default function PostsPage() {
       )}
       </div>
     </>
+  );
+}
+
+export default function PostsPageWrapper() {
+  return (
+    <Suspense
+      fallback={(
+        <div className="max-w-4xl mx-auto">
+          <p className="text-muted-foreground">Loading…</p>
+        </div>
+      )}
+    >
+      <PostsPage />
+    </Suspense>
   );
 }
 
