@@ -58,18 +58,18 @@ export function ProfileSetupPrompt() {
   };
 
   return (
-    <Card className="border-teal-200 bg-gradient-to-br from-teal-50 to-cyan-50 shadow-md">
+    <Card className="border-slate-200 bg-white text-slate-900 shadow-md">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">
-            <div className="rounded-full bg-teal-100 p-2">
+            <div className="rounded-full bg-teal-50 p-2 border border-teal-100">
               <Sparkles className="h-5 w-5 text-teal-600" />
             </div>
             <div className="flex-1 space-y-1">
-              <CardTitle className="text-lg text-slate-900">
+              <CardTitle className="text-lg font-semibold text-slate-900">
                 Complete your profile
               </CardTitle>
-              <CardDescription className="text-sm">
+              <CardDescription className="text-sm text-slate-500">
                 Add a bio and profile picture to help readers get to know you
                 better.
               </CardDescription>
@@ -77,7 +77,7 @@ export function ProfileSetupPrompt() {
           </div>
           <button
             onClick={handleDismiss}
-            className="text-muted-foreground hover:text-slate-900 transition-colors rounded-full p-1 hover:bg-white/50"
+            className="text-slate-400 hover:text-slate-900 transition-colors rounded-full p-1 hover:bg-slate-100"
             aria-label="Dismiss"
           >
             <X className="h-4 w-4" />
@@ -88,7 +88,7 @@ export function ProfileSetupPrompt() {
       <CardContent>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <Link href="/profile/edit" className="flex-1">
-            <Button className="w-full rounded-full bg-slate-900 hover:bg-slate-800">
+            <Button className="w-full rounded-full bg-slate-900 text-white hover:bg-slate-800">
               <User className="h-4 w-4 mr-2" />
               Setup Profile
             </Button>
@@ -96,7 +96,7 @@ export function ProfileSetupPrompt() {
           <Button
             variant="ghost"
             onClick={handleDismiss}
-            className="rounded-full"
+            className="rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100"
           >
             Skip for now
           </Button>
