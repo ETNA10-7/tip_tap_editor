@@ -15,7 +15,7 @@ import Link from "next/link";
 
 /**
  * Profile Setup Prompt Component
- * 
+ *
  * Shows a friendly prompt encouraging users to set up their profile
  * after login/signup. Only shows if:
  * - User is authenticated
@@ -25,15 +25,14 @@ import Link from "next/link";
 export function ProfileSetupPrompt() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const [isDismissed, setIsDismissed] = useState(false);
-  const [hasSeenPrompt, setHasSeenPrompt] = useState(false);
 
   // Check if user has seen/dismissed the prompt before
   useEffect(() => {
     if (typeof window !== "undefined") {
       const dismissed = localStorage.getItem("profileSetupPromptDismissed");
       if (dismissed === "true") {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsDismissed(true);
-        setHasSeenPrompt(true);
       }
     }
   }, []);
@@ -71,7 +70,8 @@ export function ProfileSetupPrompt() {
                 Complete your profile
               </CardTitle>
               <CardDescription className="text-sm">
-                Add a bio and profile picture to help readers get to know you better.
+                Add a bio and profile picture to help readers get to know you
+                better.
               </CardDescription>
             </div>
           </div>
@@ -105,16 +105,3 @@ export function ProfileSetupPrompt() {
     </Card>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

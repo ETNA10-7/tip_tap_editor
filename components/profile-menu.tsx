@@ -16,7 +16,7 @@ interface ProfileMenuProps {
 
 /**
  * Profile Menu Component
- * 
+ *
  * Displays a clickable avatar that opens a dropdown menu with:
  * - View Profile
  * - Edit Profile
@@ -99,11 +99,13 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
         <ProfileAvatar user={user} size="md" />
         {/* Active indicator ring when menu is open */}
         {isOpen && (
-          <span className={`absolute inset-0 rounded-full ring-2 ${
-            isHomepage
-              ? "ring-gray-400 ring-offset-2 ring-offset-white"
-              : "ring-slate-500 ring-offset-2 ring-offset-slate-900"
-          }`} />
+          <span
+            className={`absolute inset-0 rounded-full ring-2 ${
+              isHomepage
+                ? "ring-gray-400 ring-offset-2 ring-offset-white"
+                : "ring-slate-500 ring-offset-2 ring-offset-slate-900"
+            }`}
+          />
         )}
       </button>
 
@@ -113,9 +115,9 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
           <div className="py-1">
             {/* User Info Section */}
             <div className="px-4 py-3 border-b border-gray-200">
-              <p 
+              <p
                 className="profile-dropdown-name text-sm font-semibold truncate text-black"
-                style={{ color: '#000000' }}
+                style={{ color: "#000000" }}
               >
                 {user.name || "User"}
               </p>
@@ -143,13 +145,13 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
                 <Settings className="h-4 w-4 text-gray-700" />
                 {/* Red notification dot - shows when profile is incomplete */}
                 {needsProfileSetup && (
-                  <span 
+                  <span
                     className="absolute bg-red-500 rounded-full border-2 border-white shadow-sm"
-                    style={{ 
-                      width: '8px',
-                      height: '8px',
-                      top: '-2px',
-                      right: '-2px',
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      top: "-2px",
+                      right: "-2px",
                     }}
                   />
                 )}
@@ -186,4 +188,3 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
     </div>
   );
 }
-

@@ -42,10 +42,12 @@ export default function SettingsPage() {
       // For now, show a message that password reset should be used
       // In a full implementation, you'd call a mutation here
       setError(
-        "Password change requires password reset flow. This feature is coming soon."
+        "Password change requires password reset flow. This feature is coming soon.",
       );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to change password.");
+      setError(
+        err instanceof Error ? err.message : "Failed to change password.",
+      );
     } finally {
       setLoading(false);
     }
@@ -239,4 +241,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-

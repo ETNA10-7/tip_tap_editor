@@ -11,7 +11,7 @@
 //         return (
 //           <Card
 //             key={note._id}
-//             className="shadow-sm hover:shadow-md transition border border-gray-200 dark:border-gray-700 
+//             className="shadow-sm hover:shadow-md transition border border-gray-200 dark:border-gray-700
 //                        bg-white dark:bg-gray-900"
 //           >
 //             <CardHeader>
@@ -48,7 +48,6 @@
 //     </div>
 //   );
 // }
-
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 

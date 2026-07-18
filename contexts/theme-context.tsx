@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 import { usePathname } from "next/navigation";
 
 type Theme = "dark" | "light";
@@ -23,6 +29,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (typeof window !== "undefined") {
       const savedTheme = localStorage.getItem("theme") as Theme | null;
       if (savedTheme && (savedTheme === "dark" || savedTheme === "light")) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setThemeState(savedTheme);
       }
     }
@@ -70,4 +77,3 @@ export function useTheme() {
   }
   return context;
 }
-

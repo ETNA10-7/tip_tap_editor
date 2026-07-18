@@ -9,13 +9,13 @@ export const insertNote = mutation({
   },
   handler: async (ctx, args) => {
     const now = Date.now();
-    const noteId =  await ctx.db.insert("note", {
+    const noteId = await ctx.db.insert("note", {
       title: args.title,
       body: args.body,
       createdAt: now,
     });
     console.log("Inserted note:", noteId, args.title);
-    return noteId
+    return noteId;
   },
 });
 
@@ -67,7 +67,7 @@ export const insertNote = mutation({
 export const updateNote = mutation({
   args: {
     id: v.id("note"),
-    title: v.optional(v.string()),   // optional so you can update only one field
+    title: v.optional(v.string()), // optional so you can update only one field
     body: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -103,7 +103,6 @@ export const replaceNote = mutation({
     return await ctx.db.get(id); // return replaced note
   },
 });
-
 
 export const deleteNote = mutation({
   args: { id: v.id("note") },

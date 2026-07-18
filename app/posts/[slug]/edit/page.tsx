@@ -54,10 +54,7 @@ export default function PostEditPage() {
     return (
       <div className="max-w-4xl mx-auto space-y-4">
         <p className="text-muted-foreground">Post not found.</p>
-        <Link
-          href="/posts"
-          className="text-primary underline"
-        >
+        <Link href="/posts" className="text-primary underline">
           Back to posts
         </Link>
       </div>
@@ -68,12 +65,9 @@ export default function PostEditPage() {
     return (
       <div className="max-w-4xl mx-auto space-y-4">
         <p className="text-muted-foreground">
-          You don't have permission to edit this post.
+          You don&apos;t have permission to edit this post.
         </p>
-        <Link
-          href={`/posts/${slug}`}
-          className="text-primary underline"
-        >
+        <Link href={`/posts/${slug}`} className="text-primary underline">
           View post
         </Link>
       </div>
@@ -108,7 +102,7 @@ export default function PostEditPage() {
 
   const handleDelete = async () => {
     const confirmed = window.confirm(
-      "Delete this post? This cannot be undone."
+      "Delete this post? This cannot be undone.",
     );
     if (!confirmed) return;
     setDeleting(true);
@@ -176,7 +170,10 @@ export default function PostEditPage() {
             onChange={(e) => setPublished(e.target.checked)}
             className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
           />
-          <label htmlFor="publish-toggle" className="text-sm font-medium text-slate-700 cursor-pointer">
+          <label
+            htmlFor="publish-toggle"
+            className="text-sm font-medium text-slate-700 cursor-pointer"
+          >
             {published ? "Publish" : "Save as Draft"}
           </label>
         </div>
@@ -209,7 +206,7 @@ export default function PostEditPage() {
 
       {/* Footer Navigation */}
       <div className="mt-12 pt-8 border-t border-slate-200">
-        <Link 
+        <Link
           href={`/posts/${slug}`}
           className="inline-flex items-center text-slate-600 hover:text-slate-900 transition-colors"
         >
@@ -219,8 +216,3 @@ export default function PostEditPage() {
     </article>
   );
 }
-
-
-
-
-

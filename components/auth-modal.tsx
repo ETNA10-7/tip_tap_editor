@@ -14,12 +14,18 @@ interface AuthModalProps {
   initialMode?: "login" | "signup";
 }
 
-export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalProps) {
+export function AuthModal({
+  isOpen,
+  onClose,
+  initialMode = "login",
+}: AuthModalProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signIn } = useAuthActions();
   const { user, isLoading } = useAuth();
-  const [view, setView] = useState<"login" | "signup" | "forgot" | "reset-verification">(initialMode);
+  const [view, setView] = useState<
+    "login" | "signup" | "forgot" | "reset-verification"
+  >(initialMode);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -33,7 +39,9 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
   const [resetEmailSent, setResetEmailSent] = useState(false);
 
   // Get redirect destination from URL params or default to current path
-  const redirectTo = searchParams?.get("redirect") || (typeof window !== "undefined" ? window.location.pathname : "/");
+  const redirectTo =
+    searchParams?.get("redirect") ||
+    (typeof window !== "undefined" ? window.location.pathname : "/");
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -105,13 +113,18 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
         });
 
         if (result.signingIn) {
-          console.log("[AuthModal] ✅ Password reset successful, session stored");
+          console.log(
+            "[AuthModal] ✅ Password reset successful, session stored",
+          );
           setSuccess(true);
           setLoading(false);
-          
+
           // Reload page to establish session
           setTimeout(() => {
-            console.log("[AuthModal] Reloading page to establish session and route to:", redirectTo);
+            console.log(
+              "[AuthModal] Reloading page to establish session and route to:",
+              redirectTo,
+            );
             window.location.href = redirectTo;
           }, 200);
           return;
@@ -122,40 +135,56 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
           flow: view === "login" ? "signIn" : "signUp",
           email: email.trim().toLowerCase(),
           password,
-          ...(view === "signup" && username.trim() ? { username: username.trim() } : {}),
+          ...(view === "signup" && username.trim()
+            ? { username: username.trim() }
+            : {}),
         });
 
         if (result.signingIn) {
           console.log("[AuthModal] ✅ Sign-in successful, session stored");
           setSuccess(true);
           setLoading(false);
-          
+
           // Reload page to establish session
           setTimeout(() => {
-            console.log("[AuthModal] Reloading page to establish session and route to:", redirectTo);
+            console.log(
+              "[AuthModal] Reloading page to establish session and route to:",
+              redirectTo,
+            );
             window.location.href = redirectTo;
           }, 200);
-          
+
           return;
         }
       }
     } catch (err) {
       console.error("Auth error:", err);
-      let message = err instanceof Error ? err.message : `Failed to ${view === "login" ? "sign in" : view === "signup" ? "sign up" : "reset password"}.`;
-      
+      let message =
+        err instanceof Error
+          ? err.message
+          : `Failed to ${view === "login" ? "sign in" : view === "signup" ? "sign up" : "reset password"}.`;
+
       // Provide user-friendly error messages
       if (message.includes("InvalidSecret")) {
-        message = "Invalid email or password. Please check your credentials and try again.";
+        message =
+          "Invalid email or password. Please check your credentials and try again.";
       } else if (message.includes("InvalidAccountId")) {
         message = "Account not found. Please sign up first.";
       } else if (message.includes("already exists")) {
         message = "Account already exists. Please sign in instead.";
-      } else if (message.includes("invalid password") || message.includes("password")) {
+      } else if (
+        message.includes("invalid password") ||
+        message.includes("password")
+      ) {
         message = "Password must be at least 8 characters long.";
-      } else if (message.includes("code") || message.includes("Code") || message.includes("verification")) {
+      } else if (
+        message.includes("code") ||
+        message.includes("Code") ||
+        message.includes("verification")
+      ) {
         message = "Invalid reset code. Please check your email and try again.";
       }
-      
+
       setError(message);
     } finally {
       setLoading(false);
@@ -177,7 +206,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
         className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm"
         onClick={handleClose}
       />
-      
+
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div
@@ -195,22 +224,22 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
 
           <div className="space-y-2 text-center">
             <h1 className="text-3xl font-semibold">
-              {view === "login" 
-                ? "Welcome back" 
+              {view === "login"
+                ? "Welcome back"
                 : view === "signup"
-                ? "Create account"
-                : view === "forgot"
-                ? "Reset password"
-                : "Enter reset code"}
+                  ? "Create account"
+                  : view === "forgot"
+                    ? "Reset password"
+                    : "Enter reset code"}
             </h1>
             <p className="text-sm text-muted-foreground">
               {view === "login"
                 ? "Sign in to your Mediumish account"
                 : view === "signup"
-                ? "Sign up to start writing"
-                : view === "forgot"
-                ? "Enter your email to receive a reset code"
-                : "Enter the code sent to your email and your new password"}
+                  ? "Sign up to start writing"
+                  : view === "forgot"
+                    ? "Enter your email to receive a reset code"
+                    : "Enter the code sent to your email and your new password"}
             </p>
           </div>
 
@@ -314,7 +343,11 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
                   </button>
                 </div>
                 {view === "signup" && (
@@ -348,7 +381,11 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
                     onClick={() => setShowNewPassword(!showNewPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                   >
-                    {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showNewPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
                   </button>
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -361,10 +398,12 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
               <div className="rounded-lg bg-teal-50 p-3 text-sm text-teal-600">
                 <p className="font-medium">Reset code generated!</p>
                 <p className="mt-1">
-                  <strong>Development Mode:</strong> Check your Convex dashboard logs for the reset code.
+                  <strong>Development Mode:</strong> Check your Convex dashboard
+                  logs for the reset code.
                 </p>
                 <p className="mt-1 text-xs">
-                  In production, this code would be sent to your email. Click "Enter code" below to continue.
+                  In production, this code would be sent to your email. Click
+                  &quot;Enter code&quot; below to continue.
                 </p>
               </div>
             )}
@@ -380,30 +419,32 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
               <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
                 <p className="font-medium">Error</p>
                 <p>{error}</p>
-                {view === "login" && error.includes("Invalid email or password") && (
-                  <p className="mt-2 text-xs">
-                    Don't remember your password?{" "}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setView("forgot");
-                        setError(null);
-                      }}
-                      className="underline"
-                    >
-                      Reset it here
-                    </button>
-                  </p>
-                )}
+                {view === "login" &&
+                  error.includes("Invalid email or password") && (
+                    <p className="mt-2 text-xs">
+                      Don&apos;t remember your password?{" "}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setView("forgot");
+                          setError(null);
+                        }}
+                        className="underline"
+                      >
+                        Reset it here
+                      </button>
+                    </p>
+                  )}
               </div>
             )}
 
             <Button
               type="submit"
               disabled={
-                loading || 
+                loading ||
                 (view === "signup" && password.length < 8) ||
-                (view === "reset-verification" && (newPassword.length < 8 || !resetCode.trim()))
+                (view === "reset-verification" &&
+                  (newPassword.length < 8 || !resetCode.trim()))
               }
               className="w-full"
             >
@@ -411,17 +452,17 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
                 ? view === "login"
                   ? "Signing in..."
                   : view === "signup"
-                  ? "Creating account..."
-                  : view === "forgot"
-                  ? "Sending code..."
-                  : "Resetting password..."
+                    ? "Creating account..."
+                    : view === "forgot"
+                      ? "Sending code..."
+                      : "Resetting password..."
                 : view === "login"
                   ? "Sign in"
                   : view === "signup"
-                  ? "Sign up"
-                  : view === "forgot"
-                  ? "Send reset code"
-                  : "Reset password"}
+                    ? "Sign up"
+                    : view === "forgot"
+                      ? "Send reset code"
+                      : "Reset password"}
             </Button>
           </form>
 

@@ -8,7 +8,7 @@ import { v } from "convex/values";
  *
  * Legacy `note` table is kept for backward compatibility.
  * `posts` now carries author ownership for auth-aware mutations.
- * 
+ *
  * Users table is extended from authTables to include profile fields:
  * - image: Profile picture URL
  * - bio: User biography/description

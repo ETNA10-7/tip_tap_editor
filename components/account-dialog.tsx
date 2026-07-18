@@ -36,7 +36,10 @@ export function AccountDialog({ isOpen, onClose }: AccountDialogProps) {
   // Close when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dialogRef.current && !dialogRef.current.contains(event.target as Node)) {
+      if (
+        dialogRef.current &&
+        !dialogRef.current.contains(event.target as Node)
+      ) {
         // Check if click is on auth modal
         const target = event.target as HTMLElement;
         if (target.closest('[class*="z-[60]"]')) {
@@ -59,7 +62,7 @@ export function AccountDialog({ isOpen, onClose }: AccountDialogProps) {
   // Get user's full name from users table (required field)
   const userName = user?.name as string | undefined;
   const userEmail = user?.email as string | undefined;
-  
+
   // Avatar letter is first letter of name (uppercase)
   const avatarLetter = userName?.[0]?.toUpperCase() ?? "U";
 
@@ -78,7 +81,6 @@ export function AccountDialog({ isOpen, onClose }: AccountDialogProps) {
       window.location.href = "/";
     }
   };
-
 
   return (
     <>
@@ -102,9 +104,13 @@ export function AccountDialog({ isOpen, onClose }: AccountDialogProps) {
                 {avatarLetter}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground truncate">{userName}</p>
+                <p className="text-sm font-semibold text-foreground truncate">
+                  {userName}
+                </p>
                 {userEmail && (
-                  <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {userEmail}
+                  </p>
                 )}
               </div>
               <button
@@ -190,7 +196,7 @@ export function AccountDialog({ isOpen, onClose }: AccountDialogProps) {
             </div>
           </div>
         )}
-        </div>
+      </div>
 
       {/* Forgot Password Modal */}
       {forgotPasswordOpen && (
@@ -209,7 +215,8 @@ export function AccountDialog({ isOpen, onClose }: AccountDialogProps) {
             <div className="space-y-4">
               <h2 className="text-2xl font-semibold">Reset Password</h2>
               <p className="text-sm text-muted-foreground">
-                Password reset functionality will be available soon. For now, please contact support or create a new account.
+                Password reset functionality will be available soon. For now,
+                please contact support or create a new account.
               </p>
               <button
                 onClick={() => setForgotPasswordOpen(false)}
@@ -224,4 +231,3 @@ export function AccountDialog({ isOpen, onClose }: AccountDialogProps) {
     </>
   );
 }
-

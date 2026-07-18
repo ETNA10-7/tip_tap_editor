@@ -9,10 +9,10 @@ import { v } from "convex/values";
 
 // Get all notes
 export const getNotes = query(async (ctx) => {
-    return await ctx.db.query("note").order("desc").collect();
-  });
+  return await ctx.db.query("note").order("desc").collect();
+});
 
-  //Get notes by ID
+//Get notes by ID
 export const getNoteById = query({
   args: { id: v.id("note") },
   handler: async (ctx, args) => {

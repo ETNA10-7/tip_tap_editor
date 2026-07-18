@@ -4,10 +4,10 @@ import { generateUsernameSlug } from "./utils";
 
 /**
  * Password Reset Provider Configuration
- * 
+ *
  * DEVELOPMENT MODE: This provider logs the reset code to the console.
  * For production, replace this with a proper email service like Resend.
- * 
+ *
  * To set up Resend for production:
  * 1. Install: npm install resend
  * 2. Get API key from https://resend.com
@@ -38,9 +38,11 @@ const PasswordResetProvider = {
     console.log(`Reset Code: ${token}`);
     console.log(`Expires in: 15 minutes`);
     console.log("=".repeat(50));
-    console.log("NOTE: In production, this should send an email via Resend or similar service.");
+    console.log(
+      "NOTE: In production, this should send an email via Resend or similar service.",
+    );
     console.log("=".repeat(50));
-    
+
     // TODO: For production, uncomment and configure Resend:
     /*
     if (!process.env.RESEND_API_KEY) {
@@ -72,15 +74,15 @@ const PasswordResetProvider = {
 
 /**
  * Convex Auth configuration with Password provider.
- * 
+ *
  * The profile function is called during signup/signin to extract user information.
  * It should return an object with at least an 'email' field, and optionally 'name'.
- * 
+ *
  * Convex Auth automatically:
  * - Creates users in the 'users' table
  * - Creates accounts in the 'authAccounts' table
  * - Links them via authAccounts.userId -> users._id
- * 
+ *
  * Note: Username is auto-generated from name/email but uniqueness is not checked here.
  * Users can update their username later via the updateUsername mutation.
  */
@@ -89,22 +91,26 @@ export const { auth, signIn, signOut, store } = convexAuth({
     Password({
       profile: (params) => {
         // Normalize email to lowercase to prevent duplicate accounts
-        const email = String(params.email || "").trim().toLowerCase();
-        
+        const email = String(params.email || "")
+          .trim()
+          .toLowerCase();
+
         if (!email) {
           throw new Error("Email is required");
         }
-        
+
         // Extract name from username param or use email prefix as fallback
         const usernameParam = params.username;
         const username = usernameParam ? String(usernameParam).trim() : "";
         const name = username || email.split("@")[0] || "User";
-        
+
         // Generate a username slug from name or email
         // This will be set initially, but users can update it later
         // Uniqueness is not checked here (can't access DB in profile function)
-        const usernameSlug = generateUsernameSlug(name || email.split("@")[0] || "user");
-        
+        const usernameSlug = generateUsernameSlug(
+          name || email.split("@")[0] || "user",
+        );
+
         // Return profile object - Convex Auth will create the user automatically
         // The profile must match the users table schema from authTables
         // Required: email
@@ -119,4 +125,3 @@ export const { auth, signIn, signOut, store } = convexAuth({
     }),
   ],
 });
-

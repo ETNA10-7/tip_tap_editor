@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ProfileAvatar } from "@/components/profile-avatar";
 import { format } from "date-fns";
 import { useState } from "react";
-import { Id } from "@/convex/_generated/dataModel";
+import { Id, Doc } from "@/convex/_generated/dataModel";
 import { ThumbsUp, Reply, MoreVertical } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -180,7 +180,6 @@ export function PostComments({ postId }: PostCommentsProps) {
               handleUpdateComment={handleUpdateComment}
               handleDeleteComment={handleDeleteComment}
               handleClap={handleClap}
-              router={router}
             />
           ))}
         </div>
@@ -193,9 +192,29 @@ export function PostComments({ postId }: PostCommentsProps) {
   );
 }
 
+interface CommentAuthor {
+  _id: Id<"users">;
+  name?: string | null;
+  image?: string | null;
+  email?: string | null;
+  username?: string | null;
+}
+
+interface CommentWithReplies {
+  _id: Id<"comments">;
+  authorId: string;
+  author?: CommentAuthor | null;
+  createdAt: number;
+  editedAt?: number;
+  content: string;
+  hasClapped?: boolean;
+  claps: number;
+  replies?: CommentWithReplies[];
+}
+
 interface CommentItemProps {
-  comment: any;
-  user: any;
+  comment: CommentWithReplies;
+  user: Doc<"users"> | null;
   isAuthenticated: boolean;
   replyingTo: Id<"comments"> | null;
   setReplyingTo: (id: Id<"comments"> | null) => void;
@@ -209,7 +228,6 @@ interface CommentItemProps {
   handleUpdateComment: (id: Id<"comments">) => void;
   handleDeleteComment: (id: Id<"comments">) => void;
   handleClap: (id: Id<"comments">) => void;
-  router: any;
 }
 
 function CommentItem({
@@ -228,8 +246,8 @@ function CommentItem({
   handleUpdateComment,
   handleDeleteComment,
   handleClap,
-  router,
 }: CommentItemProps) {
+  const router = useRouter();
   const isAuthor = isAuthenticated && user && comment.authorId === user._id;
   const isEditing = editingId === comment._id;
   const isReplying = replyingTo === comment._id;
@@ -380,7 +398,7 @@ function CommentItem({
           {/* Nested Replies */}
           {comment.replies && comment.replies.length > 0 && (
             <div className="mt-4 ml-4 pl-4 border-l-2 border-slate-200 space-y-4">
-              {comment.replies.map((reply: any) => (
+              {comment.replies.map((reply) => (
                 <div key={reply._id} className="flex items-start gap-3">
                   <ProfileAvatar user={reply.author} size="sm" />
                   <div className="flex-1">
@@ -423,4 +441,3 @@ function CommentItem({
     </div>
   );
 }
-

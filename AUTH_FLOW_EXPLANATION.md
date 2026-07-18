@@ -17,29 +17,37 @@
 ## ❌ What's Actually Happening (The Problem)
 
 ### **Step 1: Login Succeeds ✅**
+
 ```
 [AuthPage] ✅ Sign-in successful, session stored
 [AuthPage] Session keys in localStorage: ["__convexAuthJWT_http1270013210", "__convexAuthRefreshToken_http1270013210"]
 ```
+
 **Status:** ✅ Tokens ARE stored in localStorage
 
 ### **Step 2: Page Reloads ✅**
+
 ```
 [ConvexClientProvider] ✅ Auth tokens found in localStorage: ["__convexAuthJWT_http1270013210", ...]
 ```
+
 **Status:** ✅ Tokens ARE present after reload
 
 ### **Step 3: Query Runs ❌**
+
 ```
 [CONVEX Q(users:getCurrentUser)] [LOG] '[getCurrentUser] ❌ No userId found - session token not sent with query'
 [CONVEX Q(users:getCurrentUser)] [LOG] '[getCurrentUser] This means ConvexAuthProvider is not sending session token with the query'
 ```
+
 **Status:** ❌ **THIS IS THE PROBLEM** - Token exists but is NOT being sent with the query
 
 ### **Step 4: User is Null ❌**
+
 ```
 [useAuth] ❌ User not authenticated - user is null
 ```
+
 **Status:** ❌ Because `getCurrentUser` returned `null` (no `userId` found)
 
 ---
@@ -47,7 +55,9 @@
 ## 🔴 Root Cause: Why Token Isn't Being Sent
 
 ### **The Issue:**
+
 ConvexAuthProvider should automatically:
+
 1. Read JWT token from `localStorage` on initialization
 2. Inject token into WebSocket connection headers
 3. Send token with every query
@@ -84,10 +94,10 @@ const result = await signIn("password", { email, password });
 if (result.signingIn) {
   // ✅ Session token is stored in localStorage
   console.log("[AuthPage] ✅ Sign-in successful, session stored");
-  
+
   // ✅ We can see tokens in localStorage
   console.log("[AuthPage] Session keys in localStorage:", sessionKeys);
-  
+
   // ⚠️ Page reloads to pick up tokens
   setTimeout(() => {
     window.location.href = redirectTo; // Full page reload
@@ -96,6 +106,7 @@ if (result.signingIn) {
 ```
 
 **What happens:**
+
 - ✅ `signIn()` stores tokens in `localStorage`
 - ✅ Tokens are visible in browser DevTools
 - ✅ Page reloads to initialize ConvexAuthProvider
@@ -107,10 +118,10 @@ if (result.signingIn) {
 ```typescript
 const convex = useMemo(() => {
   const client = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-  
+
   // ✅ Tokens are found in localStorage
   console.log("[ConvexClientProvider] ✅ Auth tokens found in localStorage:", authKeys);
-  
+
   return client;
 }, []);
 
@@ -122,6 +133,7 @@ return (
 ```
 
 **What happens:**
+
 - ✅ ConvexAuthProvider wraps ConvexProvider
 - ✅ Tokens are visible in `localStorage`
 - ❌ **But tokens are NOT being sent with queries**
@@ -134,13 +146,15 @@ return (
 export const getCurrentUser = query(async (ctx) => {
   // Try to get userId from session token
   const userId = await auth.getUserId(ctx);
-  
+
   if (!userId) {
     // ❌ THIS IS WHERE IT FAILS
-    console.log("[getCurrentUser] ❌ No userId found - session token not sent with query");
+    console.log(
+      "[getCurrentUser] ❌ No userId found - session token not sent with query",
+    );
     return null; // Returns null because no token was received
   }
-  
+
   // This code never runs because userId is null
   const user = await ctx.db.get(userId);
   return user;
@@ -148,6 +162,7 @@ export const getCurrentUser = query(async (ctx) => {
 ```
 
 **What happens:**
+
 - ❌ `auth.getUserId(ctx)` returns `null`
 - ❌ This means `ctx.auth.getUserIdentity()` received no JWT token
 - ❌ Query returns `null` instead of user object
@@ -160,10 +175,10 @@ export const getCurrentUser = query(async (ctx) => {
 export function useAuth() {
   // Calls getCurrentUser query
   const user = useQuery(api.users.getCurrentUser);
-  
+
   // user is null because getCurrentUser returned null
   const isAuthenticated = user !== null && user !== undefined; // false
-  
+
   if (!isLoading) {
     if (user) {
       // ❌ This never runs
@@ -172,12 +187,13 @@ export function useAuth() {
       console.log("[useAuth] ❌ User not authenticated - user is null");
     }
   }
-  
+
   return { user: null, isAuthenticated: false, isLoading: false };
 }
 ```
 
 **What happens:**
+
 - ❌ `getCurrentUser` returns `null`
 - ❌ `user` is `null` in the hook
 - ❌ `isAuthenticated` is `false`
@@ -196,6 +212,7 @@ AND getCurrentUser MUST return user object (never null)
 ```
 
 ### **Current State:**
+
 ```
 ✅ Session token exists in localStorage
 ❌ Token is NOT sent with query
@@ -205,6 +222,7 @@ AND getCurrentUser MUST return user object (never null)
 ```
 
 ### **Expected State:**
+
 ```
 ✅ Session token exists in localStorage
 ✅ Token IS sent with query
@@ -218,6 +236,7 @@ AND getCurrentUser MUST return user object (never null)
 ## 🔧 What Needs to Be Fixed
 
 ### **The Core Problem:**
+
 ConvexAuthProvider is not injecting the JWT token into WebSocket connection headers.
 
 ### **Possible Causes:**
@@ -243,12 +262,14 @@ ConvexAuthProvider is not injecting the JWT token into WebSocket connection head
 ## 📝 Summary
 
 ### **What Works:**
+
 - ✅ Login/signup stores tokens in localStorage
 - ✅ Tokens persist after page reload
 - ✅ Tokens are visible in browser DevTools
 - ✅ ConvexAuthProvider finds tokens in localStorage
 
 ### **What Doesn't Work:**
+
 - ❌ Tokens are NOT sent with WebSocket queries
 - ❌ Backend receives no JWT token
 - ❌ `auth.getUserId(ctx)` returns `null`
@@ -257,7 +278,9 @@ ConvexAuthProvider is not injecting the JWT token into WebSocket connection head
 - ❌ UI shows "not authenticated" even with valid tokens
 
 ### **The Fix Needed:**
+
 Ensure ConvexAuthProvider properly injects JWT tokens into WebSocket connection headers so that:
+
 1. Every query includes the token
 2. Backend can validate the session
 3. `auth.getUserId(ctx)` returns the `userId`
@@ -269,16 +292,19 @@ Ensure ConvexAuthProvider properly injects JWT tokens into WebSocket connection 
 ## 🐛 Error Messages Explained
 
 ### **Error 1: "No userId found - session token not sent with query"**
+
 **Meaning:** The backend received a query but no JWT token was included in the request.
 
 **Why:** ConvexAuthProvider didn't inject the token into WebSocket headers.
 
 ### **Error 2: "User not authenticated - user is null"**
+
 **Meaning:** The `getCurrentUser` query returned `null` because no `userId` was found.
 
 **Why:** Without a JWT token, `auth.getUserId(ctx)` returns `null`, so the query returns `null`.
 
 ### **Error 3: "WebSocket reconnected"**
+
 **Meaning:** The WebSocket connection was re-established, but still without the auth token.
 
 **Why:** The connection is being made before ConvexAuthProvider injects the token.
@@ -304,23 +330,3 @@ Ensure ConvexAuthProvider properly injects JWT tokens into WebSocket connection 
 3. **Test with Convex Auth example** to compare behavior
 4. **Consider upgrading** `@convex-dev/auth` if newer version fixes this
 5. **Manual token injection** as a workaround if needed
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,4 +1,4 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, DatabaseReader } from "./_generated/server";
 import { auth } from "./auth";
 import { v } from "convex/values";
 import { generateSlug } from "./utils";
@@ -7,8 +7,8 @@ import { generateSlug } from "./utils";
  * Helper function to ensure slug uniqueness by appending numbers if needed.
  */
 async function ensureUniqueSlug(
-  ctx: { db: any },
-  baseSlug: string
+  ctx: { db: DatabaseReader },
+  baseSlug: string,
 ): Promise<string> {
   let slug = baseSlug;
   let counter = 1;
@@ -16,7 +16,7 @@ async function ensureUniqueSlug(
   while (true) {
     const existing = await ctx.db
       .query("posts")
-      .withIndex("slug", (q: any) => q.eq("slug", slug))
+      .withIndex("slug", (q) => q.eq("slug", slug))
       .first();
 
     if (!existing) {
@@ -50,7 +50,10 @@ export const create = mutation({
     const now = Date.now();
     const excerpt =
       args.excerpt ??
-      args.content.replace(/<[^>]+>/g, "").slice(0, 180).concat("…");
+      args.content
+        .replace(/<[^>]+>/g, "")
+        .slice(0, 180)
+        .concat("…");
 
     // Generate slug from title and ensure uniqueness
     const baseSlug = generateSlug(args.title);
@@ -109,9 +112,9 @@ export const update = mutation({
       // Check if new slug conflicts with other posts (excluding current post)
       const conflictingPost = await ctx.db
         .query("posts")
-        .withIndex("slug", (q: any) => q.eq("slug", baseSlug))
+        .withIndex("slug", (q) => q.eq("slug", baseSlug))
         .first();
-      
+
       if (conflictingPost && conflictingPost._id !== id) {
         // Collision with another post, append number
         patch.slug = await ensureUniqueSlug(ctx, baseSlug);
@@ -122,7 +125,8 @@ export const update = mutation({
     }
     if (rest.content !== undefined) patch.content = rest.content;
     if (rest.excerpt !== undefined) patch.excerpt = rest.excerpt;
-    if (rest.featuredImage !== undefined) patch.featuredImage = rest.featuredImage;
+    if (rest.featuredImage !== undefined)
+      patch.featuredImage = rest.featuredImage;
     if (rest.published !== undefined) patch.published = rest.published;
 
     await ctx.db.patch(id, patch);
@@ -148,10 +152,10 @@ export const remove = mutation({
 
 export const list = query(async (ctx) => {
   const allPosts = await ctx.db.query("posts").order("desc").collect();
-  
+
   // Filter only published posts (published === true or undefined for backward compatibility)
-  const publishedPosts = allPosts.filter(post => post.published !== false);
-  
+  const publishedPosts = allPosts.filter((post) => post.published !== false);
+
   // Fetch author information for each post
   const postsWithAuthors = await Promise.all(
     publishedPosts.map(async (post) => {
@@ -173,7 +177,7 @@ export const list = query(async (ctx) => {
         slug,
         author: authorInfo,
       };
-    })
+    }),
   );
 
   return postsWithAuthors;
@@ -192,18 +196,18 @@ export const search = query({
     }
 
     const allPosts = await ctx.db.query("posts").order("desc").collect();
-    
+
     // For single character searches, only search titles to avoid irrelevant results
     const isSingleChar = searchTerm.length === 1;
-    
+
     // Separate posts into title matches and content matches
     const titleMatches: typeof allPosts = [];
     const contentMatches: typeof allPosts = [];
-    
+
     for (const post of allPosts) {
       const titleLower = post.title.toLowerCase();
       const titleMatch = titleLower.includes(searchTerm);
-      
+
       if (titleMatch) {
         titleMatches.push(post);
       } else if (!isSingleChar) {
@@ -220,20 +224,22 @@ export const search = query({
     const matchingPosts = [...titleMatches, ...contentMatches];
 
     // Filter only published posts (published === true or undefined for backward compatibility)
-    const publishedMatchingPosts = matchingPosts.filter(post => post.published !== false);
+    const publishedMatchingPosts = matchingPosts.filter(
+      (post) => post.published !== false,
+    );
 
     // Fetch author information and generate slugs for posts that don't have them
     const postsWithAuthors = await Promise.all(
       publishedMatchingPosts.map(async (post) => {
         const author = await ctx.db.get(post.authorId);
-          const authorInfo = author
-            ? {
-                _id: author._id,
-                name: author.name || "Anonymous",
-                image: author.image,
-                username: author.username,
-              }
-            : null;
+        const authorInfo = author
+          ? {
+              _id: author._id,
+              name: author.name || "Anonymous",
+              image: author.image,
+              username: author.username,
+            }
+          : null;
 
         const slug = post.slug || generateSlug(post.title);
 
@@ -242,7 +248,7 @@ export const search = query({
           slug,
           author: authorInfo,
         };
-      })
+      }),
     );
 
     return postsWithAuthors;
@@ -259,10 +265,10 @@ export const listByUser = query(async (ctx) => {
   }
   const posts = await ctx.db
     .query("posts")
-    .withIndex("authorId", (q: any) => q.eq("authorId", userId))
+    .withIndex("authorId", (q) => q.eq("authorId", userId))
     .order("desc")
     .collect();
-  
+
   // Fetch author information for each post
   const postsWithAuthors = await Promise.all(
     posts.map(async (post) => {
@@ -284,7 +290,7 @@ export const listByUser = query(async (ctx) => {
         slug,
         author: authorInfo,
       };
-    })
+    }),
   );
 
   return postsWithAuthors;
@@ -294,7 +300,7 @@ export const listByUser = query(async (ctx) => {
  * Get all posts created by a specific author (for public profiles).
  * This is different from listByUser which only shows the current user's posts.
  * Only returns published posts (not drafts).
- * 
+ *
  * @param args.authorId - The ID of the author whose posts to fetch
  */
 export const listByAuthorId = query({
@@ -302,25 +308,25 @@ export const listByAuthorId = query({
   handler: async (ctx, args) => {
     const allPosts = await ctx.db
       .query("posts")
-      .withIndex("authorId", (q: any) => q.eq("authorId", args.authorId))
+      .withIndex("authorId", (q) => q.eq("authorId", args.authorId))
       .order("desc")
       .collect();
-    
+
     // Filter only published posts (published === true or undefined for backward compatibility)
-    const publishedPosts = allPosts.filter(post => post.published !== false);
-    
+    const publishedPosts = allPosts.filter((post) => post.published !== false);
+
     // Fetch author information for each post
     const postsWithAuthors = await Promise.all(
       publishedPosts.map(async (post) => {
         const author = await ctx.db.get(post.authorId);
-          const authorInfo = author
-            ? {
-                _id: author._id,
-                name: author.name || "Anonymous",
-                image: author.image,
-                username: author.username,
-              }
-            : null;
+        const authorInfo = author
+          ? {
+              _id: author._id,
+              name: author.name || "Anonymous",
+              image: author.image,
+              username: author.username,
+            }
+          : null;
 
         // Generate slugs on-the-fly for posts that don't have them
         const slug = post.slug || generateSlug(post.title);
@@ -330,7 +336,7 @@ export const listByAuthorId = query({
           slug,
           author: authorInfo,
         };
-      })
+      }),
     );
 
     return postsWithAuthors;
@@ -369,7 +375,7 @@ export const ensurePostSlug = mutation({
   handler: async (ctx, args) => {
     const post = await ctx.db.get(args.id);
     if (!post) throw new Error("Post not found");
-    
+
     if (!post.slug) {
       const baseSlug = generateSlug(post.title);
       const slug = await ensureUniqueSlug(ctx, baseSlug);
@@ -388,20 +394,20 @@ export const getBySlug = query({
   args: { slug: v.string() },
   handler: async (ctx, args) => {
     console.log(`[getBySlug] Searching for slug: ${args.slug}`);
-    
+
     // First, try to find by saved slug
     let post = await ctx.db
       .query("posts")
-      .withIndex("slug", (q: any) => q.eq("slug", args.slug))
+      .withIndex("slug", (q) => q.eq("slug", args.slug))
       .first();
 
-    console.log(`[getBySlug] Found by index: ${post ? post.title : 'none'}`);
+    console.log(`[getBySlug] Found by index: ${post ? post.title : "none"}`);
 
     // If not found by slug, search all posts and find one whose title generates this slug
     if (!post) {
       const allPosts = await ctx.db.query("posts").collect();
       console.log(`[getBySlug] Searching through ${allPosts.length} posts`);
-      
+
       for (const p of allPosts) {
         // Check if post has saved slug that matches
         if (p.slug === args.slug) {
@@ -412,7 +418,9 @@ export const getBySlug = query({
         // If no saved slug, generate from title and compare
         if (!p.slug) {
           const generatedSlug = generateSlug(p.title);
-          console.log(`[getBySlug] Post "${p.title}" generates slug: "${generatedSlug}"`);
+          console.log(
+            `[getBySlug] Post "${p.title}" generates slug: "${generatedSlug}"`,
+          );
           if (generatedSlug === args.slug) {
             post = p;
             console.log(`[getBySlug] Found by generated slug: ${p.title}`);
@@ -426,28 +434,32 @@ export const getBySlug = query({
       console.log(`[getBySlug] ❌ Post not found for slug: ${args.slug}`);
       // Debug: List all posts and their slugs
       const allPosts = await ctx.db.query("posts").collect();
-      const postsInfo = allPosts.map(p => ({
+      const postsInfo = allPosts.map((p) => ({
         title: p.title,
         slug: p.slug || generateSlug(p.title),
-        hasSlug: !!p.slug
+        hasSlug: !!p.slug,
       }));
       console.log(`[getBySlug] Available posts:`, postsInfo);
-      
+
       // Last resort: try case-insensitive title match
-      const titleMatch = allPosts.find(p => 
-        generateSlug(p.title).toLowerCase() === args.slug.toLowerCase()
+      const titleMatch = allPosts.find(
+        (p) => generateSlug(p.title).toLowerCase() === args.slug.toLowerCase(),
       );
       if (titleMatch) {
-        console.log(`[getBySlug] Found by case-insensitive title match: ${titleMatch.title}`);
+        console.log(
+          `[getBySlug] Found by case-insensitive title match: ${titleMatch.title}`,
+        );
         post = titleMatch;
       }
-      
+
       if (!post) {
         return null;
       }
     }
 
-    console.log(`[getBySlug] ✅ Found post: "${post.title}", saved slug: ${post.slug || 'none'}`);
+    console.log(
+      `[getBySlug] ✅ Found post: "${post.title}", saved slug: ${post.slug || "none"}`,
+    );
 
     const userId = await auth.getUserId(ctx);
     const canEdit = !!userId && post.authorId === userId;
@@ -486,7 +498,7 @@ export const migrateSlugs = mutation({
   handler: async (ctx) => {
     const allPosts = await ctx.db.query("posts").collect();
     let migrated = 0;
-    
+
     for (const post of allPosts) {
       if (!post.slug) {
         const baseSlug = generateSlug(post.title);
@@ -495,11 +507,7 @@ export const migrateSlugs = mutation({
         migrated++;
       }
     }
-    
+
     return { migrated, total: allPosts.length };
   },
 });
-
-
-
-

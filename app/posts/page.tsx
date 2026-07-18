@@ -5,7 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { PostCard } from "@/components/post-card";
 import { useAuth } from "@/hooks/useAuth";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/theme-context";
 
@@ -17,28 +17,18 @@ function PostsPage() {
   const [view, setView] = useState<"all" | "mine">("all");
   const isLightMode = theme === "light";
 
-  // Reset to "all" when running a search
-  useEffect(() => {
-    if (searchQuery) {
-      setView("all");
-    }
-  }, [searchQuery]);
-
   // Use search query if search term exists, otherwise show user's posts or all posts
   const searchResults = useQuery(
     api.posts.search,
-    searchQuery ? { query: searchQuery } : "skip"
+    searchQuery ? { query: searchQuery } : "skip",
   );
-  
+
   const userPosts = useQuery(
     api.posts.listByUser,
-    isAuthenticated && !searchQuery ? {} : "skip"
+    isAuthenticated && !searchQuery ? {} : "skip",
   );
-  const allPosts = useQuery(
-    api.posts.list,
-    !searchQuery ? {} : "skip"
-  );
-  
+  const allPosts = useQuery(api.posts.list, !searchQuery ? {} : "skip");
+
   // Determine which posts to display
   const posts = useMemo(() => {
     if (searchQuery) return searchResults ?? [];
@@ -49,8 +39,8 @@ function PostsPage() {
   // Separate published and draft posts when viewing "My posts"
   const { publishedPosts, draftPosts } = useMemo(() => {
     if (view === "mine" && isAuthenticated && userPosts) {
-      const published = userPosts.filter(post => post.published !== false);
-      const drafts = userPosts.filter(post => post.published === false);
+      const published = userPosts.filter((post) => post.published !== false);
+      const drafts = userPosts.filter((post) => post.published === false);
       return { publishedPosts: published, draftPosts: drafts };
     }
     return { publishedPosts: posts, draftPosts: [] };
@@ -60,135 +50,159 @@ function PostsPage() {
     <>
       {/* Green background overlay for light mode only */}
       {isLightMode && (
-        <div 
+        <div
           className="fixed inset-0 -z-10"
-          style={{ backgroundColor: 'var(--leafy-green, #B8DB80)' }}
+          style={{ backgroundColor: "var(--leafy-green, #B8DB80)" }}
         />
       )}
       <div className="space-y-6 relative z-0">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <h1 className={`text-3xl font-semibold ${isLightMode ? "text-black" : "text-white"}`}>
-              {searchQuery 
-                ? `Search results for "${searchQuery}"` 
+            <h1
+              className={`text-3xl font-semibold ${isLightMode ? "text-black" : "text-white"}`}
+            >
+              {searchQuery
+                ? `Search results for "${searchQuery}"`
                 : view === "mine" && isAuthenticated
                   ? "My posts"
                   : "All posts"}
             </h1>
             <p className={isLightMode ? "text-black" : "text-white"}>
-            {searchQuery
-              ? `Found ${posts.length} ${posts.length === 1 ? "post" : "posts"}`
-              : view === "mine" && isAuthenticated
-                ? "Posts you've created, saved in Convex."
-                : "Stories saved in Convex, rendered with the TipTap editor."}
-          </p>
+              {searchQuery
+                ? `Found ${posts.length} ${posts.length === 1 ? "post" : "posts"}`
+                : view === "mine" && isAuthenticated
+                  ? "Posts you've created, saved in Convex."
+                  : "Stories saved in Convex, rendered with the TipTap editor."}
+            </p>
+          </div>
+
+          {!searchQuery && (
+            <div className="flex items-center gap-2">
+              <Button
+                variant={view === "all" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setView("all")}
+                className={
+                  view === "all"
+                    ? "bg-teal-600 text-white hover:bg-teal-700"
+                    : isLightMode
+                      ? "border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                      : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white"
+                }
+              >
+                All posts
+              </Button>
+              <Button
+                variant={view === "mine" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setView("mine")}
+                disabled={!isAuthenticated}
+                className={
+                  view === "mine"
+                    ? "bg-teal-600 text-white hover:bg-teal-700"
+                    : isLightMode
+                      ? "border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                      : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white"
+                }
+              >
+                My posts
+              </Button>
+            </div>
+          )}
         </div>
 
-        {!searchQuery && (
-          <div className="flex items-center gap-2">
-            <Button
-              variant={view === "all" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setView("all")}
-              className={view === "all" 
-                ? "bg-teal-600 text-white hover:bg-teal-700" 
-                : isLightMode
-                  ? "border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                  : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white"}
-            >
-              All posts
-            </Button>
-            <Button
-              variant={view === "mine" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setView("mine")}
-              disabled={!isAuthenticated}
-              className={view === "mine" 
-                ? "bg-teal-600 text-white hover:bg-teal-700" 
-                : isLightMode
-                  ? "border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                  : "border-slate-600 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white"}
-            >
-              My posts
-            </Button>
+        {view === "mine" && isAuthenticated ? (
+          // Show published and drafts separately when viewing "My posts"
+          <div className="space-y-8">
+            {/* Published Posts Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2
+                    className={`text-xl font-semibold ${isLightMode ? "text-black" : "text-white"}`}
+                  >
+                    Published Posts
+                  </h2>
+                  <p
+                    className={`text-sm mt-1 ${isLightMode ? "text-black" : "text-white"}`}
+                  >
+                    {publishedPosts.length}{" "}
+                    {publishedPosts.length === 1 ? "post" : "posts"} published
+                  </p>
+                </div>
+              </div>
+              {publishedPosts.length === 0 ? (
+                <div
+                  className={`rounded-xl border-2 border-dashed p-8 text-center ${
+                    isLightMode
+                      ? "border-gray-300 bg-white/50"
+                      : "border-slate-700 bg-slate-800/30"
+                  }`}
+                >
+                  <p className={isLightMode ? "text-black" : "text-white"}>
+                    You haven&apos;t published any posts yet.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {publishedPosts.map((post) => (
+                    <PostCard key={post._id} post={post} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Draft Posts Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2
+                    className={`text-xl font-semibold ${isLightMode ? "text-black" : "text-white"}`}
+                  >
+                    Drafts
+                  </h2>
+                  <p
+                    className={`text-sm mt-1 ${isLightMode ? "text-black" : "text-white"}`}
+                  >
+                    {draftPosts.length}{" "}
+                    {draftPosts.length === 1 ? "draft" : "drafts"} saved
+                  </p>
+                </div>
+              </div>
+              {draftPosts.length === 0 ? (
+                <div
+                  className={`rounded-xl border-2 border-dashed p-8 text-center ${
+                    isLightMode
+                      ? "border-gray-300 bg-white/50"
+                      : "border-slate-700 bg-slate-800/30"
+                  }`}
+                >
+                  <p className={isLightMode ? "text-black" : "text-white"}>
+                    You don&apos;t have any drafts yet.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {draftPosts.map((post) => (
+                    <PostCard key={post._id} post={post} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        ) : posts.length === 0 ? (
+          <p className={isLightMode ? "text-black" : "text-white"}>
+            {searchQuery
+              ? `No posts found matching "${searchQuery}"`
+              : "No posts yet."}
+          </p>
+        ) : (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {posts.map((post) => (
+              <PostCard key={post._id} post={post} />
+            ))}
           </div>
         )}
-      </div>
-
-      {view === "mine" && isAuthenticated ? (
-        // Show published and drafts separately when viewing "My posts"
-        <div className="space-y-8">
-          {/* Published Posts Section */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className={`text-xl font-semibold ${isLightMode ? "text-black" : "text-white"}`}>Published Posts</h2>
-                <p className={`text-sm mt-1 ${isLightMode ? "text-black" : "text-white"}`}>
-                  {publishedPosts.length} {publishedPosts.length === 1 ? "post" : "posts"} published
-                </p>
-              </div>
-            </div>
-            {publishedPosts.length === 0 ? (
-              <div className={`rounded-xl border-2 border-dashed p-8 text-center ${
-                isLightMode 
-                  ? "border-gray-300 bg-white/50" 
-                  : "border-slate-700 bg-slate-800/30"
-              }`}>
-                <p className={isLightMode ? "text-black" : "text-white"}>
-                  You haven't published any posts yet.
-                </p>
-              </div>
-            ) : (
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {publishedPosts.map((post) => (
-                  <PostCard key={post._id} post={post} />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Draft Posts Section */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className={`text-xl font-semibold ${isLightMode ? "text-black" : "text-white"}`}>Drafts</h2>
-                <p className={`text-sm mt-1 ${isLightMode ? "text-black" : "text-white"}`}>
-                  {draftPosts.length} {draftPosts.length === 1 ? "draft" : "drafts"} saved
-                </p>
-              </div>
-            </div>
-            {draftPosts.length === 0 ? (
-              <div className={`rounded-xl border-2 border-dashed p-8 text-center ${
-                isLightMode 
-                  ? "border-gray-300 bg-white/50" 
-                  : "border-slate-700 bg-slate-800/30"
-              }`}>
-                <p className={isLightMode ? "text-black" : "text-white"}>
-                  You don't have any drafts yet.
-                </p>
-              </div>
-            ) : (
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {draftPosts.map((post) => (
-                  <PostCard key={post._id} post={post} />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      ) : posts.length === 0 ? (
-        <p className={isLightMode ? "text-black" : "text-white"}>
-          {searchQuery
-            ? `No posts found matching "${searchQuery}"`
-            : "No posts yet."}
-        </p>
-      ) : (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post) => (
-            <PostCard key={post._id} post={post} />
-          ))}
-        </div>
-      )}
       </div>
     </>
   );
@@ -197,17 +211,13 @@ function PostsPage() {
 export default function PostsPageWrapper() {
   return (
     <Suspense
-      fallback={(
+      fallback={
         <div className="max-w-4xl mx-auto">
           <p className="text-muted-foreground">Loading…</p>
         </div>
-      )}
+      }
     >
       <PostsPage />
     </Suspense>
   );
 }
-
-
-
-

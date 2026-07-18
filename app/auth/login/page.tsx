@@ -23,7 +23,7 @@ export default function LoginPage() {
         email: email.trim().toLowerCase(),
         password,
       });
-      
+
       // Wait a moment for auth state to update, then redirect
       if (result.signingIn) {
         setTimeout(() => {
@@ -33,11 +33,13 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error(err);
-      const message =
-        err instanceof Error ? err.message : "Failed to sign in.";
+      const message = err instanceof Error ? err.message : "Failed to sign in.";
       if (message.toLowerCase().includes("invalidaccountid")) {
         setError("Account not found. Please sign up first.");
-      } else if (message.toLowerCase().includes("invalid credentials") || message.toLowerCase().includes("invalidsecret")) {
+      } else if (
+        message.toLowerCase().includes("invalid credentials") ||
+        message.toLowerCase().includes("invalidsecret")
+      ) {
         setError("Invalid email or password.");
       } else {
         setError(message);
@@ -107,7 +109,10 @@ export default function LoginPage() {
 
         <div className="text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="/auth/signup" className="font-semibold text-slate-900 hover:underline">
+          <Link
+            href="/auth/signup"
+            className="font-semibold text-slate-900 hover:underline"
+          >
             Sign up
           </Link>
         </div>
@@ -115,4 +120,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

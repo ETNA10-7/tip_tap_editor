@@ -36,8 +36,10 @@ export function UserMenu() {
   if (!me) return null;
 
   const email = me.email as string | undefined;
-  const username = (me.name as string | undefined) || email?.split("@")[0] || "User";
-  const avatarLetter = email?.[0]?.toUpperCase() ?? username[0]?.toUpperCase() ?? "U";
+  const username =
+    (me.name as string | undefined) || email?.split("@")[0] || "User";
+  const avatarLetter =
+    email?.[0]?.toUpperCase() ?? username[0]?.toUpperCase() ?? "U";
   const displayName = username.charAt(0).toUpperCase() + username.slice(1);
 
   const handleLogout = async () => {
@@ -75,7 +77,9 @@ export function UserMenu() {
           {/* Welcome section */}
           <div className="px-3 py-3 border-b">
             <p className="text-xs font-medium text-muted-foreground">Welcome</p>
-            <p className="text-lg font-semibold text-foreground">Welcome, {displayName}!</p>
+            <p className="text-lg font-semibold text-foreground">
+              Welcome, {displayName}!
+            </p>
             <p className="text-xs text-muted-foreground truncate">{email}</p>
           </div>
 

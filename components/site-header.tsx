@@ -20,13 +20,15 @@ import { useTheme } from "@/contexts/theme-context";
  * Generate slug from title (client-side, matches server-side logic)
  */
 function generateSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "") || "post";
+  return (
+    title
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "post"
+  );
 }
 
 const navItems = [
@@ -60,7 +62,9 @@ export function SiteHeader() {
   // Fetch search results when debounced query changes (trigger with 1+ character)
   const searchResults = useQuery(
     api.posts.search,
-    debouncedQuery.trim().length >= 1 ? { query: debouncedQuery.trim() } : "skip"
+    debouncedQuery.trim().length >= 1
+      ? { query: debouncedQuery.trim() }
+      : "skip",
   );
 
   // Close dropdown when clicking outside
@@ -98,27 +102,35 @@ export function SiteHeader() {
     setIsSearchFocused(false);
   };
 
-  const showDropdown = isSearchFocused && debouncedQuery.trim().length >= 1 && searchResults !== undefined;
+  const showDropdown =
+    isSearchFocused &&
+    debouncedQuery.trim().length >= 1 &&
+    searchResults !== undefined;
 
   return (
-    <header className={`border-b sticky top-0 z-40 backdrop-blur ${isHomepage ? "homepage-header" : ""} ${
-      isHomepage || isLightMode
-        ? "border-gray-200 bg-white" 
-        : "border-slate-700 bg-slate-900/95 dark:border-slate-700 dark:bg-slate-900/95"
-    }`}>
+    <header
+      className={`border-b sticky top-0 z-40 backdrop-blur ${isHomepage ? "homepage-header" : ""} ${
+        isHomepage || isLightMode
+          ? "border-gray-200 bg-white"
+          : "border-slate-700 bg-slate-900/95 dark:border-slate-700 dark:bg-slate-900/95"
+      }`}
+    >
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 gap-4">
-        <Link href="/" className={`text-lg font-semibold tracking-tight flex-shrink-0 homepage-text-black ${
-          isHomepage || isLightMode
-            ? "!text-black" 
-            : "text-white dark:text-white"
-        }`}>
+        <Link
+          href="/"
+          className={`text-lg font-semibold tracking-tight flex-shrink-0 homepage-text-black ${
+            isHomepage || isLightMode
+              ? "!text-black"
+              : "text-white dark:text-white"
+          }`}
+        >
           Mediumish
         </Link>
 
         {/* Search Bar */}
         <form onSubmit={handleSearch} className="flex-1 max-w-md mx-4">
           <div className="relative" ref={searchContainerRef}>
-            <Search 
+            <Search
               className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${
                 isHomepage || isLightMode
                   ? `text-gray-400 ${isSearchFocused ? "text-gray-500" : ""}`
@@ -137,46 +149,64 @@ export function SiteHeader() {
                   : "border-slate-600 bg-slate-800/50 text-white placeholder:text-slate-400 focus:ring-slate-500 focus:border-slate-500 dark:border-slate-600 dark:bg-slate-800/50 dark:text-white dark:placeholder:text-slate-400 dark:focus:ring-slate-500 dark:focus:border-slate-500"
               }`}
             />
-            
+
             {/* Search Results Dropdown */}
             {showDropdown && (
-              <div className={`absolute top-full left-0 right-0 mt-1.5 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto ${
-                isHomepage
-                  ? "bg-white border border-gray-200"
-                  : "bg-slate-800 border border-slate-700 dark:bg-slate-800 dark:border-slate-700 bg-white border-gray-200"
-              }`}>
-                {/* Arrow pointing up */}
-                <div className={`absolute -top-1.5 left-6 w-3 h-3 rotate-45 ${
+              <div
+                className={`absolute top-full left-0 right-0 mt-1.5 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto ${
                   isHomepage
-                    ? "bg-white border-l border-t border-gray-200"
-                    : "bg-slate-800 border-l border-t border-slate-700 dark:bg-slate-800 dark:border-slate-700 bg-white border-gray-200"
-                }`}></div>
-                
+                    ? "bg-white border border-gray-200"
+                    : "bg-slate-800 border border-slate-700 dark:bg-slate-800 dark:border-slate-700 bg-white border-gray-200"
+                }`}
+              >
+                {/* Arrow pointing up */}
+                <div
+                  className={`absolute -top-1.5 left-6 w-3 h-3 rotate-45 ${
+                    isHomepage
+                      ? "bg-white border-l border-t border-gray-200"
+                      : "bg-slate-800 border-l border-t border-slate-700 dark:bg-slate-800 dark:border-slate-700 bg-white border-gray-200"
+                  }`}
+                ></div>
+
                 {searchResults === undefined ? (
-                  <div className={`px-4 py-3 text-sm ${
-                    isHomepage ? "text-gray-500" : "text-slate-400 dark:text-slate-400 text-gray-500"
-                  }`}>
+                  <div
+                    className={`px-4 py-3 text-sm ${
+                      isHomepage
+                        ? "text-gray-500"
+                        : "text-slate-400 dark:text-slate-400 text-gray-500"
+                    }`}
+                  >
                     Searching...
                   </div>
                 ) : searchResults.length === 0 ? (
-                  <div className={`px-4 py-3 text-sm ${
-                    isHomepage ? "text-gray-500" : "text-slate-400 dark:text-slate-400 text-gray-500"
-                  }`}>
+                  <div
+                    className={`px-4 py-3 text-sm ${
+                      isHomepage
+                        ? "text-gray-500"
+                        : "text-slate-400 dark:text-slate-400 text-gray-500"
+                    }`}
+                  >
                     No posts found
                   </div>
                 ) : (
                   <div className="py-1">
-                    <div className={`px-4 py-2 text-xs font-semibold uppercase tracking-wider border-b ${
-                      isHomepage
-                        ? "text-gray-500 border-gray-200"
-                        : "text-slate-400 border-slate-700 dark:text-slate-400 dark:border-slate-700 text-gray-500 border-gray-200"
-                    }`}>
+                    <div
+                      className={`px-4 py-2 text-xs font-semibold uppercase tracking-wider border-b ${
+                        isHomepage
+                          ? "text-gray-500 border-gray-200"
+                          : "text-slate-400 border-slate-700 dark:text-slate-400 dark:border-slate-700 text-gray-500 border-gray-200"
+                      }`}
+                    >
                       Posts
                     </div>
                     {searchResults.slice(0, 3).map((post) => (
                       <button
                         key={post._id}
-                        onClick={() => handleResultClick(post.slug || generateSlug(post.title))}
+                        onClick={() =>
+                          handleResultClick(
+                            post.slug || generateSlug(post.title),
+                          )
+                        }
                         className={`w-full text-left px-4 py-2.5 transition-colors ${
                           isHomepage
                             ? "hover:bg-gray-100"
@@ -188,39 +218,62 @@ export function SiteHeader() {
                             user={
                               post.author
                                 ? {
-                                    _id: post.author._id,
+                                    _id: post.author._id as string,
                                     name: post.author.name,
                                     image: post.author.image,
                                     email: undefined,
                                     username: post.author.username,
-                                  } as any
+                                  }
                                 : null
                             }
                             size="sm"
                           />
                           <div className="flex flex-col gap-1">
-                            <div className={`font-medium text-sm line-clamp-1 ${
-                              isHomepage || isLightMode
-                                ? "text-gray-900"
-                                : "text-white dark:text-white"
-                            }`}>
+                            <div
+                              className={`font-medium text-sm line-clamp-1 ${
+                                isHomepage || isLightMode
+                                  ? "text-gray-900"
+                                  : "text-white dark:text-white"
+                              }`}
+                            >
                               {post.title}
                             </div>
-                            <div className={`flex items-center gap-2 text-xs ${
-                              isHomepage || isLightMode
-                                ? "text-gray-500"
-                                : "text-slate-400 dark:text-slate-400"
-                            }`}>
-                              <span className={`font-medium ${
+                            <div
+                              className={`flex items-center gap-2 text-xs ${
                                 isHomepage || isLightMode
-                                  ? "text-gray-700"
-                                  : "text-slate-300 dark:text-slate-300"
-                              }`}>
+                                  ? "text-gray-500"
+                                  : "text-slate-400 dark:text-slate-400"
+                              }`}
+                            >
+                              <span
+                                className={`font-medium ${
+                                  isHomepage || isLightMode
+                                    ? "text-gray-700"
+                                    : "text-slate-300 dark:text-slate-300"
+                                }`}
+                              >
                                 {post.author?.name || "Anonymous"}
                               </span>
-                              <span className={isHomepage || isLightMode ? "text-gray-400" : "text-slate-600 dark:text-slate-600"}>•</span>
-                              <span className={isHomepage || isLightMode ? "text-gray-500" : "text-slate-400 dark:text-slate-400"}>
-                                {format(new Date(post.createdAt), "MMM d, yyyy")}
+                              <span
+                                className={
+                                  isHomepage || isLightMode
+                                    ? "text-gray-400"
+                                    : "text-slate-600 dark:text-slate-600"
+                                }
+                              >
+                                •
+                              </span>
+                              <span
+                                className={
+                                  isHomepage || isLightMode
+                                    ? "text-gray-500"
+                                    : "text-slate-400 dark:text-slate-400"
+                                }
+                              >
+                                {format(
+                                  new Date(post.createdAt),
+                                  "MMM d, yyyy",
+                                )}
                               </span>
                             </div>
                           </div>
@@ -246,11 +299,11 @@ export function SiteHeader() {
           </div>
         </form>
 
-        <nav className={`flex items-center gap-6 text-sm font-medium flex-shrink-0 ${
-          isHomepage || isLightMode
-            ? "text-gray-600"
-            : "text-white"
-        }`}>
+        <nav
+          className={`flex items-center gap-6 text-sm font-medium flex-shrink-0 ${
+            isHomepage || isLightMode ? "text-gray-600" : "text-white"
+          }`}
+        >
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -273,8 +326,8 @@ export function SiteHeader() {
             <ProfileMenu user={user} />
           ) : (
             // Show sign in / sign up button when not authenticated
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className={`rounded-full ${
                 isHomepage
                   ? "border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
@@ -290,7 +343,3 @@ export function SiteHeader() {
     </header>
   );
 }
-
-
-
-

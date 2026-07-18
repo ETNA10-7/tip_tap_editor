@@ -50,10 +50,10 @@ bun dev
 
 ### Terminal Layout
 
-| Terminal | Command            | Purpose                       |
-|----------|--------------------|------------------------------ |
-| 1        | `bunx convex dev`  | Convex backend (keep running) |
-| 2        | `bun dev`          | Next.js frontend              |
+| Terminal | Command           | Purpose                       |
+| -------- | ----------------- | ----------------------------- |
+| 1        | `bunx convex dev` | Convex backend (keep running) |
+| 2        | `bun dev`         | Next.js frontend              |
 
 ---
 

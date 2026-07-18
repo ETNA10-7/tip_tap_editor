@@ -56,72 +56,76 @@ export default function Home() {
   return (
     <>
       {/* Leafy light green background overlay for homepage only */}
-      <div 
+      <div
         className="fixed inset-0 -z-10"
-        style={{ backgroundColor: 'var(--leafy-green, #B8DB80)' }}
+        style={{ backgroundColor: "var(--leafy-green, #B8DB80)" }}
       />
       <div className="space-y-10 relative z-0">
-      {/* Profile Setup Prompt - Shows for authenticated users who haven't set up their profile */}
-      <ProfileSetupPrompt />
+        {/* Profile Setup Prompt - Shows for authenticated users who haven't set up their profile */}
+        <ProfileSetupPrompt />
 
-      <section className="grid gap-8 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 px-8 py-12 text-white shadow-lg">
-        <div className="space-y-4">
-          <p className="text-sm uppercase tracking-[0.2em] text-slate-300">
-            TipTap + Convex + Next.js
-          </p>
-          <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
-            Publish beautiful stories with a clean, Medium-like experience.
-          </h1>
-          <p className="max-w-3xl text-lg text-slate-200">
-            A minimal editor-first blog starter. Write with TipTap, store posts
-            in Convex, and ship fast on the Next.js App Router.
-          </p>
-          <div className="flex flex-wrap gap-3 pt-1">
-            <Link
-              href="/create"
-              className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black shadow-md transition hover:-translate-y-0.5 hover:shadow-lg hover:bg-slate-100"
-            >
-              Start writing
-            </Link>
+        <section className="grid gap-8 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 px-8 py-12 text-white shadow-lg">
+          <div className="space-y-4">
+            <p className="text-sm uppercase tracking-[0.2em] text-slate-300">
+              TipTap + Convex + Next.js
+            </p>
+            <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
+              Publish beautiful stories with a clean, Medium-like experience.
+            </h1>
+            <p className="max-w-3xl text-lg text-slate-200">
+              A minimal editor-first blog starter. Write with TipTap, store
+              posts in Convex, and ship fast on the Next.js App Router.
+            </p>
+            <div className="flex flex-wrap gap-3 pt-1">
+              <Link
+                href="/create"
+                className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black shadow-md transition hover:-translate-y-0.5 hover:shadow-lg hover:bg-slate-100"
+              >
+                Start writing
+              </Link>
+              <Link
+                href="/posts"
+                className="rounded-full border-2 border-white/60 bg-white/10 backdrop-blur-sm px-5 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/20 hover:border-white/80"
+              >
+                Browse posts
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold !text-black">Latest posts</h2>
             <Link
               href="/posts"
-              className="rounded-full border-2 border-white/60 bg-white/10 backdrop-blur-sm px-5 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/20 hover:border-white/80"
+              className="inline-flex items-center text-sm font-medium text-blue-700 hover:text-blue-800 hover:underline transition-colors"
             >
-              Browse posts
+              View all →
             </Link>
           </div>
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold !text-black">Latest posts</h2>
-          <Link href="/posts" className="inline-flex items-center text-sm font-medium text-blue-700 hover:text-blue-800 hover:underline transition-colors">
-            View all →
-          </Link>
-        </div>
-        {latest.length === 0 ? (
-          <p className="text-slate-400">
-            No posts yet. Be the first to{" "}
-            <Link href="/create" className="underline text-blue-700 hover:text-blue-800">
-              write one
-            </Link>
-            .
-          </p>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {latest.map((post) => (
-              <PostCard key={post._id} post={post} isHomepage={true} />
-            ))}
-          </div>
-        )}
-      </section>
+          {latest.length === 0 ? (
+            <p className="text-slate-400">
+              No posts yet. Be the first to{" "}
+              <Link
+                href="/create"
+                className="underline text-blue-700 hover:text-blue-800"
+              >
+                write one
+              </Link>
+              .
+            </p>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {latest.map((post) => (
+                <PostCard key={post._id} post={post} isHomepage={true} />
+              ))}
+            </div>
+          )}
+        </section>
       </div>
     </>
   );
 }
-
-
 
 // const notes = useQuery(api.query.getNotes);
 
@@ -137,7 +141,6 @@ export default function Home() {
 //         ))}
 //       </ul>
 //     </div>
-
 
 // <ul className="list-disc ml-6">
 //         {notes?.map((note) => (

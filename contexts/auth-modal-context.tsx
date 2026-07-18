@@ -9,7 +9,9 @@ interface AuthModalContextType {
   mode: "login" | "signup";
 }
 
-const AuthModalContext = createContext<AuthModalContextType | undefined>(undefined);
+const AuthModalContext = createContext<AuthModalContextType | undefined>(
+  undefined,
+);
 
 export function AuthModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,12 +42,3 @@ export function useAuthModal() {
   }
   return context;
 }
-
-
-
-
-
-
-
-
-

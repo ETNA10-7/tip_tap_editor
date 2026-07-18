@@ -23,7 +23,10 @@ export default function AuthPage() {
   const [success, setSuccess] = useState(false);
 
   // Get redirect destination from URL params or default to home page
-  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const searchParams =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search)
+      : null;
   const redirectTo = searchParams?.get("redirect") || "/";
 
   // Route when user is already authenticated (e.g., visiting /auth while logged in)
@@ -31,7 +34,9 @@ export default function AuthPage() {
   useEffect(() => {
     if (!isLoading && user) {
       // User exists in database - route to destination
-      console.log("[AuthPage] ✅ User already authenticated and exists in database:");
+      console.log(
+        "[AuthPage] ✅ User already authenticated and exists in database:",
+      );
       console.log("[AuthPage] User info:", {
         email: user.email,
         name: user.name,
@@ -56,62 +61,77 @@ export default function AuthPage() {
         flow: mode === "login" ? "signIn" : "signUp",
         email: email.trim().toLowerCase(),
         password,
-        ...(mode === "signup" && username.trim() ? { username: username.trim() } : {}),
+        ...(mode === "signup" && username.trim()
+          ? { username: username.trim() }
+          : {}),
       });
 
       if (result.signingIn) {
         // Success! The session token is stored in localStorage
         console.log("[AuthPage] ✅ Sign-in successful, session stored");
-        
+
         // Check if session is stored (for debugging)
         if (typeof window !== "undefined") {
           const allKeys = Object.keys(localStorage);
-          const sessionKeys = allKeys.filter(key => 
-            key.toLowerCase().includes("convex") || 
-            key.toLowerCase().includes("auth") || 
-            key.toLowerCase().includes("session") || 
-            key.toLowerCase().includes("token")
+          const sessionKeys = allKeys.filter(
+            (key) =>
+              key.toLowerCase().includes("convex") ||
+              key.toLowerCase().includes("auth") ||
+              key.toLowerCase().includes("session") ||
+              key.toLowerCase().includes("token"),
           );
           console.log("[AuthPage] Session keys in localStorage:", sessionKeys);
-          
+
           if (sessionKeys.length > 0) {
-            console.log("[AuthPage] ✅ Session tokens found, reloading page to establish session...");
+            console.log(
+              "[AuthPage] ✅ Session tokens found, reloading page to establish session...",
+            );
           }
         }
-        
+
         // CRITICAL: Force a full page reload to ensure ConvexAuthProvider picks up the session token
         // The Convex client needs to read the session token from localStorage on initialization
         // This ensures the session token is sent with all subsequent queries
         // Without this reload, queries continue to run without the session token
         setSuccess(true);
         setLoading(false);
-        
+
         // CRITICAL: Reload page immediately to ensure ConvexAuthProvider reads tokens from localStorage
         // ConvexAuthProvider reads tokens on initialization, so we need a fresh page load
         // The delay ensures localStorage write is complete
         setTimeout(() => {
-          console.log("[AuthPage] Reloading page to establish session and route to:", redirectTo);
+          console.log(
+            "[AuthPage] Reloading page to establish session and route to:",
+            redirectTo,
+          );
           // Force full page reload - this ensures ConvexAuthProvider initializes with tokens
           window.location.href = redirectTo;
         }, 200);
-        
+
         return;
       }
     } catch (err) {
       console.error("Auth error:", err);
-      let message = err instanceof Error ? err.message : `Failed to ${mode === "login" ? "sign in" : "sign up"}.`;
-      
+      let message =
+        err instanceof Error
+          ? err.message
+          : `Failed to ${mode === "login" ? "sign in" : "sign up"}.`;
+
       // Provide user-friendly error messages
       if (message.includes("InvalidSecret")) {
-        message = "Invalid email or password. Please check your credentials and try again.";
+        message =
+          "Invalid email or password. Please check your credentials and try again.";
       } else if (message.includes("InvalidAccountId")) {
         message = "Account not found. Please sign up first.";
       } else if (message.includes("already exists")) {
         message = "Account already exists. Please sign in instead.";
-      } else if (message.includes("invalid password") || message.includes("password")) {
+      } else if (
+        message.includes("invalid password") ||
+        message.includes("password")
+      ) {
         message = "Password must be at least 8 characters long.";
       }
-      
+
       setError(message);
     } finally {
       setLoading(false);
@@ -134,7 +154,9 @@ export default function AuthPage() {
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center space-y-2">
           <p className="text-muted-foreground">Authentication successful!</p>
-          <p className="text-sm text-muted-foreground">Validating session and redirecting...</p>
+          <p className="text-sm text-muted-foreground">
+            Validating session and redirecting...
+          </p>
         </div>
       </div>
     );
@@ -211,7 +233,11 @@ export default function AuthPage() {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
               >
-                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
               </button>
             </div>
             {mode === "signup" && (
@@ -232,11 +258,14 @@ export default function AuthPage() {
             <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
               <p className="font-medium">Error</p>
               <p>{error}</p>
-              {mode === "login" && error.includes("Invalid email or password") && (
-                <p className="mt-2 text-xs">
-                  Don't remember your password? Try signing up with a new account or use the email you signed up with.
-                </p>
-              )}
+              {mode === "login" &&
+                error.includes("Invalid email or password") && (
+                  <p className="mt-2 text-xs">
+                    {
+                      "Don't remember your password? Try signing up with a new account or use the email you signed up with."
+                    }
+                  </p>
+                )}
             </div>
           )}
 
@@ -258,7 +287,7 @@ export default function AuthPage() {
         <div className="text-center text-sm text-muted-foreground">
           {mode === "login" ? (
             <>
-              Don&apos;t have an account?{" "}
+              {" Don't have an account?"}
               <button
                 type="button"
                 onClick={() => {
@@ -288,7 +317,10 @@ export default function AuthPage() {
         </div>
 
         <div className="text-center">
-          <Link href="/" className="text-sm text-muted-foreground hover:underline">
+          <Link
+            href="/"
+            className="text-sm text-muted-foreground hover:underline"
+          >
             ← Back to home
           </Link>
         </div>
@@ -296,4 +328,3 @@ export default function AuthPage() {
     </div>
   );
 }
-

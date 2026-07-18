@@ -25,11 +25,13 @@ export const toggleClap = mutation({
     // Check if user already clapped
     const existingClap = await ctx.db
       .query("postClaps")
-      .withIndex("postId_userId", (q: any) => q.eq("postId", args.postId).eq("userId", userId))
+      .withIndex("postId_userId", (q) =>
+        q.eq("postId", args.postId).eq("userId", userId),
+      )
       .first();
 
     const currentClaps = post.claps ?? 0;
-    
+
     if (existingClap) {
       // User already clapped - remove the clap (unlike)
       await ctx.db.delete(existingClap._id);
@@ -69,7 +71,9 @@ export const hasClapped = query({
 
     const clap = await ctx.db
       .query("postClaps")
-      .withIndex("postId_userId", (q: any) => q.eq("postId", args.postId).eq("userId", userId))
+      .withIndex("postId_userId", (q) =>
+        q.eq("postId", args.postId).eq("userId", userId),
+      )
       .first();
 
     return !!clap;
@@ -99,7 +103,9 @@ export const toggleBookmark = mutation({
     // Check if user already bookmarked
     const existingBookmark = await ctx.db
       .query("bookmarks")
-      .withIndex("postId_userId", (q: any) => q.eq("postId", args.postId).eq("userId", userId))
+      .withIndex("postId_userId", (q) =>
+        q.eq("postId", args.postId).eq("userId", userId),
+      )
       .first();
 
     if (existingBookmark) {
@@ -133,7 +139,9 @@ export const hasBookmarked = query({
 
     const bookmark = await ctx.db
       .query("bookmarks")
-      .withIndex("postId_userId", (q: any) => q.eq("postId", args.postId).eq("userId", userId))
+      .withIndex("postId_userId", (q) =>
+        q.eq("postId", args.postId).eq("userId", userId),
+      )
       .first();
 
     return !!bookmark;
@@ -150,9 +158,9 @@ export const getCommentCount = query({
   handler: async (ctx, args) => {
     const comments = await ctx.db
       .query("comments")
-      .withIndex("postId", (q: any) => q.eq("postId", args.postId))
+      .withIndex("postId", (q) => q.eq("postId", args.postId))
       .collect();
-    
+
     return comments.length;
   },
 });
@@ -171,7 +179,7 @@ export const getBookmarkedPosts = query({
     // Get all bookmarks for this user
     const bookmarks = await ctx.db
       .query("bookmarks")
-      .withIndex("userId", (q: any) => q.eq("userId", userId))
+      .withIndex("userId", (q) => q.eq("userId", userId))
       .collect();
 
     // Sort by createdAt descending (most recent first)
@@ -199,11 +207,10 @@ export const getBookmarkedPosts = query({
           author: authorInfo,
           bookmarkedAt: bookmark.createdAt,
         };
-      })
+      }),
     );
 
     // Filter out null posts and return
     return posts.filter((p): p is NonNullable<typeof p> => p !== null);
   },
 });
-

@@ -124,8 +124,8 @@ export const toggleClap = mutation({
     // Check if user already clapped
     const existingClap = await ctx.db
       .query("commentClaps")
-      .withIndex("commentId_userId", (q: any) =>
-        q.eq("commentId", args.id).eq("userId", userId)
+      .withIndex("commentId_userId", (q) =>
+        q.eq("commentId", args.id).eq("userId", userId),
       )
       .first();
 
@@ -166,8 +166,8 @@ export const hasClapped = query({
 
     const clap = await ctx.db
       .query("commentClaps")
-      .withIndex("commentId_userId", (q: any) =>
-        q.eq("commentId", args.commentId).eq("userId", userId)
+      .withIndex("commentId_userId", (q) =>
+        q.eq("commentId", args.commentId).eq("userId", userId),
       )
       .first();
 
@@ -184,13 +184,15 @@ export const listByPost = query({
     // Get all comments for this post
     const allComments = await ctx.db
       .query("comments")
-      .withIndex("postId", (q: any) => q.eq("postId", args.postId))
+      .withIndex("postId", (q) => q.eq("postId", args.postId))
       .collect();
 
     // Separate top-level comments and replies
-    const topLevelComments = allComments.filter((c) => c.parentId === undefined);
+    const topLevelComments = allComments.filter(
+      (c) => c.parentId === undefined,
+    );
     const repliesMap = new Map<string, typeof allComments>();
-    
+
     // Group replies by parent ID
     allComments.forEach((comment) => {
       if (comment.parentId) {
@@ -206,38 +208,40 @@ export const listByPost = query({
     const userId = await auth.getUserId(ctx);
 
     // Build comment tree with author info and clap status
-    const buildCommentWithReplies = async (comment: typeof allComments[0]) => {
+    const buildCommentWithReplies = async (
+      comment: (typeof allComments)[0],
+    ) => {
       const author = await ctx.db.get(comment.authorId);
       const replies = repliesMap.get(comment._id) || [];
-      
+
       // Check if current user has clapped this comment
       let hasClapped = false;
       if (userId) {
         const clap = await ctx.db
           .query("commentClaps")
-          .withIndex("commentId_userId", (q: any) =>
-            q.eq("commentId", comment._id).eq("userId", userId)
+          .withIndex("commentId_userId", (q) =>
+            q.eq("commentId", comment._id).eq("userId", userId),
           )
           .first();
         hasClapped = !!clap;
       }
-      
+
       const repliesWithAuthors = await Promise.all(
         replies.map(async (reply) => {
           const replyAuthor = await ctx.db.get(reply.authorId);
-          
+
           // Check if current user has clapped this reply
           let replyHasClapped = false;
           if (userId) {
             const replyClap = await ctx.db
               .query("commentClaps")
-              .withIndex("commentId_userId", (q: any) =>
-                q.eq("commentId", reply._id).eq("userId", userId)
+              .withIndex("commentId_userId", (q) =>
+                q.eq("commentId", reply._id).eq("userId", userId),
               )
               .first();
             replyHasClapped = !!replyClap;
           }
-          
+
           return {
             ...reply,
             author: replyAuthor
@@ -250,7 +254,7 @@ export const listByPost = query({
             hasClapped: replyHasClapped,
             replies: [], // Replies don't have nested replies for now
           };
-        })
+        }),
       );
 
       return {
@@ -269,7 +273,7 @@ export const listByPost = query({
 
     // Build all top-level comments with their replies
     const commentsWithAuthors = await Promise.all(
-      topLevelComments.map((comment) => buildCommentWithReplies(comment))
+      topLevelComments.map((comment) => buildCommentWithReplies(comment)),
     );
 
     // Sort by creation date (newest first)
@@ -285,10 +289,9 @@ export const countByPost = query({
   handler: async (ctx, args) => {
     const comments = await ctx.db
       .query("comments")
-      .withIndex("postId", (q: any) => q.eq("postId", args.postId))
+      .withIndex("postId", (q) => q.eq("postId", args.postId))
       .collect();
 
     return comments.length;
   },
 });
-

@@ -23,7 +23,7 @@ export default function SignupPage() {
         email: email.trim().toLowerCase(),
         password,
       });
-      
+
       // Wait a moment for auth state to update, then redirect
       if (result.signingIn) {
         setTimeout(() => {
@@ -33,11 +33,13 @@ export default function SignupPage() {
       }
     } catch (err) {
       console.error(err);
-      const message =
-        err instanceof Error ? err.message : "Failed to sign up.";
+      const message = err instanceof Error ? err.message : "Failed to sign up.";
       if (message.toLowerCase().includes("already exists")) {
         setError("Account already exists. Please log in instead.");
-      } else if (message.toLowerCase().includes("invalid password") || (message.length < 8)) {
+      } else if (
+        message.toLowerCase().includes("invalid password") ||
+        message.length < 8
+      ) {
         setError("Password must be at least 8 characters long.");
       } else {
         setError(message);
@@ -111,7 +113,10 @@ export default function SignupPage() {
 
         <div className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/auth/login" className="font-semibold text-slate-900 hover:underline">
+          <Link
+            href="/auth/login"
+            className="font-semibold text-slate-900 hover:underline"
+          >
             Sign in
           </Link>
         </div>
@@ -119,7 +124,3 @@ export default function SignupPage() {
     </div>
   );
 }
-
-
-
-

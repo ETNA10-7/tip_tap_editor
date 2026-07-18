@@ -21,7 +21,7 @@ import { useAuth } from "@/hooks/useAuth";
  * Get the earliest creation date from user's posts or authAccounts
  * For now, we'll use a placeholder since we don't have join date in users table
  */
-function getJoinDate(user: any): Date | null {
+function getJoinDate(user: unknown): Date | null {
   // If we had a createdAt field in users, we'd use that
   // For now, return null and show nothing
   return null;
@@ -35,7 +35,7 @@ export default function UserProfilePage() {
   // Fetch user by username
   const user = useQuery(
     api.users.getByUsername,
-    username ? { username } : "skip"
+    username ? { username } : "skip",
   );
 
   // Check if viewing own profile
@@ -45,19 +45,14 @@ export default function UserProfilePage() {
   // - If viewing own profile: use listByUser to get all posts (including drafts)
   // - If viewing other user's profile: use listByAuthorId (only published posts)
   const allPosts = useQuery(
-    isOwnProfile
-      ? api.posts.listByUser
-      : api.posts.listByAuthorId,
-    user
-      ? isOwnProfile
-        ? {}
-        : { authorId: user._id }
-      : "skip"
+    isOwnProfile ? api.posts.listByUser : api.posts.listByAuthorId,
+    user ? (isOwnProfile ? {} : { authorId: user._id }) : "skip",
   );
 
   // Separate published and draft posts when viewing own profile
-  const publishedPosts = allPosts?.filter(post => post.published !== false) ?? [];
-  const draftPosts = allPosts?.filter(post => post.published === false) ?? [];
+  const publishedPosts =
+    allPosts?.filter((post) => post.published !== false) ?? [];
+  const draftPosts = allPosts?.filter((post) => post.published === false) ?? [];
 
   // Loading state
   if (user === undefined || allPosts === undefined) {
@@ -81,7 +76,8 @@ export default function UserProfilePage() {
                 User Not Found
               </h1>
               <p className="text-muted-foreground">
-                The user &quot;{username}&quot; does not exist or could not be found.
+                The user &quot;{username}&quot; does not exist or could not be
+                found.
               </p>
               <div className="flex gap-3 justify-center pt-4">
                 <Link href="/posts">
@@ -114,7 +110,7 @@ export default function UserProfilePage() {
             <div className="flex-shrink-0">
               <ProfileAvatar user={user} size="xl" />
             </div>
-            
+
             {/* User Info */}
             <div className="flex-1 space-y-4 min-w-0">
               <div className="space-y-1 min-w-0">
@@ -138,9 +134,7 @@ export default function UserProfilePage() {
               {/* Bio */}
               {user.bio ? (
                 <div className="pt-2">
-                  <p className="text-slate-700 leading-relaxed">
-                    {user.bio}
-                  </p>
+                  <p className="text-slate-700 leading-relaxed">{user.bio}</p>
                 </div>
               ) : (
                 <div className="pt-2">
@@ -187,7 +181,7 @@ export default function UserProfilePage() {
               ) : publishedPosts.length === 0 ? (
                 <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
                   <p className="text-muted-foreground">
-                    You haven't published any posts yet.
+                    You haven&apos;t published any posts yet.
                   </p>
                 </div>
               ) : (
@@ -230,7 +224,7 @@ export default function UserProfilePage() {
               ) : draftPosts.length === 0 ? (
                 <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
                   <p className="text-muted-foreground">
-                    You don't have any drafts yet.
+                    You don&apos;t have any drafts yet.
                   </p>
                 </div>
               ) : (
@@ -257,8 +251,8 @@ export default function UserProfilePage() {
                   {allPosts === undefined
                     ? "Loading posts..."
                     : publishedPosts.length === 0
-                    ? "No posts yet"
-                    : `${publishedPosts.length} ${publishedPosts.length === 1 ? "post" : "posts"} published`}
+                      ? "No posts yet"
+                      : `${publishedPosts.length} ${publishedPosts.length === 1 ? "post" : "posts"} published`}
                 </CardDescription>
               </div>
             </div>
@@ -281,7 +275,8 @@ export default function UserProfilePage() {
                   </div>
                   <div className="space-y-2">
                     <p className="text-slate-700 font-medium">
-                      {user.name || "This user"} hasn't published any posts yet.
+                      {user.name || "This user"} hasn&apos;t published any posts
+                      yet.
                     </p>
                     <p className="text-sm text-muted-foreground">
                       Check back later for new content!
@@ -302,5 +297,3 @@ export default function UserProfilePage() {
     </div>
   );
 }
-
-

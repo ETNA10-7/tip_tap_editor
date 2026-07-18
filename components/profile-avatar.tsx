@@ -12,13 +12,16 @@ import { cn } from "@/lib/utils";
  * @param className - Additional CSS classes
  * @param showFallback - Whether to show fallback initials (default: true)
  */
-type User = {
-  _id: string;
-  name?: string | null;
-  image?: string | null;
-  email?: string | null;
-  username?: string | null;
-} | null | undefined;
+type User =
+  | {
+      _id: string;
+      name?: string | null;
+      image?: string | null;
+      email?: string | null;
+      username?: string | null;
+    }
+  | null
+  | undefined;
 
 interface ProfileAvatarProps {
   user: User;
@@ -45,7 +48,9 @@ function getInitials(name: string | null | undefined): string {
     return trimmed.charAt(0).toUpperCase();
   } else {
     // Multiple words: return first letter of first and last word
-    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+    return (
+      parts[0].charAt(0) + parts[parts.length - 1].charAt(0)
+    ).toUpperCase();
   }
 }
 
@@ -88,18 +93,18 @@ export function ProfileAvatar({
     for (let i = 0; i < text.length; i++) {
       hash = text.charCodeAt(i) + ((hash << 5) - hash);
     }
-    
+
     return `text-white`;
   };
 
   const getAvatarStyle = (text: string): React.CSSProperties | undefined => {
     if (hasImage) return undefined;
-    
+
     let hash = 0;
     for (let i = 0; i < text.length; i++) {
       hash = text.charCodeAt(i) + ((hash << 5) - hash);
     }
-    
+
     // Color palette: Only Red, Green, Blue, Black, and Grey shades
     const colors = [
       { from: "rgb(59, 130, 246)", to: "rgb(37, 99, 235)" }, // Blue
@@ -112,17 +117,17 @@ export function ProfileAvatar({
       { from: "rgb(107, 114, 128)", to: "rgb(75, 85, 99)" }, // Grey Matte
       { from: "rgb(156, 163, 175)", to: "rgb(107, 114, 128)" }, // Light Grey Matte
     ];
-    
+
     const index = Math.abs(hash) % colors.length;
     const color = colors[index];
-    
+
     return {
       background: `linear-gradient(to bottom right, ${color.from}, ${color.to})`,
     };
   };
 
-  const avatarColor = hasImage 
-    ? "" 
+  const avatarColor = hasImage
+    ? ""
     : getAvatarColor(user?.name || user?.email || "?");
   const avatarStyle = getAvatarStyle(user?.name || user?.email || "?");
 
@@ -134,7 +139,7 @@ export function ProfileAvatar({
         "transition-all duration-200",
         sizeClass,
         hasImage ? "" : avatarColor,
-        className
+        className,
       )}
       style={avatarStyle}
       role="img"
@@ -158,4 +163,3 @@ export function ProfileAvatar({
     </div>
   );
 }
-

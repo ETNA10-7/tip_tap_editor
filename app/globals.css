@@ -48,7 +48,7 @@
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   /* Leafy light green for homepage - soft, easy on the eyes */
-  --leafy-green: #B8DB80;
+  --leafy-green: #b8db80;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -118,7 +118,7 @@
   * {
     @apply border-border outline-ring/50;
   }
-  
+
   /* Default light theme styles */
   body {
     color: #1f2937;
@@ -130,46 +130,64 @@
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
   }
-  
+
   html {
     scroll-behavior: smooth;
     /* Enable hardware acceleration for scrolling */
     -webkit-overflow-scrolling: touch;
   }
-  
+
   main {
     position: relative;
     z-index: 1;
     color: #1f2937;
   }
-  
+
   /* Light theme text colors */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     color: #111827;
   }
-  
-  p, span, div, label, li {
+
+  p,
+  span,
+  div,
+  label,
+  li {
     color: #4b5563;
   }
-  
+
   /* Dark theme overrides */
   .dark body {
     color: #ffffff;
     background: #0f0f0f;
   }
-  
+
   .dark main {
     color: #ffffff;
   }
-  
-  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+
+  .dark h1,
+  .dark h2,
+  .dark h3,
+  .dark h4,
+  .dark h5,
+  .dark h6 {
     color: #ffffff !important;
   }
-  
-  .dark p, .dark span, .dark div, .dark label, .dark li {
+
+  .dark p,
+  .dark span,
+  .dark div,
+  .dark label,
+  .dark li {
     color: #e5e5e5;
   }
-  
+
   /* Allow white background buttons to have black text */
   a.bg-white,
   button.bg-white,
@@ -177,77 +195,88 @@
   .bg-white button {
     color: #000000 !important;
   }
-  
+
   /* Override text colors for dark theme */
-  .dark .text-slate-900, .dark .text-slate-800, .dark .text-slate-700, .dark .text-slate-600, .dark .text-slate-500 {
+  .dark .text-slate-900,
+  .dark .text-slate-800,
+  .dark .text-slate-700,
+  .dark .text-slate-600,
+  .dark .text-slate-500 {
     color: #e5e5e5 !important;
   }
-  
-  .dark .text-gray-900, .dark .text-gray-800, .dark .text-gray-700, .dark .text-gray-600, .dark .text-gray-500 {
+
+  .dark .text-gray-900,
+  .dark .text-gray-800,
+  .dark .text-gray-700,
+  .dark .text-gray-600,
+  .dark .text-gray-500 {
     color: #e5e5e5 !important;
   }
-  
-  .dark .text-black:not(.bg-white):not([class*="bg-white"]):not(.homepage-override):not(.profile-dropdown):not(.profile-dropdown *) {
+
+  .dark
+    .text-black:not(.bg-white):not([class*="bg-white"]):not(
+      .homepage-override
+    ):not(.profile-dropdown):not(.profile-dropdown *) {
     color: #ffffff !important;
   }
-  
+
   /* Homepage header overrides - ensure text stays black */
   header.homepage-header .homepage-text-black,
   header.homepage-header a[href="/"],
   header.homepage-header a.text-black {
     color: #000000 !important;
   }
-  
+
   header.homepage-header input.homepage-search-input,
   header.homepage-header input[type="text"] {
     color: #000000 !important;
     caret-color: #000000 !important;
   }
-  
+
   /* Navigation links on homepage header */
   header.homepage-header nav a {
     color: #1f2937 !important;
   }
-  
+
   header.homepage-header nav a:hover {
     color: #000000 !important;
   }
-  
+
   /* Profile dropdown text on homepage */
   .homepage-dropdown p.text-black,
   .homepage-dropdown p[class*="text-black"],
   .homepage-dropdown p {
     color: #000000 !important;
   }
-  
+
   .homepage-dropdown p.text-gray-700 {
     color: #374151 !important;
   }
-  
+
   /* Homepage section headings */
   section h2.text-black,
   section h2[class*="text-black"] {
     color: #000000 !important;
   }
-  
+
   /* Ensure search icon is white in dark mode (non-homepage) */
   header:not(.homepage-header) .dark svg.text-white,
   header:not(.homepage-header) svg.text-white {
     color: #ffffff !important;
   }
-  
+
   /* Ensure navigation links are white in dark mode (non-homepage) */
   header:not(.homepage-header) nav.text-white,
   header:not(.homepage-header) nav.text-white a {
     color: #ffffff !important;
   }
-  
+
   /* Profile dropdown - Always white background with dark text */
   .profile-dropdown,
   .profile-dropdown * {
     color: #000000 !important;
   }
-  
+
   /* Override any dark mode rules for profile dropdown - ensure ALL text is black */
   .dark .profile-dropdown,
   .dark .profile-dropdown *,
@@ -257,7 +286,7 @@
   .dark .profile-dropdown .text-black {
     color: #000000 !important;
   }
-  
+
   /* Specifically target profile dropdown username - highest priority */
   .profile-dropdown-name,
   .profile-dropdown .profile-dropdown-name,
@@ -272,43 +301,43 @@
     color: #000000 !important;
     font-weight: 600 !important;
   }
-  
+
   .profile-dropdown-email {
     color: #4b5563 !important;
   }
-  
+
   .profile-dropdown button {
     color: #374151 !important;
   }
-  
+
   .profile-dropdown button.text-red-600,
   .profile-dropdown button .text-red-600 {
     color: #dc2626 !important;
   }
-  
+
   .profile-dropdown svg.text-gray-700 {
     color: #374151 !important;
   }
-  
+
   .profile-dropdown svg.text-red-600 {
     color: #dc2626 !important;
   }
-  
+
   .profile-dropdown:hover button {
     color: #374151 !important;
   }
-  
+
   /* White background elements should have black text */
   .bg-white,
   [class*="bg-white"] {
     color: #000000 !important;
   }
-  
+
   .bg-white *,
   [class*="bg-white"] * {
     color: #000000 !important;
   }
-  
+
   /* Override dark mode text-black for white backgrounds */
   .dark .bg-white.text-black,
   .dark .bg-white .text-black,
@@ -318,22 +347,24 @@
   .dark [class*="bg-white"] p.text-black {
     color: #000000 !important;
   }
-  
+
   /* Override muted text */
   .text-muted-foreground {
     color: #6b7280 !important;
   }
-  
+
   .dark .text-muted-foreground {
     color: #a3a3a3 !important;
   }
-  
+
   /* Ensure borders are visible */
-  .border-slate-200, .border-slate-300 {
+  .border-slate-200,
+  .border-slate-300 {
     border-color: #e5e7eb !important;
   }
-  
-  .dark .border-slate-200, .dark .border-slate-300 {
+
+  .dark .border-slate-200,
+  .dark .border-slate-300 {
     border-color: rgba(255, 255, 255, 0.2) !important;
   }
 }

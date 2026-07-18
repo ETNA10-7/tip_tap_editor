@@ -32,13 +32,15 @@ function getPostSlug(post: Post): string {
     return post.slug;
   }
   // Fallback: generate slug from title (client-side)
-  return post.title
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "") || "post";
+  return (
+    post.title
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "post"
+  );
 }
 
 /**
@@ -47,12 +49,12 @@ function getPostSlug(post: Post): string {
  */
 function getAuthorUsername(author: Author): string {
   if (!author) return "anonymous";
-  
+
   // Use stored username if available
   if (author.username) {
     return author.username;
   }
-  
+
   // Generate from name if available
   if (author.name) {
     const username = author.name
@@ -64,29 +66,39 @@ function getAuthorUsername(author: Author): string {
       .replace(/^-+|-+$/g, "");
     return username || "user";
   }
-  
+
   // Fallback: use a portion of the user ID (convert to string first)
   const userIdStr = String(author._id);
   return userIdStr.slice(-8); // Use last 8 characters as fallback
 }
 
-export function PostCard({ post, isHomepage = false }: { post: Post; isHomepage?: boolean }) {
+export function PostCard({
+  post,
+  isHomepage = false,
+}: {
+  post: Post;
+  isHomepage?: boolean;
+}) {
   const slug = getPostSlug(post);
   const { theme } = useTheme();
   const isLightMode = theme === "light" && !isHomepage;
   const useLightStyling = isHomepage || isLightMode;
-  
+
   return (
-    <article className={`group rounded-xl border overflow-hidden shadow-sm transition-all hover:shadow-lg hover:-translate-y-1 ${
-      useLightStyling
-        ? "border-gray-200 bg-white"
-        : "border-slate-700 bg-slate-800/50 backdrop-blur-sm"
-    }`}>
+    <article
+      className={`group rounded-xl border overflow-hidden shadow-sm transition-all hover:shadow-lg hover:-translate-y-1 ${
+        useLightStyling
+          ? "border-gray-200 bg-white"
+          : "border-slate-700 bg-slate-800/50 backdrop-blur-sm"
+      }`}
+    >
       {post.featuredImage && (
         <Link href={`/posts/${slug}`} className="block">
-          <div className={`relative w-full h-48 overflow-hidden ${
-            useLightStyling ? "bg-gray-100" : "bg-slate-100"
-          }`}>
+          <div
+            className={`relative w-full h-48 overflow-hidden ${
+              useLightStyling ? "bg-gray-100" : "bg-slate-100"
+            }`}
+          >
             <img
               src={post.featuredImage}
               alt={post.title}
@@ -106,18 +118,22 @@ export function PostCard({ post, isHomepage = false }: { post: Post; isHomepage?
             className="flex items-center gap-2 mb-3 hover:opacity-80 transition-opacity"
           >
             <ProfileAvatar user={post.author} size="sm" />
-            <span className={`text-sm font-medium ${
-              useLightStyling ? "!text-black" : "text-slate-300"
-            }`}>
+            <span
+              className={`text-sm font-medium ${
+                useLightStyling ? "!text-black" : "text-slate-300"
+              }`}
+            >
               {post.author.name}
             </span>
           </Link>
         )}
-        
+
         <div className="flex items-center gap-2 mb-2">
-          <div className={`text-xs uppercase tracking-wide ${
-            useLightStyling ? "!text-black" : "text-muted-foreground"
-          }`}>
+          <div
+            className={`text-xs uppercase tracking-wide ${
+              useLightStyling ? "!text-black" : "text-muted-foreground"
+            }`}
+          >
             {format(new Date(post.createdAt), "PP")}
           </div>
           {post.published === false && (
@@ -130,16 +146,18 @@ export function PostCard({ post, isHomepage = false }: { post: Post; isHomepage?
           href={`/posts/${slug}`}
           className={`block text-xl font-bold leading-tight transition-colors ${
             useLightStyling
-              ? "!text-black hover:text-gray-700" 
+              ? "!text-black hover:text-gray-700"
               : "text-white hover:text-slate-200"
           }`}
         >
           {post.title}
         </Link>
         {post.excerpt ? (
-          <p className={`mt-2 text-sm line-clamp-3 leading-relaxed ${
-            useLightStyling ? "!text-black" : "text-slate-300"
-          }`}>
+          <p
+            className={`mt-2 text-sm line-clamp-3 leading-relaxed ${
+              useLightStyling ? "!text-black" : "text-slate-300"
+            }`}
+          >
             {post.excerpt}
           </p>
         ) : null}
@@ -157,7 +175,3 @@ export function PostCard({ post, isHomepage = false }: { post: Post; isHomepage?
     </article>
   );
 }
-
-
-
-
