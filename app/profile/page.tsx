@@ -5,7 +5,6 @@ import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/hooks/useAuth";
 import { ProfileAvatar } from "@/components/profile-avatar";
 import { PostCard } from "@/components/post-card";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,7 +21,6 @@ import { useTheme } from "@/contexts/theme-context";
 
 export default function ProfilePage() {
   const { user, isLoading, isAuthenticated } = useAuth();
-  const router = useRouter();
   const { openModal } = useAuthModal();
   const { theme } = useTheme();
   const isLightMode = theme === "light";

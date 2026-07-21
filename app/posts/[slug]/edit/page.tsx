@@ -7,8 +7,6 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import RichTextEditor from "@/components/rich-text-editor";
-import { ProfileAvatar } from "@/components/profile-avatar";
-import { format } from "date-fns";
 
 export default function PostEditPage() {
   const params = useParams<{ slug: string }>();

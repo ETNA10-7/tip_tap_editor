@@ -20,7 +20,6 @@ import {
   ArrowLeft,
   Save,
   User,
-  Image as ImageIcon,
   FileText,
   AtSign,
   Check,
@@ -46,7 +45,6 @@ export default function EditProfilePage() {
   const [success, setSuccess] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
   const [usernameError, setUsernameError] = useState<string | null>(null);
-  const [checkingUsername, setCheckingUsername] = useState(false);
 
   // Check username availability
   const usernameAvailability = useQuery(

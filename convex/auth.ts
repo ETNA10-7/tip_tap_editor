@@ -23,11 +23,9 @@ const PasswordResetProvider = {
   options: {},
   sendVerificationRequest: async ({
     identifier: email,
-    provider,
     token,
   }: {
     identifier: string;
-    provider: { from: string };
     token: string;
   }) => {
     // DEVELOPMENT: Log to console (check your Convex dashboard logs)

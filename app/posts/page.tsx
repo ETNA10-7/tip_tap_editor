@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/theme-context";
 
 function PostsPage() {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { theme } = useTheme();
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search") || "";

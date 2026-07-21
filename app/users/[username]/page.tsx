@@ -21,9 +21,7 @@ import { useAuth } from "@/hooks/useAuth";
  * Get the earliest creation date from user's posts or authAccounts
  * For now, we'll use a placeholder since we don't have join date in users table
  */
-function getJoinDate(user: unknown): Date | null {
-  // If we had a createdAt field in users, we'd use that
-  // For now, return null and show nothing
+function getJoinDate(): Date | null {
   return null;
 }
 
@@ -98,7 +96,7 @@ export default function UserProfilePage() {
     );
   }
 
-  const joinDate = getJoinDate(user);
+  const joinDate = getJoinDate();
 
   return (
     <div className="space-y-8">

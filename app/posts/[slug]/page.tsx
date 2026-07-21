@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ProfileAvatar } from "@/components/profile-avatar";
 import { PostComments } from "@/components/post-comments";
@@ -66,7 +66,6 @@ function getAuthorUsername(
 
 export default function PostDetailPage() {
   const params = useParams<{ slug: string }>();
-  const router = useRouter();
   const slug = params?.slug as string | undefined;
   const { user } = useAuth();
   const { theme } = useTheme();
@@ -349,8 +348,7 @@ export default function PostDetailPage() {
                           text: result.post.excerpt || result.post.title,
                           url,
                         });
-                      } catch (error) {
-                        // User cancelled or error occurred
+                      } catch {
                         console.log("Share cancelled or failed");
                       }
                     } else {

@@ -1,6 +1,6 @@
 "use client";
 
-import { Image as ImageIcon, Info } from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/contexts/theme-context";
 

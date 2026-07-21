@@ -46,12 +46,10 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { PostCard } from "@/components/post-card";
 import { ProfileSetupPrompt } from "@/components/profile-setup-prompt";
-import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
   const posts = useQuery(api.posts.list) ?? [];
   const latest = posts.slice(0, 3);
-  const { isAuthenticated } = useAuth();
 
   return (
     <>

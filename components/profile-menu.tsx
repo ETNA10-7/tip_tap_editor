@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { ProfileAvatar } from "@/components/profile-avatar";

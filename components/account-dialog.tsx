@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { X, LogOut, LogIn, UserPlus, KeyRound } from "lucide-react";
@@ -16,7 +15,6 @@ type AccountDialogProps = {
 export function AccountDialog({ isOpen, onClose }: AccountDialogProps) {
   const { user, isAuthenticated } = useAuth();
   const { signOut } = useAuthActions();
-  const router = useRouter();
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
 

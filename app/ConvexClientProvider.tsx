@@ -1,7 +1,7 @@
 "use client";
 
 import { ConvexProvider, ConvexReactClient } from "convex/react";
-import { ReactNode, useMemo, useEffect } from "react";
+import { ReactNode, useMemo } from "react";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 
 /**
@@ -21,7 +21,14 @@ export function ConvexClientProvider({ children }: { children: ReactNode }) {
   // Create Convex client - MUST be stable (use useMemo with empty deps)
   // ConvexAuthProvider will automatically read tokens from localStorage and inject them
   const convex = useMemo(() => {
-    const client = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+    const url = process.env.NEXT_PUBLIC_CONVEX_URL;
+    if (!url) {
+      throw new Error(
+        "Missing NEXT_PUBLIC_CONVEX_URL environment variable. " +
+          "Set it in Vercel project settings \u2192 Environment Variables."
+      );
+    }
+    const client = new ConvexReactClient(url);
 
     // Debug: Check if auth tokens exist in localStorage after page load
     if (typeof window !== "undefined") {

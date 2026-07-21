@@ -7,7 +7,7 @@ import { ProfileAvatar } from "@/components/profile-avatar";
 import { format } from "date-fns";
 import { useState } from "react";
 import { Id, Doc } from "@/convex/_generated/dataModel";
-import { ThumbsUp, Reply, MoreVertical } from "lucide-react";
+import { ThumbsUp, Reply } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface PostCommentsProps {
